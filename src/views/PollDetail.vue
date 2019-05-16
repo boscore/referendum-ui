@@ -160,7 +160,7 @@
           </div>
           <div class="card">
             <h2>The conditions for the approved proposal</h2>
-            <p>1. The votes from token holders is not less than 10% of BP votes from token holders when the proposal was initiated.</p>
+            <p>1. The votes from token holders is not less than 40% of BP votes from token holders when the proposal was initiated.</p>
             <p>2. The ratio of approved votes/disapproved is greater than 1.5.</p>
             <p>3. The above conditions last for 20 days.</p>
           </div>
@@ -195,14 +195,13 @@
 import marked from 'marked'
 import Eos from 'eosjs'
 import { Message } from 'element-ui'
-import { NETWORK, API_URL } from '@/assets/constants.js'
+import { NETWORK, API_URL, NODE_ENDPOINT } from '@/assets/constants.js'
 import IEcharts from 'vue-echarts-v3/src/lite.js'
 import 'echarts/lib/chart/pie'
 import 'echarts/lib/component/tooltip'
 import 'echarts/lib/component/title'
 import PropCard from '@/components/PropCard.vue'
 import Comment from '@/components/Comment.vue'
-import { setInterval, clearInterval } from 'timers'
 export default {
   name: 'PollDetail',
   components: {
@@ -559,12 +558,7 @@ export default {
       this.screenWidth = document.body.clientWidth
     })
     this.getProducers()
-    const interv = setInterval(() => {
-      if (this.eos) {
-        this.getAuditors()
-        clearInterval(interv)
-      }
-    }, 1000)
+    this.getAuditors()
   },
   methods: {
     getProposal () {
@@ -614,26 +608,28 @@ export default {
       })
     },
     getAuditors () {
-      if (this.eos) {
-        const tableOptions = {
-          'scope': 'auditor.bos',
-          'code': 'auditor.bos',
-          'table': 'auditors',
-          'json': true
-        }
-        this.eos.getTableRows(tableOptions).then(res => {
-          this.auditorsList = res.rows
-        }).catch(e => {
-          // MessageBox.alert(e, 'Get Auditors ERROR', {
-          //   confirmButtonText: 'OK'
-          // })
-          Message({
-            showClose: true,
-            message: 'Get Auditors ERROR\n' + String(e),
-            type: 'error'
-          })
-        })
+      const tableOptions = {
+        'scope': 'auditor.bos',
+        'code': 'auditor.bos',
+        'table': 'auditors',
+        'json': true
       }
+      this.$axios({
+        method: 'post',
+        url: NODE_ENDPOINT + '/v1/chain/get_table_rows',
+        data: tableOptions
+      }).then(res => {
+        this.auditorsList = res.rows
+      }).catch(e => {
+        // MessageBox.alert(e, 'Get Auditors ERROR', {
+        //   confirmButtonText: 'OK'
+        // })
+        Message({
+          showClose: true,
+          message: 'Get Auditors ERROR\n' + String(e),
+          type: 'error'
+        })
+      })
     },
     isExpired (exporiesAt) {
       let now = new Date().getTime() + (new Date().getTimezoneOffset() * 60 * 1000)
