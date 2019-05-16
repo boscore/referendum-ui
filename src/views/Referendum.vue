@@ -13,7 +13,7 @@
             >
               <i @click="searchBy = searchText" slot="suffix" class="el-input__icon el-icon-search"></i>
             </el-input>
-            <label>
+            <span>
               Filters:
             <el-select  v-model="filterBy" multiple collapse-tags placeholder="Filter">
               <el-option
@@ -23,7 +23,7 @@
                 :value="item.value">
               </el-option>
             </el-select>
-            </label>
+            </span>
           </div>
         </div>
         <el-tabs v-model="activeTab">
@@ -243,7 +243,7 @@ export default {
           label: 'Ongoing'
         }
       ],
-      filterBy: ['poll', 'referendum', 'approved', 'rejected', 'ongoing'],
+      filterBy: ['poll', 'referendum', 'expired', 'ongoing'],
       sortBy: 'MostVoted',
       searchText: '',
       searchBy: ''

@@ -12,8 +12,12 @@
         <p>
           <span>{{`${proposal.proposal.proposal_name} by ${proposal.proposal.proposer} `}}</span>
           <span style="margin: 0 5px">{{$util.dateConvert(proposal.proposal.expires_at)}} </span>
-          <span>{{proposal.proposal.proposal_json.type || 'unknown'}}</span>
-          <span v-if="proposal.approved_by_BET || proposal.approved_by_BPs" style="color:#2ECC71; font-weight:800"> Approved</span>
+          <span>{{proposal.proposal.proposal_json.type || 'unknown'}} </span>
+          <el-tag v-if="proposal.approved_by_vote && proposal.reviewed_by_BET_date === 'None'" type="success"> Approved by accounts</el-tag>
+          <el-tag v-if="proposal.approved_by_BET" type="success"> Approved by BET</el-tag >
+          <el-tag v-if="proposal.approved_by_BPs" type="success"> Approved by BPs</el-tag >
+          <el-tag v-if="!proposal.approved_by_BPs && proposal.reviewed_by_BET_date !== 'None'" type="danger"> Disapproved by BET</el-tag >
+          <el-tag v-if="proposal.approved_by_BPs && proposal.approved_by_BPs" type="danger"> Disapproved by BPs</el-tag >
         </p>
         <div style="margin-bottom:30px">
           <div
@@ -65,7 +69,7 @@
           <div v-if="votes.length" v-loading="chartLoading" class="card" ref="stats">
             <IEcharts
               ref="chart"
-              style="height:500px;margin:auto"
+              style="min-height:500px;margin:auto"
               :option="chartOption"
             ></IEcharts>
           </div>
@@ -91,7 +95,7 @@
             <el-progress :stroke-width="10" class="pass-percent" :percentage="agreePercent"></el-progress>
             <el-progress :stroke-width="10" class="dissent-percent" :percentage="rejectPercent"></el-progress>
             <el-progress :stroke-width="10" class="abstain-percent" :percentage="abstainPercent"></el-progress>
-            <p>{{(this.proposal.stats.staked.total / 10000).toFixed(0)}} BOS voted</p>
+            <p>{{$util.toThousands((this.proposal.stats.staked.total / 10000).toFixed(0))}} BOS voted</p>
             <div class="scatter-panel">
               <div v-if="scatter">
                 <div v-if="isExpired(proposal.proposal.expires_at)">
@@ -888,13 +892,14 @@ export default {
   width:800px
   height:500px
   margin:auto
+#related-polls
+  display flex
+  flex-wrap wrap
+  justify-content center
 @media only screen and (max-width 840px)
   .main
     padding 0
   .radio-button
     margin-bottom 5px
-  #related-polls
-    display flex
-    flex-wrap wrap
-    justify-content center
+
 </style>
