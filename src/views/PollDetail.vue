@@ -41,12 +41,14 @@
             Comments
           </div>
         </div>
-        <el-steps style="background: #fff" class="card" :active="activeStep" simple finish-status="success" process-status="finish">
-          <el-step :title="activeStep == 0 ? 'Voting' : 'Vote'"></el-step>
-          <el-step :title="activeStep == 1 ? 'BET reviewing' : 'BET review'"></el-step>
-          <el-step :title="activeStep == 2 ? 'BPs Voting' : 'BPs vote'"></el-step>
-          <el-step :status="finalApproved === 0 ? 'error' : (finalApproved === 1 ? 'success': '')" :title="finalApproved === 0 ? 'Disapproved' : 'Approved'"></el-step>
+        <div style="overflow:auto;border-radius: 8px;margin-bottom: 22px">
+        <el-steps style="background: #fff;min-width:500px;margin-bottom: 0"  class="card" :active="activeStep" simple finish-status="success" process-status="finish">
+          <el-step title="Vote"></el-step>
+          <el-step title="Develop"></el-step>
+          <el-step title="Review"></el-step>
+          <el-step title="Finish"></el-step>
         </el-steps>
+        </div>
       <el-container v-loading="propLoading">
         <el-main class="main">
           <div v-if="activeButton !=='voters'" v-html="content" ref="desc" class="card prop-content">
@@ -68,17 +70,20 @@
             </div>
           </div>
           <div
-            style="text-align: center"
+            style="text-align: center; overflow: auto"
             v-if="votes.length"
             v-loading="chartLoading"
             class="card"
             ref="stats">
             <h3>Votes by vote size</h3>
+          <div style="min-width:600px;height:500px">
+
             <IEcharts
               ref="chart"
-              style="min-height:500px;margin:auto"
+
               :option="chartOption"
             ></IEcharts>
+            </div>
           </div>
 
           <div class="card" ref="comments">
@@ -207,6 +212,7 @@ import IEcharts from 'vue-echarts-v3/src/lite.js'
 import 'echarts/lib/chart/pie'
 import 'echarts/lib/component/tooltip'
 import 'echarts/lib/component/title'
+import 'echarts/lib/component/grid'
 import PropCard from '@/components/PropCard.vue'
 import Comment from '@/components/Comment.vue'
 export default {
@@ -226,13 +232,10 @@ export default {
     activeStep () {
       if (this.proposal) {
         if (this.proposal.approved_by_vote) {
-          if (this.proposal.approved_by_BET || this.proposal.approved_by_BPs) {
+          if (this.proposal.finish) {
             // final approved
             return 4
-          } else if (this.proposal.approved_by_BPs_date !== 'None' && !this.approved_by_BPs_date) {
-            // final disapproved
-            return 4
-          } else if (this.proposal.reviewed_by_BET_date !== 'None' && this.proposal.approved_by_BPs_date === 'None') {
+          } else if (this.proposal.review) {
             // voting by BPs
             return 2
           }
@@ -285,6 +288,12 @@ export default {
         })
       }
       return {
+        // grid: {
+        //   left: 200,
+        //   right: 100,
+        //   top: 1000,
+        //   containLabel: true
+        // },
         tooltip: {
           trigger: 'item',
           formatter: '{b} : {c} BOS ({d}%)'
