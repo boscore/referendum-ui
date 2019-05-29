@@ -167,7 +167,6 @@
               <p>{{this.proposal ? this.proposal.stats.votes.accounts : 0}} accounts</p>
               <p>{{this.proposal ? this.calcDays(this.proposal.proposal.created_at, new Date().toString()) : 0}} days since poll started</p>
               <p>{{(this.proposal.stats.staked.total / 100 / this.proposal.stats.currency_supply).toFixed(2)}}% participation</p>
-              <p>{{this.proposal ? this.yesLeadPercent : 0}}% YES lead over NO</p>
             </div>
           </div>
           <div class="card">
@@ -324,9 +323,9 @@ export default {
       }
     },
     votes () { // votes for this proposal
-      let allVotes = this.$store.state.votes || localStorage.getItem('votes')
-      let allAccounts = this.$store.state.accounts || localStorage.getItem('accounts')
-      let allProxies = this.$store.state.proxies || localStorage.getItem('proxies')
+      let allVotes = this.$store.state.votes
+      let allAccounts = this.$store.state.accounts
+      let allProxies = this.$store.state.proxies
       if (allVotes && allAccounts && allProxies) {
         if (typeof allVotes === 'string') {
           allVotes = JSON.parse(allVotes)
@@ -497,15 +496,6 @@ export default {
         return Number((100 * this.proposal.stats.staked[0] / this.proposal.stats.staked.total).toFixed(1))
       }
     },
-    yesLeadPercent () {
-      if (!this.proposal.stats.staked[0]) {
-        return 100
-      } else if (!this.proposal.stats.staked[1]) {
-        return 0
-      } else {
-        return this.calcPercent(this.proposal.stats.staked[1] - this.proposal.stats.staked[0], this.proposal.stats.staked[1]).toFixed(0)
-      }
-    },
     scatter () {
       return this.$store.state.scatter
     },
@@ -624,9 +614,10 @@ export default {
         this.propLoading = false
         Message({
           showClose: true,
-          message: 'Get Proposal ERROR\n' + String(e),
+          message: 'Get Proposal ERROR:' + e.message,
           type: 'error'
         })
+        console.log(e)
       })
     },
     getProducers () {
@@ -640,6 +631,7 @@ export default {
           message: 'Get Producers ERROR\n' + String(e),
           type: 'error'
         })
+        console.log(e)
         // MessageBox.alert(e, 'Get Producers ERROR', {
         //   confirmButtonText: 'OK'
         // })
@@ -745,15 +737,19 @@ export default {
               message: `Your vote  has been cast on ${this.proposalName}, data will be updated some time later`,
               type: 'success'
             })
+            this.$store.dispatch('getAccounts')
+            this.$store.dispatch('getVotes')
+            this.$store.dispatch('getProxies')
             // MessageBox.alert(`Your vote has been cast on ${this.proposalName}`, '', {
             //   confirmButtonText: 'OK'
             // })
           }).catch(e => {
             Message({
               showClose: true,
-              message: 'Vote ERROR\n' + String(e),
+              message: 'Vote ERROR:' + e.message,
               type: 'error'
             })
+            console.log(e)
             // MessageBox.alert(JSON.parse(e).error.name, 'ERROR', {
             //   confirmButtonText: 'OK'
             // })
@@ -783,15 +779,19 @@ export default {
             message: `Your unvote on ${this.proposalName} was successful, data will be updated some time later`,
             type: 'success'
           })
+          this.$store.dispatch('getAccounts')
+          this.$store.dispatch('getVotes')
+          this.$store.dispatch('getProxies')
           // MessageBox.alert(`Your unvote on ${this.proposalName} was successful, data will be updated some time later`, '', {
           //   confirmButtonText: 'OK'
           // })
         }).catch(e => {
           Message({
             showClose: true,
-            message: 'Unvote ERROR\n' + String(e),
+            message: 'Unvote ERROR: ' + e.message,
             type: 'error'
           })
+          console.log(e)
           // MessageBox.alert(JSON.parse(e).error.name, 'ERROR', {
           //   confirmButtonText: 'OK'
           // })
@@ -818,6 +818,14 @@ export default {
       if (this.showVotersNum > this.votes.length) {
         this.showVotersNum = this.votes.length
       }
+    }
+  },
+  watch: {
+    $route () {
+      this.getProposal()
+      this.$store.dispatch('getAccounts')
+      this.$store.dispatch('getVotes')
+      this.$store.dispatch('getProxies')
     }
   }
 }

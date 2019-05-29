@@ -21,12 +21,12 @@
             <el-input maxlength="1024" type="textarea" :autosize="{ minRows: 1, maxRows: 3}" v-model="form.title"></el-input>
           </el-form-item>
           <el-form-item prop="incentives">
-            <label slot="label">Incentives</label>
-            <el-input max="1000000" @change="form.incentives=form.incentives.replace(/[^\d]/g,'')" v-model="form.incentives"></el-input>
+            <label slot="label">Number of Tokens Request(BOS)</label>
+            <el-input max="1000000" @change="formatIncentives(form.incentives)" v-model="form.incentives"></el-input>
           </el-form-item>
-          <el-form-item prop="receipt">
+          <el-form-item prop="receiptor">
             <label slot="label">Receipt account</label>
-            <el-input v-model="form.receipt"></el-input>
+            <el-input v-model="form.receiptor"></el-input>
           </el-form-item>
           <el-form-item prop="content">
             <label slot="label">Content (support Markdown)</label>
@@ -90,9 +90,21 @@ export default {
         return callback(new Error('Please input a number of incentives'))
       } else {
         if (Number(value) > 1000000) {
-          return callback(new Error('No more than 1000,000 BOS'))
+          return callback(new Error('No more than 1,000,000.0000 BOS'))
         } else {
           callback()
+        }
+      }
+    }
+    const checkPropName = (rule, value, cb) => {
+      if (value === '') {
+        return cb(new Error('Please input proposal name'))
+      } else {
+        const regex = /^([a-z]|[1-5]){12}$/g
+        if (regex.test(value)) {
+          cb()
+        } else {
+          return cb(new Error('Name should be 12 characters and only contains the following symbol (1-5,a-z)'))
         }
       }
     }
@@ -113,13 +125,13 @@ export default {
         title: '',
         content: '',
         expiry: '',
-        receipt: this.proposer,
-        incentives: 0,
+        receiptor: this.proposer,
+        incentives: '0.0000',
         type: 'referendum-v1'
       },
       rules: {
         name: [
-          { required: true, message: 'please input proposal name', trigger: 'blur' }
+          { required: true, validator: checkPropName, trigger: 'blur' }
         ],
         title: [
           { required: true, message: 'please input proposal title', trigger: 'blur' }
@@ -128,15 +140,15 @@ export default {
           { required: true, message: 'please input proposal content', trigger: 'blur' }
         ],
         expiry: [
-          { validator: checkExpiryDate, trigger: 'blur' }
+          { required: true, validator: checkExpiryDate, trigger: 'blur' }
         ],
         type: [
-          { required: true, message: 'please choose proposal type', trigger: 'blur' }
+          { message: 'please choose proposal type', trigger: 'blur' }
         ],
         incentives: [
-          { validator: checkIncentives, trigger: 'blur' }
+          { required: true, validator: checkIncentives, trigger: 'blur' }
         ],
-        receipt: [
+        receiptor: [
           { required: true, message: 'please input receipt account of incentives', trigger: 'blur' }
         ]
       }
@@ -175,7 +187,9 @@ export default {
             expires_at: this.form.expiry,
             proposal_json: JSON.stringify({
               content: this.form.content,
-              type: this.form.type
+              type: this.form.type,
+              incentives: this.form.incentives,
+              receiptor: this.form.receiptor
             })
           }
           const transactionOptions = {
@@ -214,14 +228,23 @@ export default {
               Message({
                 showClose: true,
                 type: 'error',
-                message: 'Create ERROR' + String(e)
+                message: 'Create ERROR:' + e.message
               })
+              console.log(e)
               // MessageBox.alert(e, 'ERROR', {
               //   confirmButtonText: 'OK'
               // })
             })
         }
       })
+    },
+    formatIncentives (value) {
+      const v = Number(value)
+      if (!Number.isNaN(v)) {
+        this.form.incentives = v.toFixed(4)
+      } else {
+        this.form.incentives = '0.0000'
+      }
     }
   }
 }

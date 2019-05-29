@@ -27,7 +27,6 @@
           </div>
         </div>
         <el-tabs v-model="activeTab">
-          <!-- <el-tab-pane label="Search" name="search"></el-tab-pane> -->
           <!-- 我的提案 -->
           <el-tab-pane label="My proposals" name="proposals">
             <div v-loading="actionLoading" class="card" style="margin: 10px 0px">
@@ -63,10 +62,17 @@
                     </el-table-column>
                     <el-table-column>
                       <template slot-scope="scope">
-                        <el-button v-if="scope.row.approved_by_BET" type="primary" @click="claimRewards()">Claim Rewards</el-button>
+                        <el-button :disabled="!scope.row.shouldReview" type="primary" @click="applyReview(scope.row.proposal_name)">Apply for Review</el-button>
                         <!-- <label v-else>Expired</label> -->
                       </template>
                     </el-table-column>
+                    <el-table-column>
+                      <template slot-scope="scope">
+                        <el-button :disabled="!scope.row.approved_by_BET" type="primary" @click="claimRewards()">Claim Rewards</el-button>
+                        <!-- <label v-else>Expired</label> -->
+                      </template>
+                    </el-table-column>
+
                   </el-table>
                 </div>
               </div>
@@ -148,6 +154,18 @@
               <img style="width:100%" src="@/assets/proposal_flow.png" />
             </div>
           </el-tab-pane>
+          <el-tab-pane label="How to vote" name="tutorial">
+            <div class="card tutorial">
+              <p>1. Set Scatter networks</p>
+              <img src="@/assets/images/tutorial-1.png"/>
+              <p>2. Add your key</p>
+              <img src="@/assets/images/tutorial-2.png"/>
+              <p>3. Then link your account</p>
+              <img src="@/assets/images/tutorial-3.png"/>
+              <p>4. Login and send your vote to a proposal </p>
+              <img src="@/assets/images/tutorial-4.png"/>
+            </div>
+          </el-tab-pane>
         </el-tabs>
         <div class="clear-float">
             <h1 class="title" style="float:left">Discover Polls</h1>
@@ -188,7 +206,7 @@
 // @ is an alias to /src
 import { Message } from 'element-ui'
 import Eos from 'eosjs'
-import { NETWORK } from '@/assets/constants.js'
+import { NETWORK, API_URL } from '@/assets/constants.js'
 import PropCard from '@/components/PropCard.vue'
 export default {
   name: 'Referendum',
@@ -249,8 +267,8 @@ export default {
       searchBy: ''
     }
   },
-  async created () {
-    await this.getProposals()
+  async mounted () {
+    await this.$store.dispatch('getProposals')
   },
   computed: {
     scatter () {
@@ -376,6 +394,7 @@ export default {
           if (this.proposals[key].proposal.proposer === this.scatter.identity.accounts[0].name) {
             let proposal = { ...this.proposals[key].proposal }
             proposal.approved_by_BET = this.proposals[key].approved_by_BET
+            proposal.shouldReview = this.proposals[key].approved_by_vote && !this.proposals[key].review
             myProposals.push(proposal)
           }
         })
@@ -384,6 +403,25 @@ export default {
     }
   },
   methods: {
+    applyReview (proposal) {
+      fetch(API_URL.API_APPLY_REVIEW)
+        .then(res => res.json())
+        .then(res => {
+          Message({
+            showClose: true,
+            type: 'success',
+            message: 'Apply for review success'
+          })
+        })
+        .catch(e => {
+          Message({
+            showClose: true,
+            type: 'error',
+            message: 'Error: ' + e.message
+          })
+          console.log(e)
+        })
+    },
     claimRewards () {
       const account = this.scatter.identity.accounts.find(x => x.blockchain === 'eos')
       const transactionOptions = {
@@ -409,8 +447,9 @@ export default {
           Message({
             showClose: true,
             type: 'error',
-            message: 'Expired ERROR' + String(e)
+            message: 'Claim ERROR: ' + e.message
           })
+          console.log(e)
         })
     },
     expireProp (proposal) {
@@ -440,8 +479,9 @@ export default {
           Message({
             showClose: true,
             type: 'error',
-            message: 'Expired ERROR' + String(e)
+            message: 'Expired ERROR:' + e.message
           })
+          console.log(e)
           // MessageBox.alert(e, 'ERROR', {
           //   confirmButtonText: 'OK'
           // })
@@ -454,9 +494,6 @@ export default {
         return true
       }
       return false
-    },
-    getProposals () {
-      this.$store.dispatch('getProposals')
     },
     getIdentity () { // scatter认证
       const requiredFields = {
@@ -476,6 +513,11 @@ export default {
     },
     forgetIdentity () {
       this.scatter.forgetIdentity()
+    }
+  },
+  watch: {
+    $route () {
+      this.$store.dispatch('getProposals')
     }
   }
 }
@@ -538,6 +580,16 @@ export default {
   display flex
   flex-wrap wrap
   justify-content flex-end
+.tutorial
+  text-align left
+  img
+    display block
+    width 80%
+    margin auto
+@media only screen and (max-width 700px)
+  .tutorial
+    img
+      width 100%
 @media only screen and (max-width 450px)
   .prop-card
     margin 25px 0
