@@ -9,21 +9,11 @@
               clearable
               v-model="searchText"
               @blur="searchBy = searchText"
-              style="width: 200px"
+              class="search-input"
             >
               <i @click="searchBy = searchText" slot="suffix" class="el-input__icon el-icon-search"></i>
             </el-input>
-            <span>
-              Filters:
-            <el-select  v-model="filterBy" multiple collapse-tags placeholder="Filter">
-              <el-option
-                v-for="item in filterOptions"
-                :key="item.value"
-                :label="item.label"
-                :value="item.value">
-              </el-option>
-            </el-select>
-            </span>
+
           </div>
         </div>
         <el-tabs v-model="activeTab">
@@ -36,44 +26,55 @@
                   <div class="button" @click="getIdentity">Pair Scatter</div>
                 </div>
                 <div class="proposal-table" v-else>
-                  <p class="account-name">Accout: {{scatter.identity.accounts[0].name}}
-                    <span class="button" @click="forgetIdentity">Remove Identity</span>
-                    <router-link :to="{path: '/create_proposal'}">
+                  <p class="account-name">Account: {{scatter.identity.accounts[0].name}}
+                    <span v-if="$store.state.isPC" class="button" @click="forgetIdentity">Remove Identity</span>
+                    <router-link v-if="$store.state.isPC" :to="{path: '/create_proposal'}">
                       <span class="button">Create Proposal</span>
                     </router-link>
                   </p>
-                  <el-table  :data="myProposals" empty-text="No records found" :default-sort="{prop:'proposal_name', order:'ascending'}">
+                  <div style="overflow: auto">
+                  <el-table style="min-width: 600px"  :data="myProposals" empty-text="No records found" :default-sort="{prop:'proposal_name', order:'ascending'}">
                     <el-table-column sortable label="Proposal" prop="proposal_name"></el-table-column>
                     <el-table-column sortable label="Created" >
                        <template slot-scope="scope">
                          <span>{{$util.dateConvert(scope.row.created_at)}}</span>
                        </template>
                     </el-table-column>
-                    <el-table-column sortable label="Expire">
+                    <!-- <el-table-column sortable label="Expire">
                       <template slot-scope="scope">
                          <span>{{$util.dateConvert(scope.row.expires_at)}}</span>
                        </template>
-                    </el-table-column>
-                    <el-table-column>
+                    </el-table-column> -->
+                    <!-- <el-table-column>
                       <template slot-scope="scope">
                         <el-button v-if="!isExpired(scope.row.expires_at)" type="danger" @click="expireProp(scope.row.proposal_name)">Expire</el-button>
                         <label v-else>Expired</label>
                       </template>
-                    </el-table-column>
+                    </el-table-column> -->
                     <el-table-column>
                       <template slot-scope="scope">
-                        <el-button :disabled="!scope.row.shouldReview" type="primary" @click="applyReview(scope.row.proposal_name)">Apply for Review</el-button>
+                        <el-dropdown trigger="click">
+                          <span>
+                            <i style="font-size: 20px" class="el-icon-setting"></i>
+                          </span>
+                          <el-dropdown-menu slot="dropdown">
+                            <!-- <el-dropdown-item type="primary" @click="console.log('extend')">
+                              <p  @click="openPicker(scope.row.proposal_name)">Extend</p>
+                            </el-dropdown-item> -->
+                            <el-dropdown-item type="primary" >
+                              <p @click="cancelProp(scope.row.proposal_name)">Cancel </p>
+                            </el-dropdown-item>
+                            <el-dropdown-item v-if="scope.row.shouldReview" type="primary" @click="applyReview(scope.row.proposal_name)">
+                              Apply for Review
+                            </el-dropdown-item>
+                            <el-dropdown-item v-if="scope.row.approved_by_BET" type="primary" @click="claimRewards()">Claim Rewards</el-dropdown-item>
+                          </el-dropdown-menu>
+                        </el-dropdown>
                         <!-- <label v-else>Expired</label> -->
                       </template>
                     </el-table-column>
-                    <el-table-column>
-                      <template slot-scope="scope">
-                        <el-button :disabled="!scope.row.approved_by_BET" type="primary" @click="claimRewards()">Claim Rewards</el-button>
-                        <!-- <label v-else>Expired</label> -->
-                      </template>
-                    </el-table-column>
-
                   </el-table>
+                  </div>
                 </div>
               </div>
               <div v-else>
@@ -83,6 +84,36 @@
                 </a>
               </div>
             </div>
+            <!-- <mt-datetime-picker
+              ref="picker"
+              type="datetime"
+              :startDate="new Date()"
+              cancelText="Cancel"
+              confirmText="Extend"
+              @confirm="setExtendTime"
+            ></mt-datetime-picker>
+            <el-dialog
+              title="Extend"
+              v-loading="actionLoading"
+              :visible.sync="extendVisible"
+              width="30%"
+            >
+              <label>New expiry(UTC):
+                <el-date-picker
+                  type="datetime"
+                  value-format="yyyy-MM-ddThh:mm:ss"
+                  placeholder="extend date"
+                  v-model="extendTime">
+                </el-date-picker>
+              </label>
+              <span slot="footer" class="dialog-footer">
+                <el-button @click="extendVisible = false">Cancel</el-button>
+                <el-button type="primary" @click="() => {
+                  extendProp()
+                  extendVisible = false
+                  }">Confirm</el-button>
+              </span>
+            </el-dialog> -->
           </el-tab-pane>
           <!-- 我的投票 -->
           <el-tab-pane label="My votes" name="votes">
@@ -93,7 +124,8 @@
                   <div class="button" @click="getIdentity">Pair Scatter</div>
                 </div>
                 <div class="proposal-table" v-else>
-                  <p class="account-name">Account: {{scatter.identity.accounts[0].name}} <span style="margin: 0 10px" class="button" @click="forgetIdentity">Remove Identity</span></p>
+                  <p class="account-name">Account: {{scatter.identity.accounts[0].name}}
+                     <span v-if="$store.state.isPC" style="margin: 0 10px" class="button" @click="forgetIdentity">Remove Identity</span></p>
                   <el-table :data="myVotes" empty-text="No records found" :default-sort="{prop:'proposal_name', order:'ascending'}">
                     <el-table-column sortable label="Proposal" prop="proposal_name"></el-table-column>
                     <el-table-column sortable label="Result" prop="result"></el-table-column>
@@ -154,7 +186,7 @@
               <img style="width:100%" src="@/assets/proposal_flow.png" />
             </div>
           </el-tab-pane>
-          <el-tab-pane label="How to vote" name="tutorial">
+          <el-tab-pane v-if="$store.state.isPC" label="How to vote" name="tutorial">
             <div class="card tutorial">
               <p>1. Set Scatter networks</p>
               <img src="@/assets/images/tutorial-1.png"/>
@@ -170,8 +202,7 @@
         <div class="clear-float">
             <h1 class="title" style="float:left">Discover Polls</h1>
             <div style="float:right">
-              sort results by
-              <el-select v-model="sortBy">
+              <el-select class="select-button" v-model="sortBy">
                 <el-option
                   v-for="item in sortOptions"
                   :key="item.value"
@@ -179,6 +210,14 @@
                   :value="item.value"
                 ></el-option>
               </el-select>
+              <el-select class="select-button" v-model="filterBy" multiple collapse-tags placeholder="Filter">
+                <el-option
+                  v-for="item in filterOptions"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value">
+                </el-option>
+            </el-select>
             </div>
           </div>
         <div class="prop-list" v-loading="!proposals">
@@ -194,6 +233,7 @@
               :desc="prop.proposal.proposal_json.content || ''"
               :votes="prop.stats.staked"
               :staked="prop.stats.staked.total"
+              :expired="false"
               class="prop-card"></PropCard>
           </div>
         </div>
@@ -204,9 +244,10 @@
 
 <script>
 // @ is an alias to /src
-import { Message } from 'element-ui'
+import { MessageBox as MbMessageBox } from 'mint-ui'
+import { MessageBox } from 'element-ui'
 import Eos from 'eosjs'
-import { NETWORK, API_URL } from '@/assets/constants.js'
+import { NETWORK, API_URL, EOSFORUM } from '@/assets/constants.js'
 import PropCard from '@/components/PropCard.vue'
 export default {
   name: 'Referendum',
@@ -217,6 +258,9 @@ export default {
     return {
       actionLoading: false,
       activeTab: 'proposals',
+      extendTime: null,
+      extendPropName: '',
+      extendVisible: false,
       sortOptions: [
         {
           value: 'MostVoted',
@@ -229,15 +273,15 @@ export default {
         {
           value: 'OldestFirst',
           label: 'Oldest First'
-        },
-        {
-          value: 'ExpiresFirst',
-          label: 'Expires First'
-        },
-        {
-          value: 'ExpiresLast',
-          label: 'Expires Last'
         }
+        // {
+        //   value: 'ExpiresFirst',
+        //   label: 'Expires First'
+        // },
+        // {
+        //   value: 'ExpiresLast',
+        //   label: 'Expires Last'
+        // }
       ],
       filterOptions: [
         {
@@ -247,21 +291,21 @@ export default {
         {
           value: 'referendum',
           label: 'Referendum'
-        },
+        }
         // {
         //   value: 'approved',
         //   label: 'Approved'
         // },
-        {
-          value: 'expired',
-          label: 'Expired'
-        },
-        {
-          value: 'ongoing',
-          label: 'Ongoing'
-        }
+        // {
+        //   value: 'expired',
+        //   label: 'Expired'
+        // },
+        // {
+        //   value: 'ongoing',
+        //   label: 'Ongoing'
+        // }
       ],
-      filterBy: ['poll', 'referendum', 'expired', 'ongoing'],
+      filterBy: ['poll', 'referendum'],
       sortBy: 'MostVoted',
       searchText: '',
       searchBy: ''
@@ -295,7 +339,7 @@ export default {
             referendum: false,
             approved: false,
             expired: false,
-            ongoing: false
+            ongoing: true
           }
           this.filterBy.forEach(filter => {
             if (filter === 'poll') { // 暂时把不是referendum的认为是poll
@@ -403,22 +447,36 @@ export default {
     }
   },
   methods: {
+    alert (title, msg) {
+      if (this.$store.state.isPC) {
+        MessageBox.alert(msg, title, {
+          confirmButtonText: 'OK'
+        })
+      } else {
+        MbMessageBox.alert(msg, title, {
+          confirmButtonText: 'OK'
+        })
+      }
+    },
     applyReview (proposal) {
       fetch(API_URL.API_APPLY_REVIEW)
         .then(res => res.json())
         .then(res => {
-          Message({
-            showClose: true,
-            type: 'success',
-            message: 'Apply for review success'
-          })
+          this.alert('Success', 'Apply for review success')
+          // Message({
+          //   showClose: true,
+          //   type: 'success',
+          //   message: 'Apply for review success'
+          // })
         })
         .catch(e => {
-          Message({
-            showClose: true,
-            type: 'error',
-            message: 'Error: ' + e.message
-          })
+          let error = this.$util.errorFormat(e)
+          this.alert('Error', 'Error: ' + error.message)
+          // Message({
+          //   showClose: true,
+          //   type: 'error',
+          //   message: 'Error: ' + e.message
+          // })
           console.log(e)
         })
     },
@@ -437,55 +495,159 @@ export default {
       }
       this.eos.transaction(transactionOptions, { blocksBehind: 3, expireSeconds: 30 })
         .then(res => {
-          Message({
-            showClose: true,
-            type: 'success',
-            message: 'Claim success'
-          })
+          this.alert('Success', 'Claim success')
+          // Message({
+          //   showClose: true,
+          //   type: 'success',
+          //   message: 'Claim success'
+          // })
         })
         .catch(e => {
-          Message({
-            showClose: true,
-            type: 'error',
-            message: 'Claim ERROR: ' + e.message
-          })
+          let error = this.$util.errorFormat(e)
+          this.alert('Error', 'Claim ERROR:' + error.message)
+          // Message({
+          //   showClose: true,
+          //   type: 'error',
+          //   message: 'Claim ERROR: ' + e.message
+          // })
           console.log(e)
         })
     },
-    expireProp (proposal) {
+    cancelProp (proposal) {
       this.actionLoading = true
       const account = this.scatter.identity.accounts.find(x => x.blockchain === 'eos')
       const transactionOptions = {
         actions: [{
-          account: 'eosio.forum',
-          name: 'expire',
+          account: EOSFORUM,
+          name: 'cancel',
           authorization: [{
             actor: account.name,
             permission: account.authority
           }],
-          data: { proposal_name: proposal }
+          data: {
+            proposer: account.name,
+            proposal_name: proposal
+          }
         }]
       }
       this.eos.transaction(transactionOptions, { blocksBehind: 3, expireSeconds: 30 })
         .then(res => {
           this.actionLoading = false
-          Message({
-            showClose: true,
-            type: 'success',
-            message: `Expired ${proposal}`
-          })
+          this.alert('Success', `Extend ${this.extendPropName}`)
+          // Message({
+          //   showClose: true,
+          //   type: 'success',
+          //   message: `Extend ${this.extendPropName}`
+          // })
         }).catch(e => {
           this.actionLoading = false
-          Message({
-            showClose: true,
-            type: 'error',
-            message: 'Expired ERROR:' + e.message
-          })
+          let error = this.$util.errorFormat(e)
+          this.alert('Error', 'Extend ERROR:' + error.message)
+          // Message({
+          //   showClose: true,
+          //   type: 'error',
+          //   message: 'Extend ERROR:' + e.message
+          // })
           console.log(e)
           // MessageBox.alert(e, 'ERROR', {
           //   confirmButtonText: 'OK'
           // })
         })
+    },
+    // expireProp (proposal) {
+    //   this.actionLoading = true
+    //   const account = this.scatter.identity.accounts.find(x => x.blockchain === 'eos')
+    //   const transactionOptions = {
+    //     actions: [{
+    //       account: 'eosio.forum',
+    //       name: 'expire',
+    //       authorization: [{
+    //         actor: account.name,
+    //         permission: account.authority
+    //       }],
+    //       data: { proposal_name: proposal }
+    //     }]
+    //   }
+    //   this.eos.transaction(transactionOptions, { blocksBehind: 3, expireSeconds: 30 })
+    //     .then(res => {
+    //       this.actionLoading = false
+    //       this.alert('Success', `Expired ${proposal}`)
+    //       // Message({
+    //       //   showClose: true,
+    //       //   type: 'success',
+    //       //   message: `Expired ${proposal}`
+    //       // })
+    //     }).catch(e => {
+    //       this.actionLoading = false
+    //       let error = this.$util.errorFormat(e)
+    //       this.alert('Error', 'Expired ERROR:' + error.message)
+    //       // Message({
+    //       //   showClose: true,
+    //       //   type: 'error',
+    //       //   message: 'Expired ERROR:' + e.message
+    //       // })
+    //       console.log(e)
+    //     })
+    // },
+    openPicker (proposal) {
+      this.extendPropName = proposal
+      if (this.$store.state.isPC) {
+        this.extendVisible = true
+      } else {
+        this.$refs['picker'].open()
+      }
+    },
+    extendProp () {
+      this.actionLoading = true
+      const account = this.scatter.identity.accounts.find(x => x.blockchain === 'eos')
+      const transactionOptions = {
+        actions: [{
+          account: 'eosforumdapp',
+          name: 'extend',
+          authorization: [{
+            actor: account.name,
+            permission: account.authority
+          }],
+          data: {
+            proposer: 'icelandtest3',
+            proposal_name: 'icelandtestz',
+            expires_at: this.extendTime
+          }
+        }]
+      }
+      this.eos.transaction(transactionOptions, { blocksBehind: 3, expireSeconds: 30 })
+        .then(res => {
+          this.actionLoading = false
+          this.alert('Success', `Extend ${this.extendPropName}`)
+          // Message({
+          //   showClose: true,
+          //   type: 'success',
+          //   message: `Extend ${this.extendPropName}`
+          // })
+        }).catch(e => {
+          this.actionLoading = false
+          let error = this.$util.errorFormat(e)
+          this.alert('Error', 'Extend ERROR:' + error.message)
+          // Message({
+          //   showClose: true,
+          //   type: 'error',
+          //   message: 'Extend ERROR:' + e.message
+          // })
+          console.log(e)
+          // MessageBox.alert(e, 'ERROR', {
+          //   confirmButtonText: 'OK'
+          // })
+        })
+    },
+    setExtendTime (time) {
+      function formatNumber (n) {
+        if (n < 10) {
+          return '0' + n
+        }
+        return n
+      }
+      this.extendTime = `${time.getFullYear()}-${formatNumber(time.getMonth() + 1)}-${formatNumber(time.getDate())}T${formatNumber(time.getHours())}:${formatNumber(time.getMinutes())}:${formatNumber(time.getSeconds())}`
+      this.extendProp()
     },
     isExpired (exporiesAt) {
       let now = new Date().getTime() + (new Date().getTimezoneOffset() * 60 * 1000)
@@ -541,14 +703,8 @@ export default {
 .prop-card
   margin 25px
 .card
-  font-family: Roboto-Regular
   font-size 18px
   color #606266
-  padding 22px 34px
-  background: #FCFDFF;
-  box-shadow: 0 2px 4px 0 #B0D9FF;
-  border-radius: 8px;
-  margin-bottom 22px
 .button
   margin 5px
   display inline-block
@@ -586,10 +742,24 @@ export default {
     display block
     width 80%
     margin auto
+.search-input
+  width 200px
+.select-button
+  margin 0 5px
 @media only screen and (max-width 700px)
+  .card
+    padding 10px
   .tutorial
     img
       width 100%
+  #search-bar
+    width 100%
+  .search-input
+    width 100%
+    margin-bottom 10px
+  .select-button
+    width 50%
+    margin 0 0 5px 0
 @media only screen and (max-width 450px)
   .prop-card
     margin 25px 0

@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-import axios from 'axios'
 import { API_URL } from '@/assets/constants.js'
+import util from '@/util.js'
 
 Vue.use(Vuex)
 
@@ -14,7 +14,8 @@ export default new Vuex.Store({
     votes: null,
     proposals: null,
     proxies: null,
-    screenWidth: -1
+    screenWidth: -1,
+    isPC: true
   },
   mutations: {
     setScatter (state, payload) {
@@ -37,6 +38,9 @@ export default new Vuex.Store({
     },
     setScreenWidth (state, payload) {
       state.screenWidth = payload.screenWidth
+    },
+    setIsPC (state, payload) {
+      state.isPC = payload.isPC
     }
   },
   actions: {
@@ -51,64 +55,108 @@ export default new Vuex.Store({
     },
     getProposals ({ commit, dispatch }, payload) {
       // axios.defaults.headers.common['Origin'] = 'https://s3.amazonaws.com'
-      axios.get(API_URL.API_GET_ALL_PROPOSALS).then(res => {
-        if (res.status === 200) {
-          Object.keys(res.data).forEach(key => {
+      fetch(API_URL.API_GET_ALL_PROPOSALS)
+        .then(res => {
+          if (res.status !== 200) {
+            console.log(res.statusText)
+          }
+          return res.json()
+        })
+        .then(res => {
+          Object.keys(res).forEach(key => {
             try {
-              if (res.data[key].proposal.proposal_json) {
-                res.data[key].proposal.proposal_json = JSON.parse(res.data[key].proposal.proposal_json)
+              if (res[key].proposal.proposal_json) {
+                res[key].proposal.proposal_json = JSON.parse(util.transSpecialChar(res[key].proposal.proposal_json))
+                res[key].proposal.proposal_json.content = util.unTransSpecialChar(res[key].proposal.proposal_json.content)
               } else {
-                res.data[key].proposal.proposal_json = {
+                res[key].proposal.proposal_json = {
                   type: '',
                   content: ''
                 }
               }
             } catch (e) {
-              console.log('invalid proposal_json')
-              res.data[key].proposal.proposal_json = {
+              console.log(e)
+              console.log(key + ' invalid proposal_json')
+              res[key].proposal.proposal_json = {
                 type: '',
                 content: ''
               }
             }
           })
           if (payload && payload.hasOwnProperty('proposalName')) {
-            dispatch('setCurrentProposal', { proposal: res.data[payload.proposalName] })
+            dispatch('setCurrentProposal', { proposal: res[payload.proposalName] })
           }
-          commit('setProposals', { proposals: res.data })
-        }
-      })
+          commit('setProposals', { proposals: res })
+        })
+        .catch(e => {
+          console.log(e)
+          let error = util.errorFormat(e)
+          util.alert('Get proposals Error: ', error.message)
+        })
     },
     getAccounts ({ commit, dispatch }, payload) {
-      axios.get(API_URL.API_GET_ALL_ACCOUNTS).then(res => {
-        if (res.status === 200) {
-          commit('setAccounts', { accounts: res.data })
-        }
-      })
+      fetch(API_URL.API_GET_ALL_ACCOUNTS)
+        .then(res => {
+          if (res.status !== 200) {
+            console.log(res.statusText)
+          }
+          return res.json()
+        })
+        .then(res => {
+          commit('setAccounts', { accounts: res })
+        })
+        .catch(e => {
+          console.log(e)
+          let error = util.errorFormat(e)
+          util.alert('Get accounts Error:', error.message)
+        })
     },
     getProxies ({ commit, dispatch }, payload) {
-      axios.get(API_URL.API_GET_ALL_PROXIES).then(res => {
-        if (res.status === 200) {
-          commit('setProxies', { proxies: res.data })
-        }
-      })
+      fetch(API_URL.API_GET_ALL_PROXIES)
+        .then(res => {
+          if (res.status !== 200) {
+            console.log(res.statusText)
+          }
+          return res.json()
+        })
+        .then(res => {
+          commit('setProxies', { proxies: res })
+        })
+        .catch(e => {
+          console.log(e)
+          let error = util.errorFormat(e)
+          util.alert('Get proxies Error:', error.message)
+        })
     },
     getVotes ({ commit, dispatch }, payload) {
-      axios.get(API_URL.API_GET_ALL_VOTES).then(res => {
-        if (res.status === 200) {
-          res.data.forEach(vote => {
+      fetch(API_URL.API_GET_ALL_VOTES)
+        .then(res => {
+          if (res.status !== 200) {
+            console.log(res.statusText)
+          }
+          return res.json()
+        })
+        .then(res => {
+          res.forEach(vote => {
             if (vote.vote_json) {
               try {
-                vote.vote_json = JSON.parse(vote.vote_json)
+                vote.vote_json = JSON.parse(util.transSpecialChar(vote.vote_json))
+                vote.vote_json.comment = util.unTransSpecialChar(vote.vote_json.comment)
               } catch (e) {
-                console.log('invalid vote_json')
+                console.log(e)
+                console.log(vote.voter + 'invalid vote_json')
               }
             } else {
               vote.vote_json = null
             }
           })
-          commit('setVotes', { votes: res.data })
-        }
-      })
+          commit('setVotes', { votes: res })
+        })
+        .catch(e => {
+          console.log(e)
+          let error = util.errorFormat(e)
+          util.alert('Get Votes Error: ', error.message)
+        })
     }
   }
 })
