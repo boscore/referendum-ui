@@ -12,7 +12,7 @@ module.exports = {
       }
     ],
     [
-      'component',
+      'mint-ui',
       {
         'libraryName': 'mint-ui',
         'style': true
