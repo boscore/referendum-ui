@@ -10,10 +10,10 @@
         <h2 v-if="CDToAuditor > 0" style="color: #E74C3C">The countdown to auditors giving opinions ends in {{CDToAuditor}} days</h2>
         <h2 v-if="CDToBP > 0" style="color: #E74C3C">The countdown to BPs voting ends in {{CDToBP}} days</h2>
         <p>
-          <span class="proposal-info">{{`${proposal.proposal.proposal_name} by ${proposal.proposal.proposer} `}}</span>
+          <span style="margin-right: 10px" class="proposal-info">{{`${proposal.proposal.proposal_name} by ${proposal.proposal.proposer} `}}</span>
           <br v-if="!$store.state.isPC"/>
           <!-- <span style="margin: 0 5px">{{$util.dateConvert(proposal.proposal.expires_at)}} </span> -->
-          <span style="margin-left: 10px">{{proposal.proposal.proposal_json.type || 'unknown'}} </span>
+          <span >{{proposal.proposal.proposal_json.type || 'unknown'}} </span>
         </p>
         <div v-if="$store.state.isPC" style="margin-bottom:30px">
           <div
