@@ -11,11 +11,12 @@ module.exports = {
         'styleLibraryName': 'theme-chalk'
       }
     ],
-    ['component', [
+    [
+      'component',
       {
         'libraryName': 'mint-ui',
         'style': true
       }
-    ]]
+    ]
   ]
 }
