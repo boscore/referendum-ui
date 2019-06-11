@@ -744,7 +744,8 @@ export default {
     sendVote () {
       if (this.voteActionParams.vote === -1) {
         this.alert('Warning', 'Please choose your vote')
-      } else if (this.myComment === '' && (this.isAuditor || this.isBP)) {
+      } else
+      if (this.myComment === '' && (this.isAuditor || this.isBP)) {
         this.alert('Warning', 'Please write your opinion of this proposal')
       } else {
         this.voteActionParams.voter = this.account.name

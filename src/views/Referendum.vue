@@ -538,7 +538,7 @@ export default {
       this.eos.transaction(transactionOptions, { blocksBehind: 3, expireSeconds: 30 })
         .then(res => {
           this.actionLoading = false
-          this.alert('Success', `Cancel ${this.proposal}`)
+          this.alert('Success', `Canceled ${proposal}`)
           // Message({
           //   showClose: true,
           //   type: 'success',
