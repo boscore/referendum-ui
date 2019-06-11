@@ -768,9 +768,12 @@ export default {
           .then(res => {
             let message = `Your vote  has been cast on ${this.proposalName}, data will be updated some time later`
             this.alert('Success', message)
-            this.$store.dispatch('getAccounts')
-            this.$store.dispatch('getVotes')
-            this.$store.dispatch('getProxies')
+            this.$store.commit('addVote', { vote: {
+              ...this.voteActionParams
+            } })
+            // this.$store.dispatch('getAccounts')
+            // this.$store.dispatch('getVotes')
+            // this.$store.dispatch('getProxies')
             // MessageBox.alert(`Your vote has been cast on ${this.proposalName}`, '', {
             //   confirmButtonText: 'OK'
             // })
@@ -805,9 +808,12 @@ export default {
         .then(res => {
           let message = `Your unvote on ${this.proposalName} was successful, data will be updated some time later`
           this.alert('Success', 'Vote ERROR:' + message)
-          this.$store.dispatch('getAccounts')
-          this.$store.dispatch('getVotes')
-          this.$store.dispatch('getProxies')
+          this.$store.commit('deleteVote', { vote: {
+            ...actionParams
+          } })
+          // this.$store.dispatch('getAccounts')
+          // this.$store.dispatch('getVotes')
+          // this.$store.dispatch('getProxies')
           // MessageBox.alert(`Your unvote on ${this.proposalName} was successful, data will be updated some time later`, '', {
           //   confirmButtonText: 'OK'
           // })

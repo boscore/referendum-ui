@@ -11,7 +11,7 @@ export default new Vuex.Store({
     scatter: null,
     currentProposal: null,
     accounts: null,
-    votes: null,
+    votes: [],
     proposals: null,
     proxies: null,
     screenWidth: -1,
@@ -35,6 +35,32 @@ export default new Vuex.Store({
     },
     setVotes (state, payload) {
       state.votes = payload.votes
+    },
+    addVote (state, payload) {
+      state.votes.push(payload.vote)
+      if (state.accounts[payload.vote.voter]) {
+        state.accounts[payload.vote.voter].votes[payload.vote.proposal_name] = payload.vote
+      } else {
+        let votes = {}
+        votes[payload.vote.proposal_name] = payload.vote
+        state.accounts[payload.vote.voter] = {
+          is_proxy: false,
+          proxy: '',
+          staked: 0,
+          votes: votes
+        }
+        state.accounts = Object.assign({}, state.accounts)
+      }
+    },
+    deleteVote (state, payload) {
+      state.votes.forEach((vote, index) => {
+        if (payload.vote.voter === vote.voter && payload.vote.proposal_name === vote.proposal_name) {
+          state.votes.splice(index, 1)
+        }
+      })
+      let votes = { ...state.accounts[payload.vote.voter].votes }
+      delete votes[payload.vote.proposal_name]
+      state.accounts[payload.vote.voter].votes = votes
     },
     setScreenWidth (state, payload) {
       state.screenWidth = payload.screenWidth

@@ -132,8 +132,10 @@
 import Eos from 'eosjs'
 import { NETWORK, NODE_ENDPOINT } from '@/assets/constants.js'
 import Avatar from '@/components/Avatar.vue'
+
 import { MessageBox as MbMessageBox } from 'mint-ui'
 import { MessageBox } from 'element-ui'
+
 import CandidateCollapse from '@/components/CandidateCollapse.vue'
 export default {
   name: 'Auditor',
@@ -234,6 +236,7 @@ export default {
     }
   },
   methods: {
+
     alert (title, msg) {
       if (this.$store.state.isPC) {
         MessageBox.alert(msg, title, {

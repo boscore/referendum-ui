@@ -30,12 +30,15 @@ export default {
   },
   created () {
     this.$store.commit('setIsPC', { isPC: this.$util.isPC() })
-    this.interval = setInterval((() => {
+    this.$store.dispatch('getAccounts')
+    this.$store.dispatch('getVotes')
+    this.$store.dispatch('getProxies')
+    this.interval = setInterval(() => {
       this.$store.dispatch('getAccounts')
       this.$store.dispatch('getVotes')
       this.$store.dispatch('getProxies')
       console.log('getinfo')
-    })(), 60000)
+    }, 30000)
     this.$store.dispatch('getProposals')
     ScatterJS.scatter.connect('BOSCore-Referendum').then(connected => {
       if (!connected) return false

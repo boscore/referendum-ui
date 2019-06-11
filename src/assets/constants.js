@@ -1,9 +1,12 @@
+
 // export const EOSFORUM = 'eosforumdapp'
 
 // export const NETWORK = {
 //   blockchain: 'eos',
 //   protocol: 'https',
+
 //   host: 'bos-testnet.eosphere.io',
+
 //   port: 443,
 //   chainId: '33cc2426f1b258ef8c798c34c0360b31732ea27a2d7e35a65797850a86d1ba85'
 // }
@@ -24,6 +27,7 @@
 //   API_GET_ALL_PROXIES: 'https://s3.amazonaws.com/bostest.referendum/referendum/proxies/latest.json' }
 
 export const EOSFORUM = 'eosio.forum'
+
 export const NETWORK = {
   blockchain: 'eos',
   protocol: 'https',
