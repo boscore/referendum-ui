@@ -112,6 +112,9 @@
             </div>
             <div class="scatter-panel">
               <div v-if="scatter">
+                <!-- <div v-if="$util.isExpired(proposal.proposal.expires_at)">
+                  This proposal is expired
+                </div> -->
                 <div v-if="!scatter.identity" @click="getIdentity" class="button">
                   Link Scatter to vote
                 </div>
@@ -165,6 +168,7 @@
               <h3 v-if="this.proposal.approved_by_vote">Meet the conditions {{this.proposal.meet_conditions_days}} Days</h3>
               <p>{{this.proposal ? this.proposal.stats.votes.accounts : 0}} accounts</p>
               <p>{{this.proposal ? this.calcDays(this.proposal.proposal.created_at, new Date().toString()) : 0}} days since poll started</p>
+              <!-- <p>{{(this.proposal.stats.staked.total / this.votesOfBP * 100).toFixed(2)}}% of BP votes</p> -->
             </div>
           </div>
           <div class="card">
@@ -248,9 +252,6 @@ export default {
         return '100%'
       }
       return '350px'
-    },
-    votesOfBP () { // cunrrent active votes of BP election
-      return this.$store.state.summaries.bp_votes || 1
     },
     chartLoading () {
       if (this.votes) {
@@ -538,6 +539,7 @@ export default {
       title: 'Should EOS tokens sent to eosio.ramfee and eosio.names accounts in the future be allocated to REX?',
       activeButton: 'desc',
       auditorsList: [],
+      votesOfBP: 1, // cunrrent active votes of BP election
       CDToBP: -1,
       CDToAuditor: -1,
       voteActionParams: {
@@ -592,6 +594,7 @@ export default {
     })
     this.getProducers()
     this.getAuditors()
+    this.getTotalStake()
     this.$refs['steps'].scrollLeft += this.$refs['steps'].scrollWidth * this.activeStep / 4
   },
   methods: {
@@ -710,6 +713,22 @@ export default {
         this.$store.dispatch('setScatter', { scatter: this.scatter })
       })
     },
+    getTotalStake () {
+      let body = { 'json': true, 'scope': 'eosio', 'code': 'eosio', 'table': 'global', 'limit': 500 }
+      let config = {
+        body: JSON.stringify(body),
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
+        }
+      }
+      fetch(NODE_ENDPOINT + '/v1/chain/get_table_rows', config).then(res => res.json())
+        .then(res => {
+          this.votesOfBP = res.rows[0].total_activated_stake
+        }).catch(e => {
+          console.log(e)
+        })
+    },
     calcDays (start, end) {
       let startDay = new Date(start)
       let endDay = new Date(end)
@@ -752,10 +771,19 @@ export default {
             this.$store.commit('addVote', { vote: {
               ...this.voteActionParams
             } })
+            // this.$store.dispatch('getAccounts')
+            // this.$store.dispatch('getVotes')
+            // this.$store.dispatch('getProxies')
+            // MessageBox.alert(`Your vote has been cast on ${this.proposalName}`, '', {
+            //   confirmButtonText: 'OK'
+            // })
           }).catch(e => {
             let error = this.$util.errorFormat(e)
             this.alert('Error', 'Vote ERROR:' + error.message)
             console.log(e)
+            // MessageBox.alert(JSON.parse(e).error.name, 'ERROR', {
+            //   confirmButtonText: 'OK'
+            // })
           })
       }
     },
@@ -783,10 +811,19 @@ export default {
           this.$store.commit('deleteVote', { vote: {
             ...actionParams
           } })
+          // this.$store.dispatch('getAccounts')
+          // this.$store.dispatch('getVotes')
+          // this.$store.dispatch('getProxies')
+          // MessageBox.alert(`Your unvote on ${this.proposalName} was successful, data will be updated some time later`, '', {
+          //   confirmButtonText: 'OK'
+          // })
         }).catch(e => {
           let error = this.$util.errorFormat(e)
           this.alert('Error', 'Unvote ERROR:' + error.message)
           console.log(e)
+          // MessageBox.alert(JSON.parse(e).error.name, 'ERROR', {
+          //   confirmButtonText: 'OK'
+          // })
         })
     },
     turnTo (target) {
@@ -800,16 +837,10 @@ export default {
         localStorage.setItem('proposalName', prop.proposal.proposal_name)
       }
       this.$store.dispatch('setCurrentProposal', { proposal: prop })
+      this.propLoading = true
 
-      let routeUrl = this.$router.resolve({
-        path: '/poll_detail',
-        query: {
-          proposal: prop.proposal.proposal_name
-        }
-      })
-      window.open(routeUrl.href, '_blank')
-      // this.$router.push({ path: '/poll_detail', query: { proposal: prop.proposal.proposal_name } })
-      // this.getProposal()
+      this.$router.push({ path: '/poll_detail', query: { proposal: prop.proposal.proposal_name } })
+      this.getProposal()
     },
     showMoreVoters () {
       this.showVotersNum += 30

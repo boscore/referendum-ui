@@ -15,7 +15,6 @@ export default new Vuex.Store({
     proposals: null,
     proxies: null,
     screenWidth: -1,
-    summaries: {},
     isPC: true
   },
   mutations: {
@@ -65,9 +64,6 @@ export default new Vuex.Store({
     },
     setScreenWidth (state, payload) {
       state.screenWidth = payload.screenWidth
-    },
-    setSummaries (state, payload) {
-      state.summaries = payload.summaries
     },
     setIsPC (state, payload) {
       state.isPC = payload.isPC
@@ -120,9 +116,11 @@ export default new Vuex.Store({
         })
         .catch(e => {
           console.log(e)
+          let error = util.errorFormat(e)
+          util.alert('Get proposals Error: ', error.message)
         })
     },
-    getAccounts ({ commit }, payload) {
+    getAccounts ({ commit, dispatch }, payload) {
       fetch(API_URL.API_GET_ALL_ACCOUNTS)
         .then(res => {
           if (res.status !== 200) {
@@ -135,9 +133,11 @@ export default new Vuex.Store({
         })
         .catch(e => {
           console.log(e)
+          let error = util.errorFormat(e)
+          util.alert('Get accounts Error:', error.message)
         })
     },
-    getProxies ({ commit }, payload) {
+    getProxies ({ commit, dispatch }, payload) {
       fetch(API_URL.API_GET_ALL_PROXIES)
         .then(res => {
           if (res.status !== 200) {
@@ -150,9 +150,11 @@ export default new Vuex.Store({
         })
         .catch(e => {
           console.log(e)
+          let error = util.errorFormat(e)
+          util.alert('Get proxies Error:', error.message)
         })
     },
-    getVotes ({ commit }, payload) {
+    getVotes ({ commit, dispatch }, payload) {
       fetch(API_URL.API_GET_ALL_VOTES)
         .then(res => {
           if (res.status !== 200) {
@@ -178,14 +180,8 @@ export default new Vuex.Store({
         })
         .catch(e => {
           console.log(e)
-        })
-    },
-    getSummaries ({ commit }) {
-      fetch(API_URL.API_GET_SUMMARIES).then(res => res.json())
-        .then(res => {
-          commit('setSummaries', { summaries: res })
-        }).catch(e => {
-          console.log(e)
+          let error = util.errorFormat(e)
+          util.alert('Get Votes Error: ', error.message)
         })
     }
   }
