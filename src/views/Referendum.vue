@@ -40,17 +40,6 @@
                          <span>{{$util.dateConvert(scope.row.created_at)}}</span>
                        </template>
                     </el-table-column>
-                    <!-- <el-table-column sortable label="Expire">
-                      <template slot-scope="scope">
-                         <span>{{$util.dateConvert(scope.row.expires_at)}}</span>
-                       </template>
-                    </el-table-column> -->
-                    <!-- <el-table-column>
-                      <template slot-scope="scope">
-                        <el-button v-if="!isExpired(scope.row.expires_at)" type="danger" @click="expireProp(scope.row.proposal_name)">Expire</el-button>
-                        <label v-else>Expired</label>
-                      </template>
-                    </el-table-column> -->
                     <el-table-column>
                       <template slot-scope="scope">
                         <el-dropdown trigger="click">
@@ -58,9 +47,6 @@
                             <i style="font-size: 20px" class="el-icon-setting"></i>
                           </span>
                           <el-dropdown-menu slot="dropdown">
-                            <!-- <el-dropdown-item type="primary" @click="console.log('extend')">
-                              <p  @click="openPicker(scope.row.proposal_name)">Extend</p>
-                            </el-dropdown-item> -->
                             <el-dropdown-item type="primary" >
                               <p @click="cancelProp(scope.row.proposal_name)">Cancel </p>
                             </el-dropdown-item>
@@ -70,7 +56,6 @@
                             <el-dropdown-item v-if="scope.row.approved_by_BET" type="primary" @click="claimRewards()">Claim Rewards</el-dropdown-item>
                           </el-dropdown-menu>
                         </el-dropdown>
-                        <!-- <label v-else>Expired</label> -->
                       </template>
                     </el-table-column>
                   </el-table>
@@ -84,36 +69,6 @@
                 </a>
               </div>
             </div>
-            <!-- <mt-datetime-picker
-              ref="picker"
-              type="datetime"
-              :startDate="new Date()"
-              cancelText="Cancel"
-              confirmText="Extend"
-              @confirm="setExtendTime"
-            ></mt-datetime-picker>
-            <el-dialog
-              title="Extend"
-              v-loading="actionLoading"
-              :visible.sync="extendVisible"
-              width="30%"
-            >
-              <label>New expiry(UTC):
-                <el-date-picker
-                  type="datetime"
-                  value-format="yyyy-MM-ddThh:mm:ss"
-                  placeholder="extend date"
-                  v-model="extendTime">
-                </el-date-picker>
-              </label>
-              <span slot="footer" class="dialog-footer">
-                <el-button @click="extendVisible = false">Cancel</el-button>
-                <el-button type="primary" @click="() => {
-                  extendProp()
-                  extendVisible = false
-                  }">Confirm</el-button>
-              </span>
-            </el-dialog> -->
           </el-tab-pane>
           <!-- 我的投票 -->
           <el-tab-pane label="My votes" name="votes">
@@ -279,14 +234,6 @@ export default {
           value: 'OldestFirst',
           label: 'Oldest First'
         }
-        // {
-        //   value: 'ExpiresFirst',
-        //   label: 'Expires First'
-        // },
-        // {
-        //   value: 'ExpiresLast',
-        //   label: 'Expires Last'
-        // }
       ],
       filterOptions: [
         {
@@ -297,18 +244,6 @@ export default {
           value: 'referendum',
           label: 'Referendum'
         }
-        // {
-        //   value: 'approved',
-        //   label: 'Approved'
-        // },
-        // {
-        //   value: 'expired',
-        //   label: 'Expired'
-        // },
-        // {
-        //   value: 'ongoing',
-        //   label: 'Ongoing'
-        // }
       ],
       filterBy: ['poll', 'referendum'],
       sortBy: 'MostVoted',
@@ -468,20 +403,10 @@ export default {
         .then(res => res.json())
         .then(res => {
           this.alert('Success', 'Apply for review success')
-          // Message({
-          //   showClose: true,
-          //   type: 'success',
-          //   message: 'Apply for review success'
-          // })
         })
         .catch(e => {
           let error = this.$util.errorFormat(e)
           this.alert('Error', 'Error: ' + error.message)
-          // Message({
-          //   showClose: true,
-          //   type: 'error',
-          //   message: 'Error: ' + e.message
-          // })
           console.log(e)
         })
     },
@@ -501,20 +426,10 @@ export default {
       this.eos.transaction(transactionOptions, { blocksBehind: 3, expireSeconds: 30 })
         .then(res => {
           this.alert('Success', 'Claim success')
-          // Message({
-          //   showClose: true,
-          //   type: 'success',
-          //   message: 'Claim success'
-          // })
         })
         .catch(e => {
           let error = this.$util.errorFormat(e)
           this.alert('Error', 'Claim ERROR:' + error.message)
-          // Message({
-          //   showClose: true,
-          //   type: 'error',
-          //   message: 'Claim ERROR: ' + e.message
-          // })
           console.log(e)
         })
     },
@@ -539,24 +454,11 @@ export default {
         .then(res => {
           this.actionLoading = false
           this.alert('Success', `Canceled ${proposal}`)
-          // Message({
-          //   showClose: true,
-          //   type: 'success',
-          //   message: `Extend ${this.extendPropName}`
-          // })
         }).catch(e => {
           this.actionLoading = false
           let error = this.$util.errorFormat(e)
           this.alert('Error', 'Cancel ERROR:' + error.message)
-          // Message({
-          //   showClose: true,
-          //   type: 'error',
-          //   message: 'Extend ERROR:' + e.message
-          // })
           console.log(e)
-          // MessageBox.alert(e, 'ERROR', {
-          //   confirmButtonText: 'OK'
-          // })
         })
     },
     unvote (proposal) {
@@ -587,41 +489,6 @@ export default {
           console.log(e)
         })
     },
-    // expireProp (proposal) {
-    //   this.actionLoading = true
-    //   const account = this.scatter.identity.accounts.find(x => x.blockchain === 'eos')
-    //   const transactionOptions = {
-    //     actions: [{
-    //       account: 'eosio.forum',
-    //       name: 'expire',
-    //       authorization: [{
-    //         actor: account.name,
-    //         permission: account.authority
-    //       }],
-    //       data: { proposal_name: proposal }
-    //     }]
-    //   }
-    //   this.eos.transaction(transactionOptions, { blocksBehind: 3, expireSeconds: 30 })
-    //     .then(res => {
-    //       this.actionLoading = false
-    //       this.alert('Success', `Expired ${proposal}`)
-    //       // Message({
-    //       //   showClose: true,
-    //       //   type: 'success',
-    //       //   message: `Expired ${proposal}`
-    //       // })
-    //     }).catch(e => {
-    //       this.actionLoading = false
-    //       let error = this.$util.errorFormat(e)
-    //       this.alert('Error', 'Expired ERROR:' + error.message)
-    //       // Message({
-    //       //   showClose: true,
-    //       //   type: 'error',
-    //       //   message: 'Expired ERROR:' + e.message
-    //       // })
-    //       console.log(e)
-    //     })
-    // },
     openPicker (proposal) {
       this.extendPropName = proposal
       if (this.$store.state.isPC) {
@@ -630,48 +497,6 @@ export default {
         this.$refs['picker'].open()
       }
     },
-    // extendProp () {
-    //   this.actionLoading = true
-    //   const account = this.scatter.identity.accounts.find(x => x.blockchain === 'eos')
-    //   const transactionOptions = {
-    //     actions: [{
-    //       account: 'eosforumdapp',
-    //       name: 'extend',
-    //       authorization: [{
-    //         actor: account.name,
-    //         permission: account.authority
-    //       }],
-    //       data: {
-    //         proposer: 'icelandtest3',
-    //         proposal_name: 'icelandtestz',
-    //         expires_at: this.extendTime
-    //       }
-    //     }]
-    //   }
-    //   this.eos.transaction(transactionOptions, { blocksBehind: 3, expireSeconds: 30 })
-    //     .then(res => {
-    //       this.actionLoading = false
-    //       this.alert('Success', `Extend ${this.extendPropName}`)
-    //       // Message({
-    //       //   showClose: true,
-    //       //   type: 'success',
-    //       //   message: `Extend ${this.extendPropName}`
-    //       // })
-    //     }).catch(e => {
-    //       this.actionLoading = false
-    //       let error = this.$util.errorFormat(e)
-    //       this.alert('Error', 'Extend ERROR:' + error.message)
-    //       // Message({
-    //       //   showClose: true,
-    //       //   type: 'error',
-    //       //   message: 'Extend ERROR:' + e.message
-    //       // })
-    //       console.log(e)
-    //       // MessageBox.alert(e, 'ERROR', {
-    //       //   confirmButtonText: 'OK'
-    //       // })
-    //     })
-    // },
     setExtendTime (time) {
       function formatNumber (n) {
         if (n < 10) {
@@ -704,7 +529,13 @@ export default {
         localStorage.setItem('proposalName', prop.proposal.proposal_name)
       }
       this.$store.dispatch('setCurrentProposal', { proposal: prop })
-      this.$router.push({ path: '/poll_detail?proposal=' + prop.proposal.proposal_name })
+      let routeUrl = this.$router.resolve({
+        path: '/poll_detail',
+        query: {
+          proposal: prop.proposal.proposal_name
+        }
+      })
+      window.open(routeUrl.href, '_blank')
     },
     forgetIdentity () {
       this.scatter.forgetIdentity()
