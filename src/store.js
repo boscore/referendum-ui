@@ -11,10 +11,11 @@ export default new Vuex.Store({
     scatter: null,
     currentProposal: null,
     accounts: null,
-    votes: null,
+    votes: [],
     proposals: null,
     proxies: null,
-    screenWidth: -1
+    screenWidth: -1,
+    isPC: true
   },
   mutations: {
     setScatter (state, payload) {
@@ -35,8 +36,37 @@ export default new Vuex.Store({
     setVotes (state, payload) {
       state.votes = payload.votes
     },
+    addVote (state, payload) {
+      state.votes.push(payload.vote)
+      if (state.accounts[payload.vote.voter]) {
+        state.accounts[payload.vote.voter].votes[payload.vote.proposal_name] = payload.vote
+      } else {
+        let votes = {}
+        votes[payload.vote.proposal_name] = payload.vote
+        state.accounts[payload.vote.voter] = {
+          is_proxy: false,
+          proxy: '',
+          staked: 0,
+          votes: votes
+        }
+        state.accounts = Object.assign({}, state.accounts)
+      }
+    },
+    deleteVote (state, payload) {
+      state.votes.forEach((vote, index) => {
+        if (payload.vote.voter === vote.voter && payload.vote.proposal_name === vote.proposal_name) {
+          state.votes.splice(index, 1)
+        }
+      })
+      let votes = { ...state.accounts[payload.vote.voter].votes }
+      delete votes[payload.vote.proposal_name]
+      state.accounts[payload.vote.voter].votes = votes
+    },
     setScreenWidth (state, payload) {
       state.screenWidth = payload.screenWidth
+    },
+    setIsPC (state, payload) {
+      state.isPC = payload.isPC
     }
   },
   actions: {
@@ -84,6 +114,11 @@ export default new Vuex.Store({
           }
           commit('setProposals', { proposals: res })
         })
+        .catch(e => {
+          console.log(e)
+          let error = util.errorFormat(e)
+          util.alert('Get proposals Error: ', error.message)
+        })
     },
     getAccounts ({ commit, dispatch }, payload) {
       fetch(API_URL.API_GET_ALL_ACCOUNTS)
@@ -96,6 +131,11 @@ export default new Vuex.Store({
         .then(res => {
           commit('setAccounts', { accounts: res })
         })
+        .catch(e => {
+          console.log(e)
+          let error = util.errorFormat(e)
+          util.alert('Get accounts Error:', error.message)
+        })
     },
     getProxies ({ commit, dispatch }, payload) {
       fetch(API_URL.API_GET_ALL_PROXIES)
@@ -107,6 +147,11 @@ export default new Vuex.Store({
         })
         .then(res => {
           commit('setProxies', { proxies: res })
+        })
+        .catch(e => {
+          console.log(e)
+          let error = util.errorFormat(e)
+          util.alert('Get proxies Error:', error.message)
         })
     },
     getVotes ({ commit, dispatch }, payload) {
@@ -132,6 +177,11 @@ export default new Vuex.Store({
             }
           })
           commit('setVotes', { votes: res })
+        })
+        .catch(e => {
+          console.log(e)
+          let error = util.errorFormat(e)
+          util.alert('Get Votes Error: ', error.message)
         })
     }
   }

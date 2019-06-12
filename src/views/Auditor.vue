@@ -51,48 +51,50 @@
             </div>
           </div>
         </div>
-        <div v-if="myCandidate && !myAuditor" class="card">
-          <h1>You are a candidate</h1>
-          <p>Votes: {{(myCandidate.total_votes / 10000).toFixed(4)}}</p>
-          <p>Staked: {{myCandidate.locked_tokens}}</p>
-          <div v-if="myCandidate.is_active">
-            <p>you are active for elections</p>
-            <div @click="inactive" class="vote-button vote-button-active">Be inactive</div>
-          </div>
-          <div v-else >
-            <p>you are inactive for elections</p>
-            <div v-if="myCandidate.locked_tokens !== '0.0000 BOS' || pendingStake">
-              <div @click="active" class="vote-button vote-button-active">Be active</div>
-              <div @click="unstake" class="vote-button vote-button-active">Unstake</div>
+        <div v-if="$store.state.isPC">
+          <div v-if="myCandidate && !myAuditor" class="card">
+            <h1>You are a candidate</h1>
+            <p>Votes: {{(myCandidate.total_votes / 10000).toFixed(4)}}</p>
+            <p>Staked: {{myCandidate.locked_tokens}}</p>
+            <div v-if="myCandidate.is_active">
+              <p>you are active for elections</p>
+              <div @click="inactive" class="vote-button vote-button-active">Be inactive</div>
             </div>
-            <div v-else @click="stake" class="vote-button vote-button-active">Stake</div>
+            <div v-else >
+              <p>you are inactive for elections</p>
+              <div v-if="myCandidate.locked_tokens !== '0.0000 BOS' || pendingStake">
+                <div @click="active" class="vote-button vote-button-active">Be active</div>
+                <div @click="unstake" class="vote-button vote-button-active">Unstake</div>
+              </div>
+              <div v-else @click="stake" class="vote-button vote-button-active">Stake</div>
+            </div>
+            <div @click="showUpdate" class="vote-button vote-button-active">Update info</div>
           </div>
-          <div @click="showUpdate" class="vote-button vote-button-active">Update info</div>
-        </div>
-        <div v-else-if="myAuditor" class="card">
-          <h1>You are a auditor</h1>
-          <p>Votes: {{(myAuditor.total_votes / 10000).toFixed(4)}}</p>
-          <div @click="showUpdate" class="vote-button vote-button-active">Update info</div>
-        </div>
-        <div v-else-if="scatter">
-          <div v-if="!scatter.identity" class="button square-button"
-            @click="getIdentity"
-          >
-            Pair Scatter
+          <div v-else-if="myAuditor" class="card">
+            <h1>You are a auditor</h1>
+            <p>Votes: {{(myAuditor.total_votes / 10000).toFixed(4)}}</p>
+            <div @click="showUpdate" class="vote-button vote-button-active">Update info</div>
           </div>
-          <router-link v-else :to="{path: '/auditor/register'}">
-            <div class="button square-button"
-              v-if="!candidateLoading && !auditorLoading"
+          <div v-else-if="scatter">
+            <div v-if="!scatter.identity" class="button square-button"
+              @click="getIdentity"
             >
-              Register as Candidate
+              Pair Scatter
             </div>
-          </router-link>
-        </div>
-        <div v-else>
-          <!-- <p>Scatter is required!</p> -->
-          <a target="blank" href="https://get-scatter.com/">
-            <div class="button square-button">Get Scatter</div>
-          </a>
+            <router-link v-else :to="{path: '/auditor/register'}">
+              <div class="button square-button"
+                v-if="!candidateLoading && !auditorLoading"
+              >
+                Register as Candidate
+              </div>
+            </router-link>
+          </div>
+          <div v-else>
+            <!-- <p>Scatter is required!</p> -->
+            <a target="blank" href="https://get-scatter.com/">
+              <div class="button square-button">Get Scatter</div>
+            </a>
+          </div>
         </div>
       </el-aside>
     </el-container>
@@ -130,7 +132,10 @@
 import Eos from 'eosjs'
 import { NETWORK, NODE_ENDPOINT } from '@/assets/constants.js'
 import Avatar from '@/components/Avatar.vue'
-import { Message, MessageBox } from 'element-ui'
+
+import { MessageBox as MbMessageBox } from 'mint-ui'
+import { MessageBox } from 'element-ui'
+
 import CandidateCollapse from '@/components/CandidateCollapse.vue'
 export default {
   name: 'Auditor',
@@ -231,6 +236,18 @@ export default {
     }
   },
   methods: {
+
+    alert (title, msg) {
+      if (this.$store.state.isPC) {
+        MessageBox.alert(msg, title, {
+          confirmButtonText: 'OK'
+        })
+      } else {
+        MbMessageBox.alert(msg, title, {
+          confirmButtonText: 'OK'
+        })
+      }
+    },
     getConfig () {
       const tableOptions = {
         'scope': 'auditor.bos',
@@ -320,11 +337,13 @@ export default {
         })
       }).catch(e => {
         this.candidateLoading = false
-        Message({
-          showClose: true,
-          message: 'Get candidates ERROR: ' + e.message,
-          type: 'error'
-        })
+        let error = this.$util.errorFormat(e)
+        this.alert('Error', 'Get candidates ERROR:' + error.message)
+        // Message({
+        //   showClose: true,
+        //   message: 'Get candidates ERROR: ' + e.message,
+        //   type: 'error'
+        // })
         console.log(e)
         // MessageBox.alert(e, 'ERROR.\n', {
         //   confirmButtonText: 'OK'
@@ -359,11 +378,13 @@ export default {
         })
       }).catch(e => {
         this.auditorLoading = false
-        Message({
-          showClose: true,
-          message: 'Get auditors ERROR: ' + e.message,
-          type: 'error'
-        })
+        let error = this.$util.errorFormat(e)
+        this.alert('Error', 'Get auditors ERROR:' + error.message)
+        // Message({
+        //   showClose: true,
+        //   message: 'Get auditors ERROR: ' + e.message,
+        //   type: 'error'
+        // })
         console.log(e)
         // MessageBox.alert(e, 'ERROR.\n', {
         //   confirmButtonText: 'OK'
@@ -401,11 +422,12 @@ export default {
         }
       } else {
         //  提示
-        Message({
-          showClose: true,
-          type: 'warning',
-          message: `You only can vote to ${this.config.maxvotes} candidates`
-        })
+        this.alert('Warning', `You only can vote to ${this.config.maxvotes} candidates`)
+        // Message({
+        //   showClose: true,
+        //   type: 'warning',
+        //   message: `You only can vote to ${this.config.maxvotes} candidates`
+        // })
       }
     },
     removeCandidate (id) {
@@ -442,11 +464,12 @@ export default {
           }
         })
       } else if (!this.scatter.identity) {
-        Message({
-          showClose: true,
-          type: 'warning',
-          message: `Pair Scatter first`
-        })
+        // Message({
+        //   showClose: true,
+        //   type: 'warning',
+        //   message: `Pair Scatter first`
+        // })
+        this.alert('Warning', 'Pair Scatter first')
         // MessageBox.alert('Pair Scatter first', '', {
         //   confirmButtonText: 'OK'
         // })
@@ -476,20 +499,23 @@ export default {
         this.eos.transaction(transactionOptions, { blocksBehind: 3, expireSeconds: 30 })
           .then(() => {
             this.actionLoading = false
-            Message({
-              showClose: true,
-              type: 'success',
-              message: 'Your vote has been cast on candidates'
-            })
+            this.alert('Success', 'Your vote has been cast on candidates')
+            // Message({
+            //   showClose: true,
+            //   type: 'success',
+            //   message: 'Your vote has been cast on candidates'
+            // })
             this.getAllInfo()
             this.removeAllCand()
           }).catch(e => {
             this.actionLoading = false
-            Message({
-              showClose: true,
-              type: 'error',
-              message: 'Vote ERROR:' + e.message
-            })
+            let error = this.$util.errorFormat(e)
+            this.alert('Error', 'Vote ERROR:' + error.message)
+            // Message({
+            //   showClose: true,
+            //   type: 'error',
+            //   message: 'Vote ERROR:' + e.message
+            // })
             console.log(e)
             // MessageBox.alert(e, 'ERROR.\n.\n', {
             //   confirmButtonText: 'OK'
@@ -504,19 +530,22 @@ export default {
           this.getCandidates()
           this.getPendingStake()
           this.actionLoading = false
-          Message({
-            showClose: true,
-            type: 'success',
-            message: 'Stake successfully'
-          })
+          // Message({
+          //   showClose: true,
+          //   type: 'success',
+          //   message: 'Stake successfully'
+          // })
+          this.alert('Success', 'Stake successfully')
         })
         .catch(e => {
           this.actionLoading = false
-          Message({
-            showClose: true,
-            type: 'error',
-            message: 'Stake ERROR:' + e.message
-          })
+          let error = this.$util.errorFormat(e)
+          this.alert('Error', 'Stake ERROR:' + error.message)
+          // Message({
+          //   showClose: true,
+          //   type: 'error',
+          //   message: 'Stake ERROR:' + e.message
+          // })
           console.log(e)
           // MessageBox.alert(e, 'ERROR.\n.\n', {
           //   confirmButtonText: 'OK'
@@ -544,19 +573,22 @@ export default {
           this.actionLoading = false
           this.getCandidates()
           this.getPendingStake()
-          Message({
-            showClose: true,
-            type: 'success',
-            message: `Unstake successfully`
-          })
+          // Message({
+          //   showClose: true,
+          //   type: 'success',
+          //   message: `Unstake successfully`
+          // })
+          this.alert('Success', 'Unstake successfully')
         })
         .catch(e => {
           this.actionLoading = false
-          Message({
-            showClose: true,
-            type: 'error',
-            message: 'Unstake ERROR: ' + e.message
-          })
+          let error = this.$util.errorFormat(e)
+          this.alert('Error', 'Unstake ERROR:' + error.message)
+          // Message({
+          //   showClose: true,
+          //   type: 'error',
+          //   message: 'Unstake ERROR: ' + e.message
+          // })
           console.log(e)
           // MessageBox.alert(e, 'ERROR.\n.\n', {
           //   confirmButtonText: 'OK'
@@ -583,19 +615,22 @@ export default {
         .then(() => {
           this.actionLoading = false
           this.getCandidates()
-          Message({
-            showClose: true,
-            type: 'success',
-            message: 'You are active for auditor elections'
-          })
+          this.alert('Success', 'You are active for auditor elections')
+          // Message({
+          //   showClose: true,
+          //   type: 'success',
+          //   message: 'You are active for auditor elections'
+          // })
         })
         .catch(e => {
           this.actionLoading = false
-          Message({
-            showClose: true,
-            type: 'error',
-            message: 'Be active ERROR: ' + e.message
-          })
+          let error = this.$util.errorFormat(e)
+          this.alert('Error', 'Be active ERROR:' + error.message)
+          // Message({
+          //   showClose: true,
+          //   type: 'error',
+          //   message: 'Be active ERROR: ' + e.message
+          // })
           console.log(e)
           // MessageBox.alert(e, 'ERROR.\n', {
           //   confirmButtonText: 'OK'
@@ -622,19 +657,22 @@ export default {
         .then(() => {
           this.actionLoading = false
           this.getCandidates()
-          Message({
-            showClose: true,
-            type: 'success',
-            message: 'You are inactive for auditor elections'
-          })
+          // Message({
+          //   showClose: true,
+          //   type: 'success',
+          //   message: 'You are inactive for auditor elections'
+          // })
+          this.alert('Success', 'You are inactive for auditor elections')
         })
         .catch(e => {
           this.actionLoading = false
-          Message({
-            showClose: true,
-            type: 'error',
-            message: 'Be inactive ERROR: ' + e.message
-          })
+          let error = this.$util.errorFormat(e)
+          this.alert('Error', 'Be inactive ERROR:' + error.message)
+          // Message({
+          //   showClose: true,
+          //   type: 'error',
+          //   message: 'Be inactive ERROR: ' + e.message
+          // })
           console.log(e)
         })
     },
@@ -670,14 +708,17 @@ export default {
             .then(res => {
               this.updateDialog = false
               this.actionLoading = false
+              this.alert('Success', 'Update BIO successfully')
             })
             .catch(e => {
               this.actionLoading = false
-              Message({
-                showClose: true,
-                type: 'error',
-                message: 'Update BIO ERROR: ' + e.message
-              })
+              let error = this.$util.errorFormat(e)
+              this.alert('Error', 'Update BIO ERROR:' + error.message)
+              // Message({
+              //   showClose: true,
+              //   type: 'error',
+              //   message: 'Update BIO ERROR: ' + e.message
+              // })
               console.log(e)
               // MessageBox.alert(e, 'ERROR.\n', {
               //   confirmButtonText: 'OK'

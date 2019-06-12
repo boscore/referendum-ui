@@ -1,4 +1,17 @@
-// date String
+import { MessageBox as MbMessageBox } from 'mint-ui'
+import { MessageBox } from 'element-ui'
+
+export default {
+  alert,
+  dateConvert,
+  errorFormat,
+  toThousands,
+  isExpired,
+  isPC,
+  transSpecialChar,
+  unTransSpecialChar
+}
+
 function dateConvert (date) {
   // convert date to current time zone
   const diff = new Date().getTimezoneOffset()
@@ -25,13 +38,6 @@ function isExpired (exporiesAt) {
   }
   return false
 }
-export default {
-  dateConvert,
-  toThousands,
-  isExpired,
-  transSpecialChar,
-  unTransSpecialChar
-}
 
 function transSpecialChar (json) {
   if (json !== undefined && json !== '' && json !== 'null') {
@@ -53,4 +59,43 @@ function unTransSpecialChar (json) {
     json = json.replace(/\\\\"/g, '\\"')
   }
   return json
+}
+
+function isPC () {
+  const userAgentInfo = navigator.userAgent
+  const Agents = ['Android', 'iPhone', 'SymbianOS', 'Windows Phone', 'iPad', 'iPod']
+  let flag = true
+  for (let i = 0; i < Agents.length; i++) {
+    if (userAgentInfo.indexOf(Agents[i]) > 0) {
+      flag = false
+      break
+    }
+  }
+  return flag
+}
+
+function errorFormat (e) {
+  let error = e
+  if (typeof e === 'string') {
+    try {
+      error = JSON.parse(e)
+    } catch (jsonError) {
+      error = {
+        message: e
+      }
+    }
+  }
+  return error
+}
+
+function alert (title, msg) {
+  if (isPC()) {
+    MessageBox.alert(msg, title, {
+      confirmButtonText: 'OK'
+    })
+  } else {
+    MbMessageBox.alert(msg, title, {
+      confirmButtonText: 'OK'
+    })
+  }
 }
