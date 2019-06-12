@@ -1,10 +1,6 @@
 {
   "version": 2,
-<<<<<<< HEAD
-  "name": "bos-referendum",
-=======
   "name": "bos-referendum-ui",
->>>>>>> 1813f571cd4cddb7dcd607f3141563d5f55c617d
   "builds": [{ "src": "package.json", "use": "@now/static-build" }],
   "routes": [
     { "handle": "filesystem" },
