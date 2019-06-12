@@ -339,15 +339,7 @@ export default {
         this.candidateLoading = false
         let error = this.$util.errorFormat(e)
         this.alert('Error', 'Get candidates ERROR:' + error.message)
-        // Message({
-        //   showClose: true,
-        //   message: 'Get candidates ERROR: ' + e.message,
-        //   type: 'error'
-        // })
         console.log(e)
-        // MessageBox.alert(e, 'ERROR.\n', {
-        //   confirmButtonText: 'OK'
-        // })
       })
     },
     getAuditors () {
@@ -380,15 +372,7 @@ export default {
         this.auditorLoading = false
         let error = this.$util.errorFormat(e)
         this.alert('Error', 'Get auditors ERROR:' + error.message)
-        // Message({
-        //   showClose: true,
-        //   message: 'Get auditors ERROR: ' + e.message,
-        //   type: 'error'
-        // })
         console.log(e)
-        // MessageBox.alert(e, 'ERROR.\n', {
-        //   confirmButtonText: 'OK'
-        // })
       })
     },
     getIdentity () { // scatter认证
@@ -396,7 +380,6 @@ export default {
         accounts: [ NETWORK ]
       }
       this.scatter.getIdentity(requiredFields).then(() => {
-        // console.log(this.scatter.identity)
         this.$store.dispatch('setScatter', { scatter: this.scatter })
       })
     },
@@ -423,11 +406,6 @@ export default {
       } else {
         //  提示
         this.alert('Warning', `You only can vote to ${this.config.maxvotes} candidates`)
-        // Message({
-        //   showClose: true,
-        //   type: 'warning',
-        //   message: `You only can vote to ${this.config.maxvotes} candidates`
-        // })
       }
     },
     removeCandidate (id) {
@@ -464,15 +442,7 @@ export default {
           }
         })
       } else if (!this.scatter.identity) {
-        // Message({
-        //   showClose: true,
-        //   type: 'warning',
-        //   message: `Pair Scatter first`
-        // })
         this.alert('Warning', 'Pair Scatter first')
-        // MessageBox.alert('Pair Scatter first', '', {
-        //   confirmButtonText: 'OK'
-        // })
         this.getIdentity()
       } else {
         this.actionLoading = true
@@ -500,26 +470,13 @@ export default {
           .then(() => {
             this.actionLoading = false
             this.alert('Success', 'Your vote has been cast on candidates')
-            // Message({
-            //   showClose: true,
-            //   type: 'success',
-            //   message: 'Your vote has been cast on candidates'
-            // })
             this.getAllInfo()
             this.removeAllCand()
           }).catch(e => {
             this.actionLoading = false
             let error = this.$util.errorFormat(e)
             this.alert('Error', 'Vote ERROR:' + error.message)
-            // Message({
-            //   showClose: true,
-            //   type: 'error',
-            //   message: 'Vote ERROR:' + e.message
-            // })
             console.log(e)
-            // MessageBox.alert(e, 'ERROR.\n.\n', {
-            //   confirmButtonText: 'OK'
-            // })
           })
       }
     },
@@ -530,26 +487,13 @@ export default {
           this.getCandidates()
           this.getPendingStake()
           this.actionLoading = false
-          // Message({
-          //   showClose: true,
-          //   type: 'success',
-          //   message: 'Stake successfully'
-          // })
           this.alert('Success', 'Stake successfully')
         })
         .catch(e => {
           this.actionLoading = false
           let error = this.$util.errorFormat(e)
           this.alert('Error', 'Stake ERROR:' + error.message)
-          // Message({
-          //   showClose: true,
-          //   type: 'error',
-          //   message: 'Stake ERROR:' + e.message
-          // })
           console.log(e)
-          // MessageBox.alert(e, 'ERROR.\n.\n', {
-          //   confirmButtonText: 'OK'
-          // })
         })
     },
     unstake () {
@@ -573,26 +517,13 @@ export default {
           this.actionLoading = false
           this.getCandidates()
           this.getPendingStake()
-          // Message({
-          //   showClose: true,
-          //   type: 'success',
-          //   message: `Unstake successfully`
-          // })
           this.alert('Success', 'Unstake successfully')
         })
         .catch(e => {
           this.actionLoading = false
           let error = this.$util.errorFormat(e)
           this.alert('Error', 'Unstake ERROR:' + error.message)
-          // Message({
-          //   showClose: true,
-          //   type: 'error',
-          //   message: 'Unstake ERROR: ' + e.message
-          // })
           console.log(e)
-          // MessageBox.alert(e, 'ERROR.\n.\n', {
-          //   confirmButtonText: 'OK'
-          // })
         })
     },
     active () {
@@ -616,25 +547,12 @@ export default {
           this.actionLoading = false
           this.getCandidates()
           this.alert('Success', 'You are active for auditor elections')
-          // Message({
-          //   showClose: true,
-          //   type: 'success',
-          //   message: 'You are active for auditor elections'
-          // })
         })
         .catch(e => {
           this.actionLoading = false
           let error = this.$util.errorFormat(e)
           this.alert('Error', 'Be active ERROR:' + error.message)
-          // Message({
-          //   showClose: true,
-          //   type: 'error',
-          //   message: 'Be active ERROR: ' + e.message
-          // })
           console.log(e)
-          // MessageBox.alert(e, 'ERROR.\n', {
-          //   confirmButtonText: 'OK'
-          // })
         })
     },
     inactive () {
@@ -657,27 +575,16 @@ export default {
         .then(() => {
           this.actionLoading = false
           this.getCandidates()
-          // Message({
-          //   showClose: true,
-          //   type: 'success',
-          //   message: 'You are inactive for auditor elections'
-          // })
           this.alert('Success', 'You are inactive for auditor elections')
         })
         .catch(e => {
           this.actionLoading = false
           let error = this.$util.errorFormat(e)
           this.alert('Error', 'Be inactive ERROR:' + error.message)
-          // Message({
-          //   showClose: true,
-          //   type: 'error',
-          //   message: 'Be inactive ERROR: ' + e.message
-          // })
           console.log(e)
         })
     },
     showUpdate () {
-      // this.candInfo = { ...this.myCandidate.inform }
       this.candInfo = {
         avatar: this.myCandidate.inform.avatar || '',
         bio: this.myCandidate.inform.bio,
@@ -714,15 +621,7 @@ export default {
               this.actionLoading = false
               let error = this.$util.errorFormat(e)
               this.alert('Error', 'Update BIO ERROR:' + error.message)
-              // Message({
-              //   showClose: true,
-              //   type: 'error',
-              //   message: 'Update BIO ERROR: ' + e.message
-              // })
               console.log(e)
-              // MessageBox.alert(e, 'ERROR.\n', {
-              //   confirmButtonText: 'OK'
-              // })
             })
         }
       })

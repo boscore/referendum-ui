@@ -12,7 +12,7 @@
       <p class="desc">{{propDesc}}</p>
       <hr/>
       <div class="card-bottom-board">
-        <div class="card-bottom-board-left" :class="cardBoardClass">
+        <div v-loading="pollAtLoading" class="card-bottom-board-left" :class="cardBoardClass">
           <p :style="{'font-family': 'Roboto-Bold','font-size': '13px','line-height': '15px','margin-bottom':'4px'}">POLL AT</p>
           <p :style="{'font-family': 'AvenirNextCondensed-Bold','font-size': '20px','line-height':'27px'}">{{pollAt}}%</p>
         </div>
@@ -107,7 +107,18 @@ export default {
       }
     },
     pollAt () {
-      return (this.staked / 100 / 1e+9).toFixed(2)
+      if (this.$store.state.summaries.bp_votes !== undefined) {
+        return (this.staked / this.$store.state.summaries.bp_votes * 100).toFixed(2)
+      } else {
+        return '0.00'
+      }
+    },
+    pollAtLoading () {
+      if (this.$store.state.summaries.bp_votes === undefined) {
+        return true
+      } else {
+        return false
+      }
     },
     propDesc () {
       return this.desc.replace(/#/g, '')
