@@ -108,7 +108,7 @@
             <!-- <el-progress :stroke-width="10" class="abstain-percent" :percentage="abstainPercent"></el-progress> -->
             <div style="margin:15px 0">
               <p style="margin: 0">{{$util.toThousands((this.proposal.stats.staked.total / 10000).toFixed(0))}} BOS voted</p>
-              <el-progress :stroke-width="10" class="voted-percent" :percentage="votedPercent"></el-progress>
+              <el-progress v-loading="this.votesOfBP === -1" :stroke-width="10" class="voted-percent" :percentage="votedPercent"></el-progress>
             </div>
             <div class="scatter-panel">
               <div v-if="scatter">
@@ -162,7 +162,7 @@
             </div>
             <hr style="border: none; border-bottom:2px solid #D8D8D8;" />
             <div>
-              <h3 v-if="this.proposal.approved_by_vote">Meet the conditions {{this.proposal.meet_conditions_days}} Days</h3>
+              <h3 v-if="(this.proposal.meet_conditions_days > 0)">Meet the conditions {{this.proposal.meet_conditions_days}} {{this.proposal.meet_conditions_days > 1 ? 'days' : 'day'}}</h3>
               <p>{{this.proposal ? this.proposal.stats.votes.accounts : 0}} accounts</p>
               <p>{{this.proposal ? this.calcDays(this.proposal.proposal.created_at, new Date().toString()) : 0}} days since poll started</p>
             </div>
@@ -250,7 +250,7 @@ export default {
       return '350px'
     },
     votesOfBP () { // cunrrent active votes of BP election
-      return this.$store.state.summaries.bp_votes || 1
+      return this.$store.state.summaries.bp_votes || -1
     },
     chartLoading () {
       if (this.votes) {
@@ -499,7 +499,11 @@ export default {
       }
     },
     votedPercent () {
-      return Number((this.proposal.stats.staked.total / this.votesOfBP * 100).toFixed(1))
+      if (this.votesOfBP === 0 || this.votesOfBP === -1) {
+        return 0
+      } else {
+        return Number((this.proposal.stats.staked.total / this.votesOfBP * 100).toFixed(1))
+      }
     },
     scatter () {
       return this.$store.state.scatter
