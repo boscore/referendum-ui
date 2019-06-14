@@ -20,6 +20,7 @@ import {
   Main,
   Menu,
   MenuItem,
+  Pagination,
   Progress,
   Option,
   Radio,
@@ -50,6 +51,7 @@ Vue.use(DropdownMenu)
 Vue.use(DropdownItem)
 
 Vue.use(Progress)
+Vue.use(Pagination)
 
 Vue.use(Menu)
 Vue.use(MenuItem)
