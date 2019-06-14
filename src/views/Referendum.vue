@@ -180,6 +180,7 @@
             </el-select>
             </div>
           </div>
+        <p v-if="propList.length === 0">No relevant proposals</p>
         <div class="prop-list" v-loading="!proposals">
           <div
             style="cursor: pointer"
@@ -188,6 +189,7 @@
             @click="turnDetail(prop)"
           >
             <PropCard
+              v-if="index >= ((currentPage - 1) * 12) && index < currentPage * 12"
               :type="prop.proposal.proposal_json.type || 'unknown'"
               :title="prop.proposal.title"
               :desc="prop.proposal.proposal_json.content || ''"
@@ -197,6 +199,13 @@
               class="prop-card"></PropCard>
           </div>
         </div>
+        <el-pagination
+          background
+          layout="prev, pager, next"
+          :page-count="Math.ceil(propList.length / 12)"
+          :current-page.sync = "currentPage"
+        >
+        </el-pagination>
       </el-main>
     </el-container>
   </div>
@@ -218,6 +227,7 @@ export default {
     return {
       actionLoading: false,
       activeTab: 'proposals',
+      currentPage: 1,
       extendTime: null,
       extendPropName: '',
       extendVisible: false,

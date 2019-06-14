@@ -14,6 +14,8 @@
           <br v-if="!$store.state.isPC"/>
           <!-- <span style="margin: 0 5px">{{$util.dateConvert(proposal.proposal.expires_at)}} </span> -->
           <span >{{proposal.proposal.proposal_json.type || 'unknown'}} </span>
+          <br v-if="!$store.state.isPC"/>
+          <span style="font-weight:600">Budget: {{incentives}}</span>
         </p>
         <div v-if="$store.state.isPC" style="margin-bottom:30px">
           <div
@@ -162,7 +164,10 @@
             </div>
             <hr style="border: none; border-bottom:2px solid #D8D8D8;" />
             <div>
-              <h3 v-if="(this.proposal.meet_conditions_days > 0)">Meet the conditions {{this.proposal.meet_conditions_days}} {{this.proposal.meet_conditions_days > 1 ? 'days' : 'day'}}</h3>
+              <div v-if="(this.proposal.meet_conditions_days > 0)">
+                <h3> {{this.proposal.meet_conditions_days}} {{this.proposal.meet_conditions_days > 1 ? 'days' : 'day'}} satisfied</h3>
+                <el-progress :format="satisfiedText" :stroke-width="10" class="pass-percent" :percentage="satisfiedPercent"></el-progress>
+              </div>
               <p>{{this.proposal ? this.proposal.stats.votes.accounts : 0}} accounts</p>
               <p>{{this.proposal ? this.calcDays(this.proposal.proposal.created_at, new Date().toString()) : 0}} days since poll started</p>
             </div>
@@ -410,6 +415,30 @@ export default {
       })
       return comm
     },
+    incentives () {
+      if (this.proposal) {
+        if (this.proposal.proposal.proposal_json.incentives !== undefined) {
+          let incentives = Number(this.proposal.proposal.proposal_json.incentives)
+          let integer = Number(incentives.toFixed(0))
+          let decimals = String(incentives * 10000 % 10000)
+          while (decimals.length < 4) {
+            decimals = '0' + decimals
+          }
+          return this.$util.toThousands(integer) + '.' + decimals + ' BOS'
+        } else {
+          if (this.budgetList[this.proposal.proposal.proposal_name] !== undefined) {
+            let incentives = Number(this.budgetList[this.proposalName])
+            let integer = Number(incentives.toFixed(0))
+            let decimals = String(incentives * 10000 % 10000)
+            while (decimals.length < 4) {
+              decimals = '0' + decimals
+            }
+            return this.$util.toThousands(integer) + '.' + decimals + ' BOS'
+          }
+        }
+      }
+      return 'Not declare'
+    },
     otherComm () {
       let comm = []
       this.votes.forEach(vote => {
@@ -481,8 +510,15 @@ export default {
         return 'no content'
       }
     },
-    abstainPercent () {
-      return Number((100 - this.agreePercent - this.rejectPercent).toFixed(1))
+    satisfiedPercent () {
+      if (this.proposal) {
+        if (this.proposal.meet_conditions_days > 20) {
+          return 100
+        }
+        return Number((100 * this.proposal.meet_conditions_days / 20).toFixed(1))
+      } else {
+        return 0
+      }
     },
     agreePercent () {
       if (!this.proposal || this.proposal.stats.staked.total === 0 || !this.proposal.stats.staked[1]) {
@@ -583,7 +619,18 @@ export default {
       propLoading: true,
       writeComment: false,
       showVotersNum: 30,
-      screenWidth: document.body.clientWidth
+      screenWidth: document.body.clientWidth,
+      budgetList: {
+        'historyindex': '250000.0000',
+        'eosiosg11111': '1000000.0000',
+        'bosnationwps': '515000.0000',
+        'constantstab': '350000.0000',
+        'hyperion.api': '995600.0000',
+        'chintaionbos': '1000000.0000',
+        'omegaautodex': '450000.0000',
+        'btconbos': '400000.0000',
+        'universal': '800000.0000'
+      }
     }
   },
   created () {
@@ -820,6 +867,9 @@ export default {
       if (this.showVotersNum > this.votes.length) {
         this.showVotersNum = this.votes.length
       }
+    },
+    satisfiedText (percentage) {
+      return `${this.proposal.meet_conditions_days}/20`
     }
   },
   watch: {
@@ -860,7 +910,7 @@ export default {
       color #F46666
     .el-progress-bar__inner
       background-image linear-gradient(269deg, #F06262 0%, #FF7171 100%)
-  .abstain-percent
+  .satisfied-percent
     .el-progress__text
       color #F4D03F
     .el-progress-bar__inner
