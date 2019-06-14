@@ -15,7 +15,7 @@
           <!-- <span style="margin: 0 5px">{{$util.dateConvert(proposal.proposal.expires_at)}} </span> -->
           <span >{{proposal.proposal.proposal_json.type || 'unknown'}} </span>
           <br v-if="!$store.state.isPC"/>
-          <span>Request tokens: {{incentives}}</span>
+          <span style="font-weight:600">Budget: {{incentives}}</span>
         </p>
         <div v-if="$store.state.isPC" style="margin-bottom:30px">
           <div
@@ -416,17 +416,28 @@ export default {
       return comm
     },
     incentives () {
-      if (this.proposal.proposal.proposal_json.incentives !== undefined) {
-        let incentives = Number(this.proposal.proposal.proposal_json.incentives)
-        let integer = Number(incentives.toFixed(0))
-        let decimals = String(incentives * 10000 % 10000)
-        while (decimals.length < 4) {
-          decimals = '0' + decimals
+      if (this.proposal) {
+        if (this.proposal.proposal.proposal_json.incentives !== undefined) {
+          let incentives = Number(this.proposal.proposal.proposal_json.incentives)
+          let integer = Number(incentives.toFixed(0))
+          let decimals = String(incentives * 10000 % 10000)
+          while (decimals.length < 4) {
+            decimals = '0' + decimals
+          }
+          return this.$util.toThousands(integer) + '.' + decimals + ' BOS'
+        } else {
+          if (this.budgetList[this.proposal.proposal.proposal_name] !== undefined) {
+            let incentives = Number(this.budgetList[this.proposalName])
+            let integer = Number(incentives.toFixed(0))
+            let decimals = String(incentives * 10000 % 10000)
+            while (decimals.length < 4) {
+              decimals = '0' + decimals
+            }
+            return this.$util.toThousands(integer) + '.' + decimals + ' BOS'
+          }
         }
-        return this.$util.toThousands(integer) + '.' + decimals + ' BOS'
-      } else {
-        return 'Not declare'
       }
+      return 'Not declare'
     },
     otherComm () {
       let comm = []
@@ -608,7 +619,18 @@ export default {
       propLoading: true,
       writeComment: false,
       showVotersNum: 30,
-      screenWidth: document.body.clientWidth
+      screenWidth: document.body.clientWidth,
+      budgetList: {
+        'historyindex': '250000.0000',
+        'eosiosg11111': '1000000.0000',
+        'bosnationwps': '515000.0000',
+        'constantstab': '350000.0000',
+        'hyperion.api': '995600.0000',
+        'chintaionbos': '1000000.0000',
+        'omegaautodex': '450000.0000',
+        'btconbos': '400000.0000',
+        'universal': '800000.0000'
+      }
     }
   },
   created () {
