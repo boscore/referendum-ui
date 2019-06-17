@@ -58,6 +58,7 @@
             <p>Staked: {{myCandidate.locked_tokens}}</p>
             <div v-if="myCandidate.is_active">
               <p>you are active for elections</p>
+              <!-- <div @click="stake('1000.0000 BOS')" class="vote-button vote-button-active">Stake More</div> -->
               <div @click="inactive" class="vote-button vote-button-active">Be inactive</div>
             </div>
             <div v-else >
@@ -66,7 +67,7 @@
                 <div @click="active" class="vote-button vote-button-active">Be active</div>
                 <div @click="unstake" class="vote-button vote-button-active">Unstake</div>
               </div>
-              <div v-else @click="stake" class="vote-button vote-button-active">Stake</div>
+              <div v-else @click="stake(config.lockupasset)" class="vote-button vote-button-active">Stake</div>
             </div>
             <div @click="showUpdate" class="vote-button vote-button-active">Update info</div>
           </div>
@@ -480,9 +481,9 @@ export default {
           })
       }
     },
-    async stake () {
+    async stake (amount) {
       this.actionLoading = true
-      this.eos.transfer(this.account.name, this.contract, this.config.lockupasset, '')
+      this.eos.transfer(this.account.name, this.contract, amount, '')
         .then(res => {
           this.getCandidates()
           this.getPendingStake()

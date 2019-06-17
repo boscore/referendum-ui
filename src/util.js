@@ -78,7 +78,18 @@ function errorFormat (e) {
   let error = e
   if (typeof e === 'string') {
     try {
-      error = JSON.parse(e)
+      let errorRaw = JSON.parse(e)
+      if (errorRaw.error) {
+        if (errorRaw.error.details.length) {
+          error = errorRaw.error.details[0]
+        } else {
+          error = {
+            message: errorRaw.error.name
+          }
+        }
+      } else {
+        error = errorRaw
+      }
     } catch (jsonError) {
       error = {
         message: e

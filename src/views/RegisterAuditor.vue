@@ -227,27 +227,12 @@ export default {
           this.eos.transaction(transactionOptions, { blocksBehind: 3, expireSeconds: 30 })
             .then(res => {
               this.actionLoading = false
-              Message({
-                showClose: true,
-                type: 'success',
-                message: 'You register as a new candidate successfully'
-              })
+              this.$util.alert('Success', 'You register as a new candidate successfully')
               this.$router.replace('/auditor')
-              // MessageBox.alert(`You register as a new candidate successfully`, '', {
-              //   confirmButtonText: 'OK',
-              //   callback: action => {
-              //     if (action === 'confirm') {
-              //       this.$router.replace('/auditor')
-              //     }
-              //   }
-              // })
             }).catch(e => {
               this.actionLoading = false
-              Message({
-                showClose: true,
-                type: 'error',
-                message: 'Register ERROR' + e.message
-              })
+              let error = this.$util.errorFormat(e)
+              this.$util.alert('Error', 'Register ERROR:' + error.message)
               console.log(e)
             })
         } else {
