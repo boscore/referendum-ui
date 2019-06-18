@@ -157,16 +157,19 @@ export default {
   box-shadow 0 2px 12px 0 rgba(0, 0, 0, 0.1)
   border-radius 12.25px 12.25px 12.25px 12.25px
   height 284px
-  width 280px
+  min-width 280px
+  width 100%
+  cursor pointer
 p
   margin 0
 .card-top
   position relative
   height 104px
-  width 280px
+  min-width 280px
+  width 100%
   border-radius 12.25px 12.25px 0px 0px
   p
-    width 246px
+    width 90%
     height 60px
     margin 9px 5%
     font-family Roboto-Medium
@@ -207,7 +210,8 @@ p
 .card-top-tag-poll
   background-image: linear-gradient(-137deg, #F07814 0%, #FCB557 100%);
 .card-bottom
-  width 280px
+  min-width 280px
+  width 100%
   height 180px
   background #E6F1FF
   border-radius 0px 0px 12.25px 12.25px
@@ -221,7 +225,7 @@ p
     background #004496
   .desc
     height 83px
-    width 246px
+    width 100%
     font-family Roboto-Regular
     font-size 14px
     color #004496
@@ -256,7 +260,7 @@ p
     letter-spacing 0
     text-align center
 .card-bottom-board-right
-    width 160px
+    width calc(100% - 100px)
     text-align left
     p
       font-family Roboto-Regular

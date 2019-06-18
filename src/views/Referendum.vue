@@ -183,20 +183,20 @@
         <p v-if="propList.length === 0">No relevant proposals</p>
         <div class="prop-list" v-loading="!proposals">
           <div
-            style="cursor: pointer"
-            v-for="(prop, index) in propList"
+            class="prop-item"
+            v-for="(prop, index) in propList.slice(((currentPage - 1) * 12), (currentPage * 12))"
+            :class="{'prop-item-middle': $store.state.screenWidth < 1040 ? (index % 2) === 1 : (index % 3) === 1}"
             :key="index"
-            @click="turnDetail(prop)"
           >
             <PropCard
-              v-if="index >= ((currentPage - 1) * 12) && index < currentPage * 12"
+              @click.native="turnDetail(prop)"
               :type="prop.proposal.proposal_json.type || 'unknown'"
               :title="prop.proposal.title"
               :desc="prop.proposal.proposal_json.content || ''"
               :votes="prop.stats.staked"
               :staked="prop.stats.staked.total"
               :expired="false"
-              class="prop-card"></PropCard>
+              ></PropCard>
           </div>
         </div>
         <el-pagination
@@ -574,8 +574,13 @@ export default {
   display flex
   flex-wrap wrap
   justify-content flex-start
-.prop-card
-  margin 25px
+.prop-item
+  padding 25px 0
+  width 32%
+  min-width 280px
+  box-sizing border-box
+.prop-item-middle
+  margin 0 2%
 .card
   font-size 18px
   color #606266
@@ -620,7 +625,16 @@ export default {
   width 200px
 .select-button
   margin 0 5px
-@media only screen and (max-width 700px)
+@media only screen and (max-width 1040px)
+  .prop-item
+    width 49%
+  .prop-item-middle
+    margin-right 0
+@media only screen and (max-width 715px)
+  .prop-item
+    width 100%
+  .prop-item-middle
+    margin 0
   .card
     padding 10px
   .tutorial
@@ -635,8 +649,6 @@ export default {
     width 50%
     margin 0 0 5px 0
 @media only screen and (max-width 450px)
-  .prop-card
-    margin 25px 0
   .prop-list
     justify-content center
 </style>

@@ -961,10 +961,13 @@ export default {
 .prop-content
   overflow-wrap break-word
   >>> h1
+    font-size 1.5em
     color #507DFE
   >>> h2
+    font-size 1.3em
     color #507DFE
   >>> h3
+    font-size 1.1em
     color #507DFE
   >>> h4
     color #507DFE

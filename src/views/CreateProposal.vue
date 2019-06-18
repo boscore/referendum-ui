@@ -21,7 +21,7 @@
             <el-input maxlength="1024" type="textarea" :autosize="{ minRows: 1, maxRows: 3}" v-model="form.title"></el-input>
           </el-form-item>
           <el-form-item prop="incentives">
-            <label slot="label">Number of Tokens Request(BOS)</label>
+            <label slot="label">Number of Tokens Request</label>
             <el-input max="1000000" @change="formatIncentives(form.incentives)" v-model="form.incentives"></el-input>
           </el-form-item>
           <el-form-item prop="receiptor">
@@ -126,7 +126,7 @@ export default {
         content: '',
         // expiry: '',
         receiptor: this.proposer,
-        incentives: '0.0000',
+        incentives: '0.0000 BOS',
         type: 'referendum-v1'
       },
       rules: {
@@ -239,11 +239,11 @@ export default {
       })
     },
     formatIncentives (value) {
-      const v = Number(value)
+      const v = Number(value.split(' ')[0])
       if (!Number.isNaN(v)) {
-        this.form.incentives = v.toFixed(4)
+        this.form.incentives = v.toFixed(4) + ' BOS'
       } else {
-        this.form.incentives = '0.0000'
+        this.form.incentives = '0.0000 BOS'
       }
     }
   }
