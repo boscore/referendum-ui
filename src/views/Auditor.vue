@@ -56,15 +56,21 @@
             <h1>You are a candidate</h1>
             <p>Votes: {{(myCandidate.total_votes / 10000).toFixed(4)}}</p>
             <p>Staked: {{myCandidate.locked_tokens}}</p>
+            <el-progress
+             :text-inside="true"
+             :stroke-width="20"
+             :format="stakeText"
+             class="pass-percent"
+             :percentage="stakePercent"></el-progress>
             <div v-if="myCandidate.is_active">
               <p>you are active for elections</p>
-              <!-- <div @click="stake('1000.0000 BOS')" class="vote-button vote-button-active">Stake More</div> -->
-              <div @click="inactive" class="vote-button vote-button-active">Be inactive</div>
+              <div @click="() => {stakeVisible = true}" class="vote-button vote-button-active">Stake More</div>
+              <div @click="inactive" class="vote-button vote-button-active">Unregister</div>
             </div>
             <div v-else >
               <p>you are inactive for elections</p>
               <div v-if="myCandidate.locked_tokens !== '0.0000 BOS' || pendingStake">
-                <div @click="active" class="vote-button vote-button-active">Be active</div>
+                <div @click="active" class="vote-button vote-button-active">Register</div>
                 <div @click="unstake" class="vote-button vote-button-active">Unstake</div>
               </div>
               <div v-else @click="stake(config.lockupasset)" class="vote-button vote-button-active">Stake</div>
@@ -104,7 +110,7 @@
     title="Update candidate information"
     :visible.sync="updateDialog"
     v-loading="actionLoading"
-  >
+    >
     <span>
       <el-form ref="updateForm" :model="candInfo" label-width="210px" :label-position="screenWidth < 821 ? 'top' : 'left'" :rules="updateRules">
         <el-form-item prop="contact">
@@ -124,6 +130,17 @@
     <span slot="footer">
       <el-button @click="updateDialog=false">Cancel</el-button>
       <el-button type="primary" @click="updateBio">Update</el-button>
+    </span>
+  </el-dialog>
+  <el-dialog
+    title="Stake more"
+    :visible.sync="stakeVisible"
+    width="30%"
+    :before-close="handleClose">
+    <el-input @change="formatStakeAmount" v-model="stakeAmount"></el-input>
+    <span slot="footer" class="dialog-footer">
+      <el-button @click="stakeVisible = false">Cancel</el-button>
+      <el-button type="primary" @click="stake(stakeAmount)">Stake</el-button>
     </span>
   </el-dialog>
   </div>
@@ -171,7 +188,9 @@ export default {
         ]
       },
       pendingStakeTable: [],
-      screenWidth: document.body.clientWidth
+      screenWidth: document.body.clientWidth,
+      stakeAmount: '0.0000 BOS',
+      stakeVisible: false
     }
   },
   mounted () {
@@ -234,10 +253,13 @@ export default {
         }
       })
       return flag
+    },
+    stakePercent () {
+      let stake = Number(this.myCandidate.locked_tokens.split(' ')[0])
+      return Number((stake * 100 / 100000).toFixed(1))
     }
   },
   methods: {
-
     alert (title, msg) {
       if (this.$store.state.isPC) {
         MessageBox.alert(msg, title, {
@@ -626,6 +648,19 @@ export default {
             })
         }
       })
+    },
+    stakeText () {
+      let stake = Number(this.myCandidate.locked_tokens.split(' ')[0]).toFixed(0)
+      stake = this.$util.toThousands(stake)
+      return stake + '/100,000'
+    },
+    formatStakeAmount (value) {
+      const v = Number(value.split(' ')[0])
+      if (!Number.isNaN(v)) {
+        this.stakeAmount = v.toFixed(4) + ' BOS'
+      } else {
+        this.stakeAmount = '0.0000 BOS'
+      }
     }
   },
   watch: {
@@ -647,6 +682,17 @@ export default {
     .el-aside
       width 100%
       padding 0 20px
+.auditor
+  .el-progress__text
+    font-family Roboto-Bold
+    font-size 11px
+    letter-spacing 0
+    text-align center
+  .pass-percent
+    .el-progress__text
+      color #30D094
+    .el-progress-bar__inner
+      background-image linear-gradient(270deg, #41B976 0%, #2CD69B 100%)
 </style>
 
 <style lang="stylus" scoped>
