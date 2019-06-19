@@ -16,7 +16,7 @@
 
           </div>
         </div>
-        <el-tabs v-model="activeTab">
+        <el-tabs @tab-click="tabClick" v-model="activeTab">
           <!-- 我的提案 -->
           <el-tab-pane label="My proposals" name="proposals">
             <div v-loading="actionLoading" class="card" style="margin: 10px 0px">
@@ -107,56 +107,10 @@
           </el-tab-pane>
           <!-- 提案流程 -->
           <el-tab-pane label="Proposal process" name="process">
-            <div class="card">
-              <h2>Fund payment process points</h2>
-              <ul id="fund-process">
-                <li>
-                  The community chooses suitable proposals for fund support by referendum.
-                </li>
-                <li>
-                  The amount of a single proposal incentives cannot exceed 1 Million BOS. Generally, after the deadline expires, the proposal incentives are automatically paid.
-                </li>
-                <li>
-                  10 days before the deadline, if the BOS Executive Team believes that the task has not been effectively executed, it has the right to temporarily freeze the payment of funds and submit the payment proposal to BP vote. BOSCore Executive Team checkpoints:
-                  <ul style="list-style-type:lower-alpha">
-                    <li>
-                      Testcase coverage, whether the test passed?
-                    </li>
-                    <li>
-                      Whether the coding quality is up to standard?
-                    </li>
-                    <li>
-                      Whether the specified functions in the proposal are fully implemented?
-                    </li>
-                    <li>
-                      Is there a security bug?
-                    </li>
-                  </ul>
-                </li>
-                <li>
-                  If the fund payment is frozen, the BOS independent auditor needs to publish the review within 7 days, make independent judgment in the contract, and issue a link to the relevant investigation report.
-                </li>
-                <li>
-                  Within two weeks after the auditor’s comments, BP needs to make a decision. If more than 2/3+1 active BPs agree to continue to pay the incentives, it will continue to pay 90% of the incentives; Otherwise the payment will be rejected.
-                </li>
-                <li>
-                  The 10% of the incentives for the proposal are equally divided between the auditors who agree with the majority of the BPs and the BPs who voted.
-                </li>
-              </ul>
-              <img style="width:100%" src="@/assets/proposal_flow.png" />
-            </div>
+            <router-view></router-view>
           </el-tab-pane>
           <el-tab-pane v-if="$store.state.isPC" label="How to vote" name="tutorial">
-            <div class="card tutorial">
-              <p>1. Set Scatter networks</p>
-              <img src="@/assets/images/tutorial-1.png"/>
-              <p>2. Add your key</p>
-              <img src="@/assets/images/tutorial-2.png"/>
-              <p>3. Then link your account</p>
-              <img src="@/assets/images/tutorial-3.png"/>
-              <p>4. Login and send your vote to a proposal </p>
-              <img src="@/assets/images/tutorial-4.png"/>
-            </div>
+            <router-view></router-view>
           </el-tab-pane>
         </el-tabs>
         <div class="clear-float">
@@ -196,6 +150,7 @@
               :votes="prop.stats.staked"
               :staked="prop.stats.staked.total"
               :expired="false"
+              :percent="prop.meet_conditions_days"
               ></PropCard>
           </div>
         </div>
@@ -549,6 +504,13 @@ export default {
     },
     forgetIdentity () {
       this.scatter.forgetIdentity()
+    },
+    tabClick (tab) {
+      if (tab.name === 'process') {
+        this.$router.push('/process')
+      } else if (tab.name === 'tutorial') {
+        this.$router.push('/tutorial')
+      }
     }
   },
   watch: {
@@ -604,23 +566,11 @@ export default {
     text-align left
     font-size 20px
     color #8290aa
-#fund-process
-  list-style-type:decimal;
-  text-align:left
-  li
-    margin-top: 20px;
-    margin-bottom: 20px;
 #search-bar
   float right
   display flex
   flex-wrap wrap
   justify-content flex-end
-.tutorial
-  text-align left
-  img
-    display block
-    width 80%
-    margin auto
 .search-input
   width 200px
 .select-button

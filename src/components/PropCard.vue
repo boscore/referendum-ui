@@ -2,6 +2,9 @@
   <div class="prop-card">
     <div class="card-top" :class="cardTopClass">
       <div class="card-top-bar">
+        <div v-if="percent > 0" class="card-top-tag card-top-tag-left clear-float">
+            <span>{{percent}} days satisfied</span>
+        </div>
         <div class="card-top-tag clear-float" :class="cardTagClass">
           {{type.search('referendum') !== -1 ? 'referendum' : 'poll'}}
         </div>
@@ -61,6 +64,10 @@ export default {
     expired: {
       type: Boolean,
       default: false
+    },
+    percent: {
+      type: [String, Number],
+      default: 0
     }
   },
   data () {
@@ -141,6 +148,8 @@ export default {
       text-align center
     .el-progress-bar__inner
       background-image linear-gradient(270deg, #41B976 0%, #2CD69B 100%)
+    .el-progress-bar__outer
+      background-color rgba(65,185,118, 0.2)
   .dissent-percent
     .el-progress__text
       font-family Roboto-Bold
@@ -150,6 +159,8 @@ export default {
       text-align center
     .el-progress-bar__inner
       background-image linear-gradient(269deg, #F06262 0%, #FF7171 100%)
+    .el-progress-bar__outer
+      background-color rgba(240,98,98, 0.2)
 </style>
 
 <style lang="stylus" scoped>
@@ -184,31 +195,47 @@ p
     display -webkit-box !important
     -webkit-box-orient vertical
     -webkit-line-clamp: 3
+  .card-top-bar
+    width 100%
+    height 22px
+    .card-top-tag
+      height 100%
+      width auto
+      padding 0 10px
+      float right
+      text-align center
+      // position absolute
+      // right 0px
+      border-radius 0 12.25px 0 12.25px
+      font-family PingFangSC-Semibold
+      font-size 12px
+      color #FFFFFF
+      letter-spacing 0
+    .card-top-tag-left
+      width auto
+      float left
+      border-radius 12.25px 0 12.25px 0
+      background-image linear-gradient(-137deg, #27AAF3 0%, #15DDCC 100%)
+      position relative
+      // .card-top-progress-bar
+      //   position absolute
+      //   border-radius 12.25px 0 12.25px 0
+      //   background-color #F06262
+      //   line-height 20px
+      //   height 100%
+      //   white-space nowrap
+      //   span
+      //     position absolute
+    .card-top-tag-referendum
+      background-image linear-gradient(-137deg, #27AAF3 0%, #15DDCC 100%)
+    .card-top-tag-poll
+      background-image: linear-gradient(-137deg, #F07814 0%, #FCB557 100%);
 .card-top-expired
   background-image linear-gradient(-179deg, #85929E 0%, #ABB2B9 100%)
 .card-top-referendum
   background-image linear-gradient(-179deg, #317EE3 0%, #59A9EC 100%)
 .card-top-poll
   background-image linear-gradient(1deg, #FFB673 0%, #F97451 100%)
-.card-top-bar
-  width 100%
-  height 22px
-.card-top-tag
-  height 100%
-  width 84px
-  float right
-  text-align center
-  // position absolute
-  // right 0px
-  border-radius 0 12.25px 0 12.25px
-  font-family PingFangSC-Semibold
-  font-size 12px
-  color #FFFFFF
-  letter-spacing 0
-.card-top-tag-referendum
-  background-image linear-gradient(-137deg, #27AAF3 0%, #15DDCC 100%)
-.card-top-tag-poll
-  background-image: linear-gradient(-137deg, #F07814 0%, #FCB557 100%);
 .card-bottom
   min-width 280px
   width 100%
@@ -238,34 +265,36 @@ p
     display -webkit-box !important
     -webkit-box-orient vertical
     -webkit-line-clamp: 5
-.card-bottom-board
-  position absolute
-  bottom 0
-  width 90%
-  display flex
-  align-items flex-end
-  justify-content space-between
-.card-bottom-board-referendum
-  background-image linear-gradient(137deg, #0570EC 0%, #53A0FD 47%, #67FFAF 100%)
-.card-bottom-board-poll
-  background-image: linear-gradient(0deg, #FFB673 0%, #F97451 100%);
-.card-bottom-board-left
-  padding 7px 6px
-  box-sizing border-box
-  height 60px
-  width 70px
-  border-radius 6px 6px 0 0
-  p
-    color #FFFFFF
-    letter-spacing 0
-    text-align center
-.card-bottom-board-right
+  .card-bottom-board
+    position absolute
+    bottom 0
+    width 90%
+    display flex
+    align-items flex-end
+    justify-content space-between
+  .card-bottom-board-referendum
+    background-image linear-gradient(137deg, #0570EC 0%, #53A0FD 47%, #67FFAF 100%)
+  .card-bottom-board-poll
+    background-image: linear-gradient(0deg, #FFB673 0%, #F97451 100%);
+  .card-bottom-board-left
+    padding 7px 6px
+    box-sizing border-box
+    height 60px
+    width 70px
+    border-radius 6px 6px 0 0
+    p
+      color #FFFFFF
+      letter-spacing 0
+      text-align center
+  .card-bottom-board-right
     width calc(100% - 100px)
     text-align left
+    margin-bottom 5px
     p
       font-family Roboto-Regular
       font-size 12px
       color #3A80D4
       letter-spacing 0
       margin-top 5px
+
 </style>

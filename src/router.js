@@ -12,8 +12,24 @@ export default new Router({
   routes: [
     {
       path: '/',
+      name: 'Home',
+      component: Referendum,
+      children: [
+        {
+          path: 'process',
+          component: () => import('@/components/help/PropProcess')
+        },
+        {
+          path: 'tutorial',
+          component: () => import('@/components/help/VoteTutorial')
+        }
+      ]
+    },
+    {
+      path: '/*',
       name: '',
-      component: Referendum
+      component: Referendum,
+      redirect: '/'
     },
     {
       path: '/referendum',
