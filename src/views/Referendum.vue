@@ -218,6 +218,11 @@ export default {
   },
   async mounted () {
     await this.$store.dispatch('getProposals')
+    if (this.$route.name === 'process') {
+      this.activeTab = 'process'
+    } else if (this.$route.name === 'tutorial') {
+      this.activeTab = 'tutorial'
+    }
   },
   computed: {
     scatter () {

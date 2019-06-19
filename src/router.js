@@ -17,10 +17,12 @@ export default new Router({
       children: [
         {
           path: 'process',
+          name: 'process',
           component: () => import('@/components/help/PropProcess')
         },
         {
           path: 'tutorial',
+          name: 'tutorial',
           component: () => import('@/components/help/VoteTutorial')
         }
       ]
