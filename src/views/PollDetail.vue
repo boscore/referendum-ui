@@ -44,7 +44,7 @@
             Comments
           </div>
         </div>
-        <div ref="steps" style="overflow:auto;border-radius: 8px;margin-bottom: 22px">
+        <div ref="steps" class="steps-bar">
           <el-steps  style="background: #fff;min-width:500px;margin-bottom: 0"  class="card" :active="activeStep" simple finish-status="success" process-status="finish">
             <el-step ref="stepItem" title="Vote"></el-step>
             <el-step title="Develop"></el-step>
@@ -102,7 +102,7 @@
             <Comment v-for="(comment, index) in otherComm" :key="index" v-bind="comment"></Comment>
           </div>
         </el-main>
-        <el-aside :width="asideWidth">
+        <el-aside class="aside-right" :width="asideWidth">
           <div class="card" id="poll-status">
             <h2>Poll Status</h2>
             <el-progress :stroke-width="10" class="pass-percent" :percentage="agreePercent"></el-progress>
@@ -194,6 +194,7 @@
               :desc="prop.proposal.proposal_json.content || ''"
               :votes="prop.stats.votes"
               :staked="prop.stats.staked.total"
+              :percent="prop.meet_conditions_days"
               >
             </PropCard>
           </div>
@@ -252,7 +253,7 @@ export default {
       if (this.screenWidth < 821) {
         return '100%'
       }
-      return '350px'
+      return '374px'
     },
     votesOfBP () { // cunrrent active votes of BP election
       return this.$store.state.summaries.bp_votes || -1
@@ -905,11 +906,15 @@ export default {
       color #30D094
     .el-progress-bar__inner
       background-image linear-gradient(270deg, #41B976 0%, #2CD69B 100%)
+    .el-progress-bar__outer
+      background-color rgba(65,185,118, 0.2)
   .dissent-percent
     .el-progress__text
       color #F46666
     .el-progress-bar__inner
       background-image linear-gradient(269deg, #F06262 0%, #FF7171 100%)
+    .el-progress-bar__outer
+      background-color rgba(240,98,98, 0.2)
   .satisfied-percent
     .el-progress__text
       color #F4D03F
@@ -920,7 +925,8 @@ export default {
       color #3498DB
     .el-progress-bar__inner
       background-image linear-gradient(270deg, #5DADE2 0%, #3498DB 100%)
-
+    .el-progress-bar__outer
+      background-color rgba(93,173,226, 0.2)
 </style>
 
 <style lang="stylus" scoped>
@@ -928,7 +934,7 @@ export default {
   background-color rgb(232,236,255)
   padding 20px 0
   text-align left
-  color: #507DFE;
+  color #507DFE
 .chart-card
   text-align: center
   overflow: auto
@@ -958,6 +964,8 @@ export default {
   h1, h2, h3, h4, h5
     font-family: Roboto-Medium;
     color: #507DFE;
+.aside-right
+  padding 0 12px
 .prop-content
   overflow-wrap break-word
   >>> h1
@@ -1019,6 +1027,11 @@ export default {
   display flex
   flex-wrap wrap
   justify-content center
+.steps-bar
+  overflow auto
+  border-radius 8px
+  margin-bottom 22px
+  margin-right 12px
 @media only screen and (max-width 840px)
   .main
     padding 0
