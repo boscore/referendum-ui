@@ -28,12 +28,6 @@ export default new Router({
       ]
     },
     {
-      path: '/*',
-      name: '',
-      component: Referendum,
-      redirect: '/'
-    },
-    {
       path: '/referendum',
       name: 'referendum',
       component: Referendum
@@ -57,6 +51,12 @@ export default new Router({
       path: '/create_proposal',
       name: 'create_proposal',
       component: CreateProposal
+    },
+    {
+      path: '/*',
+      name: '',
+      component: Referendum,
+      redirect: '/'
     }
   ]
 })
