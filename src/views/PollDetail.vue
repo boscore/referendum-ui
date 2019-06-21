@@ -419,9 +419,11 @@ export default {
     incentives () {
       if (this.proposal) {
         if (this.proposal.proposal.proposal_json.incentives !== undefined) {
-          let incentives = Number(this.proposal.proposal.proposal_json.incentives)
+          let incentives = Number(this.proposal.proposal.proposal_json.incentives.split(' ')[0])
+          console.log(incentives)
           let integer = Number(incentives.toFixed(0))
           let decimals = String(incentives * 10000 % 10000)
+          console.log(decimals)
           while (decimals.length < 4) {
             decimals = '0' + decimals
           }
