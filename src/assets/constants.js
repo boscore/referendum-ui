@@ -50,5 +50,6 @@ export const API_URL = {
   API_GET_ALL_VOTES: 'https://s3.amazonaws.com/bos.referendum/eosio.forum/vote/latest.json',
   API_POLL_TALLY: 'https://s3.amazonaws.com/bos.referendum/referendum/tallies/latest.json',
   API_GET_ALL_PROXIES: 'https://s3.amazonaws.com/bos.referendum/referendum/proxies/latest.json',
-  API_GET_SUMMARIES: 'https://s3.amazonaws.com/bos.referendum/referendum/summaries/latest.json'
+  API_GET_SUMMARIES: 'https://s3.amazonaws.com/bos.referendum/referendum/summaries/latest.json',
+  API_AUDITOR_TALLY: 'https://s3.amazonaws.com/bos.referendum/referendum/auditor.tallies/latest.json'
 }

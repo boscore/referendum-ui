@@ -990,6 +990,8 @@ export default {
     font-size: 18px;
     color: #8A8A8A;
     letter-spacing: 0;
+  >>> a
+    color #0366d6
   >>> img
     max-width 100%
 #back-button

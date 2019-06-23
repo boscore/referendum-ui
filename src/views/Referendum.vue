@@ -216,6 +216,14 @@ export default {
       searchBy: ''
     }
   },
+  created () {
+    document.onkeydown = (e) => {
+      let key = window.event.keyCode
+      if (key === 13) {
+        this.searchBy = this.searchText
+      }
+    }
+  },
   async mounted () {
     await this.$store.dispatch('getProposals')
     if (this.$route.name === 'process') {
@@ -511,10 +519,19 @@ export default {
       this.scatter.forgetIdentity()
     },
     tabClick (tab) {
-      if (tab.name === 'process') {
-        this.$router.push('/process')
-      } else if (tab.name === 'tutorial') {
-        this.$router.push('/tutorial')
+      switch (tab.name) {
+        case 'process':
+          this.$router.push('/process')
+          break
+        case 'tutorial':
+          this.$router.push('/tutorial')
+          break
+        case 'proposals':
+          this.$router.push('/referendum')
+          break
+        case 'votes':
+          this.$router.push('/referendum')
+          break
       }
     }
   },
