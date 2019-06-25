@@ -13,19 +13,21 @@
           <div class="candidate-list">
             <h1>Candidate List <span style="color: #91ADFF;">- {{candidatesList.length}}</span></h1>
             <!-- <p>The Custodian Board manages the operations and affairs of the DAC, including but not limited to the governance and administration of the assets and liabilities of the DAC. The following DAC members have vested some of their tokens to submit themselves and candidates for a position on the custodian board which last for 7 days. Every 7 days, your votes are recalculated to select who will be part of the next custodian board. Voting is important! Please vote often and stay engaged within the DAC to know who is providing value</p> -->
-            <div
-              v-loading="candidateLoading"
-              v-for="candidate in candidatesList"
-              :key="candidate.candidate_name">
-              <CandidateCollapse
-                v-if="candidate.is_active"
-                @select="handleSelect"
-                :id="candidate.candidate_name"
-                :votes="candidate.total_votes"
-                :inform="candidate.inform"
-                :isSelected="candidate.isSelected"
-                :staked="candidate.locked_tokens"
-                ></CandidateCollapse>
+            <div style="min-height: 50px" v-loading="candidateLoading">
+              <div
+
+                v-for="candidate in candidatesList"
+                :key="candidate.candidate_name">
+                <CandidateCollapse
+                  v-if="candidate.is_active"
+                  @select="handleSelect"
+                  :id="candidate.candidate_name"
+                  :votes="candidate.total_votes"
+                  :inform="candidate.inform"
+                  :isSelected="candidate.isSelected"
+                  :staked="candidate.locked_tokens"
+                  ></CandidateCollapse>
+              </div>
             </div>
           </div>
         </div>
@@ -135,8 +137,7 @@
   <el-dialog
     title="Stake more"
     :visible.sync="stakeVisible"
-    width="30%"
-    :before-close="handleClose">
+    width="30%">
     <el-input @change="formatStakeAmount" v-model="stakeAmount"></el-input>
     <span slot="footer" class="dialog-footer">
       <el-button @click="stakeVisible = false">Cancel</el-button>
@@ -148,7 +149,7 @@
 
 <script>
 import Eos from 'eosjs'
-import { NETWORK, NODE_ENDPOINT } from '@/assets/constants.js'
+import { NETWORK, NODE_ENDPOINT, API_URL } from '@/assets/constants.js'
 import Avatar from '@/components/Avatar.vue'
 
 import { MessageBox as MbMessageBox } from 'mint-ui'
@@ -325,23 +326,15 @@ export default {
       })
     },
     getCandidates () {
-      const tableOptions = {
-        'scope': 'auditor.bos',
-        'code': 'auditor.bos',
-        'table': 'candidates',
-        'json': true
-      }
-      fetch(NODE_ENDPOINT + '/v1/chain/get_table_rows', {
-        method: 'POST',
-        body: JSON.stringify(tableOptions)
-      }).then(res => res.json()).then(res => {
-        this.allCandList = []
-        this.candidatesList = []
+      fetch(API_URL.API_AUDITOR_TALLY).then(res => res.json()).then(res => {
         this.candidateLoading = false
-        res.rows.forEach(candidate => {
-          candidate.isSelected = false
+        Object.keys(res).forEach(key => {
+          let item = {
+            total_votes: res[key].stats.staked.total,
+            isSelected: false
+          }
           let inform = this.bioInfo.find(element => {
-            return element.candidate_name === candidate.candidate_name
+            return element.candidate_name === res[key].id
           })
           if (inform) {
             try {
@@ -349,21 +342,54 @@ export default {
             } catch (e) {
               console.log('json invalid')
             }
-            candidate.inform = inform.bio
-            candidate.isSelected = false
+            item.inform = inform.bio
           }
-          this.allCandList.push(candidate)
-          if (candidate.is_active) {
-            this.candidatesList.push(candidate)
-            this.candidatesList.sort((a, b) => { return b.total_votes - a.total_votes })
-          }
+          item = Object.assign(item, res[key].candidate)
+          this.candidatesList.push(item)
         })
       }).catch(e => {
         this.candidateLoading = false
-        let error = this.$util.errorFormat(e)
-        this.alert('Error', 'Get candidates ERROR:' + error.message)
         console.log(e)
       })
+      // const tableOptions = {
+      //   'scope': 'auditor.bos',
+      //   'code': 'auditor.bos',
+      //   'table': 'candidates',
+      //   'json': true
+      // }
+      // fetch(NODE_ENDPOINT + '/v1/chain/get_table_rows', {
+      //   method: 'POST',
+      //   body: JSON.stringify(tableOptions)
+      // }).then(res => res.json()).then(res => {
+      //   this.allCandList = []
+      //   this.candidatesList = []
+      //   this.candidateLoading = false
+      //   res.rows.forEach(candidate => {
+      //     candidate.isSelected = false
+      //     let inform = this.bioInfo.find(element => {
+      //       return element.candidate_name === candidate.candidate_name
+      //     })
+      //     if (inform) {
+      //       try {
+      //         inform.bio = JSON.parse(inform.bio)
+      //       } catch (e) {
+      //         console.log('json invalid')
+      //       }
+      //       candidate.inform = inform.bio
+      //       candidate.isSelected = false
+      //     }
+      //     this.allCandList.push(candidate)
+      //     if (candidate.is_active) {
+      //       this.candidatesList.push(candidate)
+      //       this.candidatesList.sort((a, b) => { return b.total_votes - a.total_votes })
+      //     }
+      //   })
+      // }).catch(e => {
+      //   this.candidateLoading = false
+      //   let error = this.$util.errorFormat(e)
+      //   this.alert('Error', 'Get candidates ERROR:' + error.message)
+      //   console.log(e)
+      // })
     },
     getAuditors () {
       const tableOptions = {
