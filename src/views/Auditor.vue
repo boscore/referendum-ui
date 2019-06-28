@@ -3,7 +3,7 @@
     <el-container v-loading="actionLoading">
       <el-main style="padding-top:0">
         <div class="main-panel">
-          <h1>Auditor Board</h1>
+          <h1>{{$t('auditor.auditorBoard')}}</h1>
           <div class="card board" v-loading="auditorLoading">
             <div v-for="auditor in auditorsList" :key="auditor.auditor_name" class="board-item">
               <Avatar :url="auditor.inform ? auditor.inform.avatar : ''" star></Avatar>
@@ -11,7 +11,7 @@
             </div>
           </div>
           <div class="candidate-list">
-            <h1>Candidate List <span style="color: #91ADFF;">- {{candidatesList.length}}</span></h1>
+            <h1>{{$t('auditor.candidateList') + ' '}}<span style="color: #91ADFF;">- {{candidatesList.length}}</span></h1>
             <!-- <p>The Custodian Board manages the operations and affairs of the DAC, including but not limited to the governance and administration of the assets and liabilities of the DAC. The following DAC members have vested some of their tokens to submit themselves and candidates for a position on the custodian board which last for 7 days. Every 7 days, your votes are recalculated to select who will be part of the next custodian board. Voting is important! Please vote often and stay engaged within the DAC to know who is providing value</p> -->
             <div style="min-height: 50px" v-loading="candidateLoading">
               <div
@@ -35,14 +35,17 @@
       <el-aside :width="asideWidth">
         <div class="vote-panel">
           <h1>
-            My Vote <span style="color: #91ADFF;">{{selectedCandidates.length}}/{{config ? config.maxvotes : 5}}</span>
+            {{$t('auditor.myVotes')}} <span style="color: #91ADFF;"> {{selectedCandidates.length}}/{{config ? config.maxvotes : 5}}</span>
           </h1>
           <p>
-            You can vote for up to 5 auditor candidates at a time. Please select candidates who you think will bring value to the BOS.
+            {{$t('auditor.voteRule')}}
           </p>
           <div class="selected-candidates card">
-            <div @click="sendVotes" class="vote-button" :class="{'vote-button-active': selectedCandidates.length}">
-              {{selectedCandidates.length ? 'SUBMIT MY VOTES' : 'MY VOTES'}}
+            <div v-if="selectedCandidates.length" @click="sendVotes" class="vote-button vote-button-active">
+              {{$t('auditor.submitVotes').toLocaleUpperCase()}}
+            </div>
+            <div v-else class="vote-button">
+              {{$t('auditor.myVotes').toLocaleUpperCase()}}
             </div>
             <div v-for="candidate in selectedCandidates" :key="candidate.id" class="selected-candidate-card">
               <Avatar size="35px" :url="candidate.image"></Avatar>
@@ -53,11 +56,17 @@
             </div>
           </div>
         </div>
-        <div v-if="$store.state.isPC">
+        <div class="card">
+          <h2>The conditions for the approved proposal</h2>
+          <p>1. The votes from token holders is not less than 3% of BP votes from token holders when the election was initiated.</p>
+          <p>2. The ratio of approved votes / disapproved is greater than 1.5.</p>
+          <p>3. The above conditions last for 20 days.</p>
+        </div>
+        <div style="margin-bottom: 20px" v-if="$store.state.isPC">
           <div v-if="myCandidate && !myAuditor" class="card">
-            <h1>You are a candidate</h1>
-            <p>Votes: {{(myCandidate.total_votes / 10000).toFixed(4)}}</p>
-            <p>Staked: {{myCandidate.locked_tokens}}</p>
+            <h1>{{$t('auditor.youAreCand')}}</h1>
+            <p>{{$t('common.votes')}}: {{(myCandidate.total_votes / 10000).toFixed(4)}}</p>
+            <p>{{$t('common.staked')}}: {{myCandidate.locked_tokens}}</p>
             <el-progress
              :text-inside="true"
              :stroke-width="20"
@@ -65,24 +74,24 @@
              class="pass-percent"
              :percentage="stakePercent"></el-progress>
             <div v-if="myCandidate.is_active">
-              <p>you are active for elections</p>
-              <div @click="() => {stakeVisible = true}" class="vote-button vote-button-active">Stake More</div>
-              <div @click="inactive" class="vote-button vote-button-active">Unregister</div>
+              <p>{{$t('auditor.activeTip')}}</p>
+              <div @click="() => {stakeVisible = true}" class="vote-button vote-button-active">{{$t('auditor.stakeMore')}}</div>
+              <div @click="inactive" class="vote-button vote-button-active">{{$t('auditor.unregister')}}</div>
             </div>
             <div v-else >
-              <p>you are inactive for elections</p>
+              <p>{{$t('auditor.inactiveTip')}}</p>
               <div v-if="myCandidate.locked_tokens !== '0.0000 BOS' || pendingStake">
-                <div @click="active" class="vote-button vote-button-active">Register</div>
-                <div @click="unstake" class="vote-button vote-button-active">Unstake</div>
+                <div @click="active" class="vote-button vote-button-active">{{$t('common.register')}}</div>
+                <div @click="unstake" class="vote-button vote-button-active">{{$t('common.unstake')}}</div>
               </div>
-              <div v-else @click="stake(config.lockupasset)" class="vote-button vote-button-active">Stake</div>
+              <div v-else @click="stake(config.lockupasset)" class="vote-button vote-button-active">{{$t('common.stake')}}</div>
             </div>
-            <div @click="showUpdate" class="vote-button vote-button-active">Update info</div>
+            <div @click="showUpdate" class="vote-button vote-button-active">{{$t('auditor.updateInfo')}}</div>
           </div>
           <div v-else-if="myAuditor" class="card">
-            <h1>You are a auditor</h1>
-            <p>Votes: {{(myAuditor.total_votes / 10000).toFixed(4)}}</p>
-            <div @click="showUpdate" class="vote-button vote-button-active">Update info</div>
+            <h1>{{$t('auditor.youAreAuditor')}}</h1>
+            <p>{{$t('common.votes')}}: {{(myAuditor.total_votes / 10000).toFixed(4)}}</p>
+            <div @click="showUpdate" class="vote-button vote-button-active">{{$t('auditor.updateInfo')}}</div>
           </div>
           <div v-else-if="scatter">
             <div v-if="!scatter.identity" class="button square-button"
@@ -326,7 +335,7 @@ export default {
       })
     },
     getCandidates () {
-      fetch(API_URL.API_AUDITOR_TALLY).then(res => res.json()).then(res => {
+      fetch(API_URL.API_GET_ALL_CANDIDATES).then(res => res.json()).then(res => {
         this.candidateLoading = false
         Object.keys(res).forEach(key => {
           let item = {
@@ -345,7 +354,11 @@ export default {
             item.inform = inform.bio
           }
           item = Object.assign(item, res[key].candidate)
-          this.candidatesList.push(item)
+          this.allCandList.push(item)
+          if (item.is_active) {
+            this.candidatesList.push(item)
+            this.candidatesList.sort((a, b) => { return b.total_votes - a.total_votes })
+          }
         })
       }).catch(e => {
         this.candidateLoading = false
@@ -782,6 +795,20 @@ h1
   box-shadow: 0 2px 4px 0 #B0D9FF;
   border-radius: 8px;
   margin-bottom 22px
+  h1
+    font-family: Roboto-Medium;
+    font-size: 24px;
+    color #507DFE
+    letter-spacing: 0;
+  h2
+    font-family: Roboto-Medium;
+    color #507DFE
+    font-size: 20px;
+  p
+    font-family: Roboto-Regular;
+    font-size: 18px;
+    color: #8A8A8A;
+    letter-spacing: 0;
 .selected-candidate-card
   background: #FCFDFF;
   box-shadow: 0 2px 4px 0 #B0D9FF;

@@ -1,0 +1,93 @@
+{
+  "common": {
+    "abstain": "弃权",
+    "account": "账户",
+    "auditor": "评审员",
+    "back": "返回",
+    "cancel": "取消",
+    "createdTime": "创建时间",
+    "createProp": "创建提案",
+    "day": "天",
+    "login": "登录",
+    "optional": "可选",
+    "proposal": "提案",
+    "poll": "民意调查",
+    "register": "注册",
+    "referendum": "公投",
+    "removeId": "注销",
+    "result": "结果",
+    "no": "反对",
+    "satisfied": "满足条件",
+    "stake": "抵押",
+    "staked": "已抵押",
+    "unstake": "赎回抵押",
+    "unvote": "取消投票",
+    "vote": "投票",
+    "votes": "投票",
+    "votedTime": "投票时间",
+    "yes": "同意"
+  },
+  "referendum": {
+    "discoverProps": "浏览提案",
+    "howToVote": "如何投票",
+    "myProps": "我的提案",
+    "myVotes": "我的投票",
+    "opinionMatter": "你的意见事项",
+    "propProcess": "提案流程",
+    "sortType": {
+      "most": "投票最多",
+      "newest": "按日期倒序",
+      "oldest": "按日期顺序"
+    }
+  },
+  "auditor": {
+    "auditorBoard": "评审员列表",
+    "activeTip": "你正在参与竞选",
+    "BIO": "简介",
+    "candidateList": "候选人列表",
+    "inactiveTip": "你已退出竞选",
+    "myVotes": "我的投票",
+    "submitVotes": "提交我的投票",
+    "stakeMore": "继续抵押",
+    "updateInfo": "更新信息",
+    "unregister": "退出竞选",
+    "voteRule": "你一次可以最多给3名候选人投票。请选出最能为BOS带来价值的候选人。",
+    "youAreCand": "你是一位候选人",
+    "youAreAuditor": "你是一位评审员"
+  },
+  "form": {
+    "budget": "预算",
+    "content": "内容",
+    "proposer": "提案者",
+    "proposalName": "提案名",
+    "receiptor": "接收账户",
+    "submit": "提交",
+    "support": "支持",
+    "title": "标题",
+    "type": "类型"
+  },
+  "proposal": {
+    "back": "查看全部提案",
+    "budget": "预算",
+    "BP": "超级节点",
+    "comments": "评论",
+    "desc": "描述",
+    "develop": "开发",
+    "finish": "结束",
+    "other": "其它",
+    "propStatus": "提案状态",
+    "publicComment": "发表评论",
+    "review": "评审",
+    "stats": "统计",
+    "voters": "投票者",
+    "vote": "投票",
+    "voteSize": "投票占比"
+  },
+  "warning": {
+    "needScatter": "需要使用Scatter",
+    "pairScatter": "登录",
+    "getScatter": "获取Scatter",
+    "noRecord": "无记录",
+    "noResult": "无结果"
+  }
+}

@@ -1,15 +1,30 @@
 import { MessageBox as MbMessageBox } from 'mint-ui'
 import { MessageBox } from 'element-ui'
+import en from 'element-ui/lib/locale/lang/en'
+import cn from 'element-ui/lib/locale/lang/zh-CN'
+import locale from 'element-ui/lib/locale'
+
+const elLang = {
+  'en': en,
+  'cn': cn
+}
 
 export default {
   alert,
   dateConvert,
+  changeLanguage,
   errorFormat,
   toThousands,
   isExpired,
   isPC,
   transSpecialChar,
   unTransSpecialChar
+}
+
+function changeLanguage (lang) {
+  locale.use(elLang[lang])
+  localStorage.setItem('language', lang)
+  this.$i18n.locale = lang
 }
 
 function dateConvert (date) {

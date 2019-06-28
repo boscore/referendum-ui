@@ -13,7 +13,7 @@
                 <span v-if="(givenName || familyName)" style="font-family: Roboto-Regular">{{`(${givenName} ${familyName})`}}</span>
               </p>
               <p class="vote">
-                Votes: {{formVotes}} &nbsp;&nbsp; Staked:{{staked}}
+                {{$t('common.votes')}}: {{formVotes}} &nbsp;&nbsp; {{$t('common.staked')}}:{{staked}}
               </p>
             </div>
             <i
@@ -25,7 +25,7 @@
         </div>
         <div class="collapse-wrap" :style="{display: isActive ? 'block' : 'none'}">
           <div class="title">
-            <h1>BIO</h1>
+            <h1>{{$t('auditor.BIO')}}</h1>
             <p v-if="contact" style="float:right">Email: {{contact}}</p>
           </div>
           <div v-html="desc" class="content"></div>

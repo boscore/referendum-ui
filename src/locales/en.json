@@ -1,0 +1,92 @@
+{
+  "common": {
+    "abstain": "abstain",
+    "account": "Account",
+    "auditor": "Auditor",
+    "back": "Back",
+    "cancel": "Cancel",
+    "createdTime": "Created Time",
+    "createProp": "Create Proposal",
+    "day": "day",
+    "login": "Login",
+    "optional": "optional",
+    "proposal": "Proposal",
+    "register": "Register",
+    "referendum": "Referendum",
+    "removeId": "Remove Identity",
+    "result": "Result",
+    "no": "No",
+    "satisfied": "satisfied",
+    "stake": "Stake",
+    "staked": "Staked",
+    "unstake": "Unstake",
+    "unvote": "Unvote",
+    "vote": "Vote",
+    "votes": "Votes",
+    "votedTime": "Voted Time",
+    "yes": "YES"
+  },
+  "auditor": {
+    "auditorBoard": "Auditor Board",
+    "activeTip": "you are active for elections",
+    "BIO": "BIO",
+    "candidateList": "Candidate List",
+    "inactiveTip": "you are inactive for elections",
+    "myVotes": "My Votes",
+    "submitVotes": "Submit My Votes",
+    "stakeMore": "Stake More",
+    "updateInfo": "Update Info",
+    "unregister": "Unregister",
+    "voteRule": "You can vote for up to 3 auditor candidates at a time. Please select candidates who you think will bring value to the BOS.",
+    "youAreCand": "You are a candidate",
+    "youAreAuditor": "You are a auditor"
+  },
+  "form": {
+    "budget": "Budget",
+    "content": "Content",
+    "proposer": "Proposer",
+    "proposalName": "Proposal Name",
+    "receiptor": "Receipt account",
+    "submit": "Submit",
+    "support": "support",
+    "title": "Title",
+    "type": "Type"
+  },
+  "proposal": {
+    "back": "View All Proposals",
+    "budget": "Budget",
+    "BP": "BP",
+    "comments": "Comments",
+    "desc": "Description",
+    "develop": "Develop",
+    "finish": "Finish",
+    "other": "Other",
+    "propStatus": "Proposal Status",
+    "publicComment": "Post a public comment",
+    "review": "Review",
+    "stats": "Stats",
+    "voters": "Voters",
+    "vote": "Vote",
+    "voteSize": "Votes by vote size"
+  },
+  "referendum": {
+    "discoverProps": "Discover Proposals",
+    "howToVote": "How to vote",
+    "myProps": "My proposals",
+    "myVotes": "My votes",
+    "opinionMatter": "Your Opinion Matters",
+    "propProcess": "Proposal process",
+    "sortType": {
+      "most": "Most Voted",
+      "newest": "Newest First",
+      "oldest": "Oldest First"
+    }
+  },
+  "warning": {
+    "needScatter": "Scatter is required!",
+    "pairScatter": "Pair Scatter",
+    "getScatter": "Get Scatter",
+    "noRecord": "No record found",
+    "noResult": "No result found"
+  }
+}

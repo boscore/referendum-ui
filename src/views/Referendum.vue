@@ -3,7 +3,7 @@
     <el-container>
       <el-main>
         <div class="clear-float">
-          <h1 class="title" style="float:left">Your Opinion Matters</h1>
+          <h1 class="title" style="float:left">{{$t('referendum.opinionMatter')}}</h1>
           <div id="search-bar">
             <el-input
               clearable
@@ -18,24 +18,24 @@
         </div>
         <el-tabs @tab-click="tabClick" v-model="activeTab">
           <!-- 我的提案 -->
-          <el-tab-pane label="My proposals" name="proposals">
+          <el-tab-pane :label="$t('referendum.myProps')" name="proposals">
             <div v-loading="actionLoading" class="card" style="margin: 10px 0px">
               <div v-if="scatter">
                 <div v-if="!scatter.identity">
-                  <p>A Scatter account is required</p>
-                  <div class="button" @click="getIdentity">Pair Scatter</div>
+                  <p>{{$t('warning.needScatter')}}</p>
+                  <div class="button" @click="getIdentity">{{$t('warning.pairScatter')}}</div>
                 </div>
                 <div class="proposal-table" v-else>
-                  <p class="account-name">Account: {{scatter.identity.accounts[0].name}}
-                    <span v-if="$store.state.isPC" class="button" @click="forgetIdentity">Remove Identity</span>
+                  <p class="account-name">{{$t('common.account')}}: {{scatter.identity.accounts[0].name}}
+                    <span v-if="$store.state.isPC" class="button" @click="forgetIdentity">{{$t('common.removeId')}}</span>
                     <router-link v-if="$store.state.isPC" :to="{path: '/create_proposal'}">
-                      <span class="button">Create Proposal</span>
+                      <span class="button">{{$t('common.createProp')}}</span>
                     </router-link>
                   </p>
                   <div style="overflow: auto">
-                  <el-table style="min-width: 600px"  :data="myProposals" empty-text="No records found" :default-sort="{prop:'proposal_name', order:'ascending'}">
-                    <el-table-column sortable label="Proposal" prop="proposal_name"></el-table-column>
-                    <el-table-column sortable label="Created" >
+                  <el-table style="min-width: 600px"  :data="myProposals" :empty-text="$t('warning.noRecord')" :default-sort="{prop:'proposal_name', order:'ascending'}">
+                    <el-table-column sortable :label="$t('common.proposal')" prop="proposal_name"></el-table-column>
+                    <el-table-column sortable :label="$t('common.createdTime')" >
                        <template slot-scope="scope">
                          <span>{{$util.dateConvert(scope.row.created_at)}}</span>
                        </template>
@@ -48,7 +48,7 @@
                           </span>
                           <el-dropdown-menu slot="dropdown">
                             <el-dropdown-item type="primary" >
-                              <p @click="cancelProp(scope.row.proposal_name)">Cancel </p>
+                              <p @click="cancelProp(scope.row.proposal_name)">{{$t('common.cancel')}} </p>
                             </el-dropdown-item>
                             <el-dropdown-item v-if="scope.row.shouldReview" type="primary" @click="applyReview(scope.row.proposal_name)">
                               Apply for Review
@@ -63,58 +63,58 @@
                 </div>
               </div>
               <div v-else>
-                <p>Scatter is required!</p>
+                <p>{{$t('warning.needScatter')}}</p>
                 <a target="blank" href="https://get-scatter.com/">
-                 <div class="button">Get Scatter</div>
+                 <div class="button">{{$t('getScatter')}}</div>
                 </a>
               </div>
             </div>
           </el-tab-pane>
           <!-- 我的投票 -->
-          <el-tab-pane label="My votes" name="votes">
+          <el-tab-pane :label="$t('referendum.myVotes')" name="votes">
             <div class="card" style="margin: 10px 0px">
               <div v-if="scatter">
                 <div v-if="!scatter.identity">
-                  <p>A Scatter account is required</p>
-                  <div class="button" @click="getIdentity">Pair Scatter</div>
+                  <p>{{$t('warning.needScatter')}}</p>
+                  <div class="button" @click="getIdentity">{{$t('warning.pairScatter')}}</div>
                 </div>
                 <div class="proposal-table" v-else>
-                  <p class="account-name">Account: {{scatter.identity.accounts[0].name}}
-                     <span v-if="$store.state.isPC" style="margin: 0 10px" class="button" @click="forgetIdentity">Remove Identity</span></p>
-                  <el-table :data="myVotes" empty-text="No records found" :default-sort="{prop:'proposal_name', order:'ascending'}">
-                    <el-table-column sortable label="Proposal" prop="proposal_name"></el-table-column>
-                    <el-table-column sortable label="Result" prop="result"></el-table-column>
-                    <el-table-column sortable label="Voted">
+                  <p class="account-name">{{$t('common.account')}}: {{scatter.identity.accounts[0].name}}
+                     <span v-if="$store.state.isPC" style="margin: 0 10px" class="button" @click="forgetIdentity">{{$t('common.removeId')}}</span></p>
+                  <el-table :data="myVotes" :empty-text="$t('warning.noRecord')" :default-sort="{prop:'proposal_name', order:'ascending'}">
+                    <el-table-column sortable :label="$t('common.proposal')" prop="proposal_name"></el-table-column>
+                    <el-table-column sortable :label="$t('common.result')" prop="result"></el-table-column>
+                    <el-table-column sortable :label="$t('common.votedTime')">
                       <template slot-scope="scope">
                          <span>{{$util.dateConvert(scope.row.updated_at)}}</span>
                        </template>
                     </el-table-column>
                     <el-table-column>
                       <template slot-scope="scope">
-                         <el-button type="danger" @click="unvote(scope.row.proposal_name)">Unvote</el-button>
+                         <el-button type="danger" @click="unvote(scope.row.proposal_name)">{{$t('common.unvote')}}</el-button>
                        </template>
                     </el-table-column>
                   </el-table>
                 </div>
               </div>
               <div v-else>
-                <p>Scatter is required!</p>
+                <p>{{$t('warning.needScatter')}}</p>
                 <a target="blank" href="https://get-scatter.com/">
-                 <div class="button">Get Scatter</div>
+                 <div class="button">{{$t('getScatter')}}</div>
                 </a>
               </div>
             </div>
           </el-tab-pane>
           <!-- 提案流程 -->
-          <el-tab-pane label="Proposal process" name="process">
+          <el-tab-pane :label="$t('referendum.propProcess')" name="process">
             <router-view></router-view>
           </el-tab-pane>
-          <el-tab-pane v-if="$store.state.isPC" label="How to vote" name="tutorial">
+          <el-tab-pane v-if="$store.state.isPC" :label="$t('referendum.howToVote')" name="tutorial">
             <router-view></router-view>
           </el-tab-pane>
         </el-tabs>
         <div class="clear-float">
-            <h1 class="title" style="float:left">Discover Polls</h1>
+            <h1 class="title" style="float:left">{{$t('referendum.discoverProps')}}</h1>
             <div style="float:right">
               <el-select class="select-button" v-model="sortBy">
                 <el-option
@@ -134,7 +134,7 @@
             </el-select>
             </div>
           </div>
-        <p v-if="propList.length === 0">No relevant proposals</p>
+        <p v-if="propList.length === 0">{{$t('warning.noResult')}}</p>
         <div class="prop-list" v-loading="!proposals">
           <div
             class="prop-item"
@@ -186,31 +186,7 @@ export default {
       extendTime: null,
       extendPropName: '',
       extendVisible: false,
-      sortOptions: [
-        {
-          value: 'MostVoted',
-          label: 'Most Voted'
-        },
-        {
-          value: 'NewestFirst',
-          label: 'Newest First'
-        },
-        {
-          value: 'OldestFirst',
-          label: 'Oldest First'
-        }
-      ],
-      filterOptions: [
-        {
-          value: 'poll',
-          label: 'Poll'
-        },
-        {
-          value: 'referendum',
-          label: 'Referendum'
-        }
-      ],
-      filterBy: ['poll', 'referendum'],
+      filterBy: ['referendum', 'poll'],
       sortBy: 'MostVoted',
       searchText: '',
       searchBy: ''
@@ -243,6 +219,18 @@ export default {
         return eos
       }
       return null
+    },
+    filterOptions () {
+      return [
+        {
+          value: 'referendum',
+          label: this.$t('common.referendum')
+        },
+        {
+          value: 'poll',
+          label: this.$t('common.poll')
+        }
+      ]
     },
     proposals () {
       return this.$store.state.proposals
@@ -362,6 +350,22 @@ export default {
         })
       }
       return myProposals
+    },
+    sortOptions () {
+      return [
+        {
+          value: 'MostVoted',
+          label: this.$t('referendum.sortType.most')
+        },
+        {
+          value: 'NewestFirst',
+          label: this.$t('referendum.sortType.newest')
+        },
+        {
+          value: 'OldestFirst',
+          label: this.$t('referendum.sortType.oldest')
+        }
+      ]
     }
   },
   methods: {

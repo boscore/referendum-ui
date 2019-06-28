@@ -3,10 +3,10 @@
     <div class="card-top" :class="cardTopClass">
       <div class="card-top-bar">
         <div v-if="percent > 0" class="card-top-tag card-top-tag-left clear-float">
-            <span>{{percent}} days satisfied</span>
+          <span>{{percent}} days satisfied</span>
         </div>
         <div class="card-top-tag clear-float" :class="cardTagClass">
-          {{type.search('referendum') !== -1 ? 'referendum' : 'poll'}}
+          {{type.search('referendum') !== -1 ? $t('common.referendum') : $t('common.poll')}}
         </div>
       </div>
       <p>{{title}}</p>

@@ -11,11 +11,16 @@
     <el-menu :class="[{'hidden-menu': !showMenu}]" style="float:right" :default-active="activeIndex" mode="horizontal">
       <el-menu-item index="referendum" @click="$router.push('/referendum')">{{$t('common.referendum')}}</el-menu-item>
       <el-menu-item index="auditor" @click="$router.push('/auditor')">{{$t('common.auditor')}}</el-menu-item>
+      <el-submenu index="languages" style="float:right">
+        <template slot="title">{{languages[$i18n.locale]}}</template>
+        <el-menu-item @click="changeLang('en')" style="text-align:center">English</el-menu-item>
+        <el-menu-item @click="changeLang('cn')" style="text-align:center">中文</el-menu-item>
+      </el-submenu>
       <el-submenu index="logout" style="float:right" v-if="account">
         <template slot="title">{{account}}</template>
-        <el-menu-item @click="forgetIdentity" style="text-align:center">Remove Identity</el-menu-item>
+        <el-menu-item @click="forgetIdentity" style="text-align:center">{{$t('common.removeId')}}</el-menu-item>
       </el-submenu>
-      <el-menu-item index="login"  v-else @click="getIdentity">Login</el-menu-item>
+      <el-menu-item index="login"  v-else @click="getIdentity">{{$t('common.login')}}</el-menu-item>
     </el-menu>
     </div>
   </div>
@@ -27,7 +32,11 @@ export default {
   name: 'NavMenu',
   data () {
     return {
-      showMenu: false
+      showMenu: false,
+      languages: {
+        en: 'English',
+        cn: '中文'
+      }
     }
   },
   computed: {
@@ -45,6 +54,9 @@ export default {
     }
   },
   methods: {
+    changeLang (lang) {
+      this.$util.changeLanguage.call(this, lang)
+    },
     getIdentity () { // scatter认证
       const requiredFields = {
         accounts: [ NETWORK ]
@@ -78,9 +90,6 @@ export default {
 .nav-menu
   background-color #fff
   position relative
-// .el-menu
-// .el-menu-item
-  // float right
 .search-mask
   width 100%
   height 100%

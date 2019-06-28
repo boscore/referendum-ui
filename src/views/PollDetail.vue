@@ -3,7 +3,7 @@
     <el-container>
       <el-main class="header">
         <div id="back-button" @click="$router.push({path: '/'})">
-          <i class="el-icon-arrow-left"></i>View All Polls
+          <i class="el-icon-arrow-left"></i>{{$t('proposal.back')}}
         </div>
         <h1>{{proposal.proposal.title}}
         </h1>
@@ -15,41 +15,41 @@
           <!-- <span style="margin: 0 5px">{{$util.dateConvert(proposal.proposal.expires_at)}} </span> -->
           <span >{{proposal.proposal.proposal_json.type || 'unknown'}} </span>
           <br v-if="!$store.state.isPC"/>
-          <span style="font-weight:600">Budget: {{incentives}}</span>
+          <span style="font-weight:600">{{$t('proposal.budget')}}: {{incentives}}</span>
         </p>
         <div v-if="$store.state.isPC" style="margin-bottom:30px">
           <div
             class="radio-button"
             @click="activeButton = 'desc'"
             :class="{'radio-button-active': activeButton === 'desc'}">
-            Description
+            {{$t('proposal.desc')}}
           </div>
           <div
             v-if="votes.length"
             class="radio-button"
             @click="turnTo('stats')"
             :class="{'radio-button-active': activeButton === 'stats'}">
-            Stats
+            {{$t('proposal.stats')}}
           </div>
           <div
             class="radio-button"
             @click="activeButton = 'voters'"
             :class="{'radio-button-active': activeButton === 'voters'}">
-            Voters
+            {{$t('proposal.voters')}}
           </div>
           <div
             class="radio-button"
             @click="turnTo('comments')"
             :class="{'radio-button-active': activeButton === 'comments'}">
-            Comments
+            {{$t('proposal.comments')}}
           </div>
         </div>
         <div ref="steps" class="steps-bar">
           <el-steps  style="background: #fff;min-width:500px;margin-bottom: 0"  class="card" :active="activeStep" simple finish-status="success" process-status="finish">
-            <el-step ref="stepItem" title="Vote"></el-step>
-            <el-step title="Develop"></el-step>
-            <el-step title="Review"></el-step>
-            <el-step title="Finish"></el-step>
+            <el-step ref="stepItem" :title="$t('proposal.vote')"></el-step>
+            <el-step :title="$t('proposal.develop')"></el-step>
+            <el-step :title="$t('proposal.review')"></el-step>
+            <el-step :title="$t('proposal.finish')"></el-step>
           </el-steps>
         </div>
       <el-container v-loading="propLoading">
@@ -61,7 +61,7 @@
             <div class="radio-button" :class="{'radio-button-active': false}">中文</div>
           </div> -->
           <div v-else class="card" ref="voters">
-            <h2>Voters</h2>
+            <h2>{{$t('proposal.voters')}}</h2>
             <el-table :data="showVoters" :default-sort="{prop: 'staked', order: 'descending'}">
               <el-table-column sortable label="Name" prop="voter"></el-table-column>
               <el-table-column sortable label="Votes" prop="staked"></el-table-column>
@@ -77,7 +77,7 @@
             v-loading="chartLoading"
             class="chart-card card"
             ref="stats">
-            <h3>Votes by vote size</h3>
+            <h3>{{$t('proposal.voteSize')}}</h3>
             <div class="chart-panel">
 
               <IEcharts
@@ -88,23 +88,23 @@
           </div>
 
           <div class="card" ref="comments">
-            <h2>Auditor comments {{auditorComm.length}}</h2>
+            <h2>{{$t('comment.auditor')}} {{$t('proposal.comments')}} {{auditorComm.length}}</h2>
             <Comment v-for="(comment, index) in auditorComm" :key="index" v-bind="comment"></Comment>
           </div>
 
           <div class="card">
-            <h2>BP comments {{BPComm.length}}</h2>
+            <h2>{{$t('proposal.BP')}} {{$t('proposal.comments')}} {{BPComm.length}}</h2>
             <Comment v-for="(comment, index) in BPComm" :key="index" v-bind="comment"></Comment>
           </div>
 
           <div class="card">
-            <h2>Other comments {{otherComm.length}}</h2>
+            <h2>{{$t('proposal.other')}} {{$t('proposal.comments')}} {{otherComm.length}}</h2>
             <Comment v-for="(comment, index) in otherComm" :key="index" v-bind="comment"></Comment>
           </div>
         </el-main>
         <el-aside class="aside-right" :width="asideWidth">
           <div class="card" id="poll-status">
-            <h2>Poll Status</h2>
+            <h2>{{$t('proposal.propStatus')}}</h2>
             <el-progress :stroke-width="10" class="pass-percent" :percentage="agreePercent"></el-progress>
             <el-progress :stroke-width="10" class="dissent-percent" :percentage="rejectPercent"></el-progress>
             <!-- <el-progress :stroke-width="10" class="abstain-percent" :percentage="abstainPercent"></el-progress> -->
@@ -120,9 +120,9 @@
                 <div v-else>
                   <div style="magin-bottom:10px">
                   <el-radio-group v-model="voteActionParams.vote">
-                    <el-radio :label="1">YES</el-radio>
-                    <el-radio :label="0">NO</el-radio>
-                    <el-radio :label="255">ABSTAIN</el-radio>
+                    <el-radio :label="1">{{$t('common.yes')}}</el-radio>
+                    <el-radio :label="0">{{$t('common.no')}}</el-radio>
+                    <el-radio :label="255">{{$t('common.abstain')}}</el-radio>
                   </el-radio-group>
                   </div>
                   <div v-if="isAuditor || isBP">
@@ -135,7 +135,7 @@
                   </div>
                   <div v-else style="margin:5px 0">
                     <el-checkbox v-model="writeComment">
-                      Post a public comment (optional)
+                      {{$t('proposal.publicComment')}} ({{$t('common.optional')}})
                     </el-checkbox>
                     <div v-if="writeComment">
                       <el-input
@@ -143,7 +143,6 @@
                         :rows="4"
                         v-model="myComment"
                       ></el-input>
-                      <p>Select Yes/No to cast your vote and make your comment public on the EOS blockchain. Your comment and vote will be recorded on-chain for ever, if you want to change your comment please vote again and our algorithm will attempt to just show your latest comment.</p>
                     </div>
                   </div>
 
