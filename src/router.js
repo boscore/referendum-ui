@@ -13,19 +13,17 @@ export default new Router({
     {
       path: '/',
       name: 'Home',
-      component: Referendum,
-      children: [
-        {
-          path: 'process',
-          name: 'process',
-          component: () => import('@/components/help/PropProcess')
-        },
-        {
-          path: 'tutorial',
-          name: 'tutorial',
-          component: () => import('@/components/help/VoteTutorial')
-        }
-      ]
+      component: Referendum
+    },
+    {
+      path: '/help/process',
+      name: 'process',
+      component: () => import('@/components/help/PropProcess')
+    },
+    {
+      path: '/help/tutorial',
+      name: 'tutorial',
+      component: () => import('@/components/help/VoteTutorial')
     },
     {
       path: '/referendum',

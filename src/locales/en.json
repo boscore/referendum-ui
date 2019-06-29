@@ -7,16 +7,18 @@
     "cancel": "Cancel",
     "createdTime": "Created Time",
     "createProp": "Create Proposal",
-    "day": "day",
+    "day": " day",
+    "days": " days",
     "login": "Login",
     "optional": "optional",
+    "OK": "OK",
     "proposal": "Proposal",
     "register": "Register",
     "referendum": "Referendum",
     "removeId": "Remove Identity",
     "result": "Result",
     "no": "No",
-    "satisfied": "satisfied",
+    "satisfied": " satisfied",
     "stake": "Stake",
     "staked": "Staked",
     "unstake": "Unstake",
@@ -40,6 +42,11 @@
     "voteRule": "You can vote for up to 3 auditor candidates at a time. Please select candidates who you think will bring value to the BOS.",
     "youAreCand": "You are a candidate",
     "youAreAuditor": "You are a auditor"
+  },
+  "help": {
+    "FAQ": "FAQ",
+    "howToVote": "How to vote",
+    "propProcess": "Proposal process"
   },
   "form": {
     "budget": "Budget",
@@ -71,11 +78,9 @@
   },
   "referendum": {
     "discoverProps": "Discover Proposals",
-    "howToVote": "How to vote",
     "myProps": "My proposals",
     "myVotes": "My votes",
     "opinionMatter": "Your Opinion Matters",
-    "propProcess": "Proposal process",
     "sortType": {
       "most": "Most Voted",
       "newest": "Newest First",

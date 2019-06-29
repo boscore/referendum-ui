@@ -15,17 +15,17 @@
             <!-- <p>The Custodian Board manages the operations and affairs of the DAC, including but not limited to the governance and administration of the assets and liabilities of the DAC. The following DAC members have vested some of their tokens to submit themselves and candidates for a position on the custodian board which last for 7 days. Every 7 days, your votes are recalculated to select who will be part of the next custodian board. Voting is important! Please vote often and stay engaged within the DAC to know who is providing value</p> -->
             <div style="min-height: 50px" v-loading="candidateLoading">
               <div
-
                 v-for="candidate in candidatesList"
-                :key="candidate.candidate_name">
+                :key="candidate.id">
                 <CandidateCollapse
-                  v-if="candidate.is_active"
+                  v-if="candidate.candidate.is_active"
                   @select="handleSelect"
-                  :id="candidate.candidate_name"
+                  :id="candidate.id"
                   :votes="candidate.total_votes"
                   :inform="candidate.inform"
                   :isSelected="candidate.isSelected"
-                  :staked="candidate.locked_tokens"
+                  :staked="candidate.candidate.locked_tokens"
+                  :progress="candidate.meet_conditions_days"
                   ></CandidateCollapse>
               </div>
             </div>
@@ -48,16 +48,16 @@
               {{$t('auditor.myVotes').toLocaleUpperCase()}}
             </div>
             <div v-for="candidate in selectedCandidates" :key="candidate.id" class="selected-candidate-card">
-              <Avatar size="35px" :url="candidate.image"></Avatar>
-              <p>{{candidate.candidate_name}}</p>
-              <div class="remove-button" @click="removeCandidate(candidate.candidate_name)">
+              <Avatar size="35px" :url="candidate.inform.avatar"></Avatar>
+              <p>{{candidate.id}}</p>
+              <div class="remove-button" @click="removeCandidate(candidate.id)">
                 <i class="el-icon-close"></i>
               </div>
             </div>
           </div>
         </div>
         <div class="card">
-          <h2>The conditions for the approved proposal</h2>
+          <h2>The conditions for the auditor</h2>
           <p>1. The votes from token holders is not less than 3% of BP votes from token holders when the election was initiated.</p>
           <p>2. The ratio of approved votes / disapproved is greater than 1.5.</p>
           <p>3. The above conditions last for 20 days.</p>
@@ -94,24 +94,18 @@
             <div @click="showUpdate" class="vote-button vote-button-active">{{$t('auditor.updateInfo')}}</div>
           </div>
           <div v-else-if="scatter">
-            <div v-if="!scatter.identity" class="button square-button"
+            <!-- <div v-if="!scatter.identity" class="button square-button"
               @click="getIdentity"
             >
               Pair Scatter
-            </div>
-            <router-link v-else :to="{path: '/auditor/register'}">
+            </div> -->
+            <router-link v-if="scatter.identity" :to="{path: '/auditor/register'}">
               <div class="button square-button"
                 v-if="!candidateLoading && !auditorLoading"
               >
                 Register as Candidate
               </div>
             </router-link>
-          </div>
-          <div v-else>
-            <!-- <p>Scatter is required!</p> -->
-            <a target="blank" href="https://get-scatter.com/">
-              <div class="button square-button">Get Scatter</div>
-            </a>
           </div>
         </div>
       </el-aside>
@@ -234,7 +228,7 @@ export default {
     },
     myCandidate () {
       if (this.account) {
-        return this.allCandList.find(elm => elm.candidate_name === this.account.name)
+        return this.allCandList.find(elm => elm.id === this.account.name)
       }
       return null
     },
@@ -265,7 +259,7 @@ export default {
       return flag
     },
     stakePercent () {
-      let stake = Number(this.myCandidate.locked_tokens.split(' ')[0])
+      let stake = Number(this.myCandidate.candidate.locked_tokens.split(' ')[0])
       return Number((stake * 100 / 100000).toFixed(1))
     }
   },
@@ -353,9 +347,9 @@ export default {
             }
             item.inform = inform.bio
           }
-          item = Object.assign(item, res[key].candidate)
+          item = Object.assign(item, res[key])
           this.allCandList.push(item)
-          if (item.is_active) {
+          if (item.candidate.is_active) {
             this.candidatesList.push(item)
             this.candidatesList.sort((a, b) => { return b.total_votes - a.total_votes })
           }
@@ -459,7 +453,7 @@ export default {
     pushCandidate (id) {
       if (this.config && this.selectedCandidates.length <= this.config.maxvotes) {
         for (let i = 0; i < this.candidatesList.length; i++) {
-          if (this.candidatesList[i].candidate_name === id) {
+          if (this.candidatesList[i].id === id) {
             this.candidatesList[i].isSelected = true
             this.selectedCandidates.push(this.candidatesList[i])
             break
@@ -472,13 +466,13 @@ export default {
     },
     removeCandidate (id) {
       for (let i = 0; i < this.selectedCandidates.length; i++) {
-        if (this.selectedCandidates[i].candidate_name === id) {
+        if (this.selectedCandidates[i].id === id) {
           this.selectedCandidates.splice(i, 1)
           break
         }
       }
       for (let i = 0; i < this.candidatesList.length; i++) {
-        if (this.candidatesList[i].candidate_name === id) {
+        if (this.candidatesList[i].id === id) {
           this.candidatesList[i].isSelected = false
           break
         }
@@ -510,7 +504,7 @@ export default {
         this.actionLoading = true
         let newvotes = []
         this.selectedCandidates.forEach(item => {
-          newvotes.push(item.candidate_name)
+          newvotes.push(item.id)
         })
         const account = this.scatter.identity.accounts.find(x => x.blockchain === 'eos')
         const transactionOptions = {
@@ -689,7 +683,7 @@ export default {
       })
     },
     stakeText () {
-      let stake = Number(this.myCandidate.locked_tokens.split(' ')[0]).toFixed(0)
+      let stake = Number(this.myCandidate.candidate.locked_tokens.split(' ')[0]).toFixed(0)
       stake = this.$util.toThousands(stake)
       return stake + '/100,000'
     },

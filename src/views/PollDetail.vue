@@ -208,8 +208,6 @@
 <script>
 import marked from 'marked'
 import Eos from 'eosjs'
-import { MessageBox as MbMessageBox } from 'mint-ui'
-import { MessageBox } from 'element-ui'
 import { NETWORK, API_URL, NODE_ENDPOINT, EOSFORUM } from '@/assets/constants.js'
 import IEcharts from 'vue-echarts-v3/src/lite.js'
 import 'echarts/lib/chart/pie'
@@ -648,17 +646,6 @@ export default {
     this.$refs['steps'].scrollLeft += this.$refs['steps'].scrollWidth * this.activeStep / 4
   },
   methods: {
-    alert (title, msg) {
-      if (this.$store.state.isPC) {
-        MessageBox.alert(msg, title, {
-          confirmButtonText: 'OK'
-        })
-      } else {
-        MbMessageBox.alert(msg, title, {
-          confirmButtonText: 'OK'
-        })
-      }
-    },
     getProposal () {
       fetch(API_URL.API_GET_PROPOSAL + '/' + this.proposalName)
         .then(res => {
@@ -690,12 +677,12 @@ export default {
               content: ' '
             }
             let error = this.$util.errorFormat(e)
-            this.alert('Error', 'proposal_json ERROR:' + error.message)
+            this.$util.alert('Error', 'proposal_json ERROR:' + error.message)
           }
         }).catch(e => {
           this.propLoading = false
           let error = this.$util.errorFormat(e)
-          this.alert('Error', 'Get Proposal ERROR:' + error.message)
+          this.$util.alert('Error', 'Get Proposal ERROR:' + error.message)
           console.log(e)
         })
     },
@@ -712,16 +699,8 @@ export default {
           this.producers = res.producer
         }).catch(e => {
           let error = this.$util.errorFormat(e)
-          this.alert('Error', 'Get Producers ERROR:' + error.message)
-          // Message({
-          //   showClose: true,
-          //   message: 'Get Producers ERROR\n' + String(e),
-          //   type: 'error'
-          // })
+          this.$util.alert('Error', 'Get Producers ERROR:' + error.message)
           console.log(e)
-        // MessageBox.alert(e, 'Get Producers ERROR', {
-        //   confirmButtonText: 'OK'
-        // })
         })
     },
     getAuditors () {
@@ -746,12 +725,9 @@ export default {
         .then(res => {
           this.auditorsList = res.rows
         }).catch(e => {
-        // MessageBox.alert(e, 'Get Auditors ERROR', {
-        //   confirmButtonText: 'OK'
-        // })
           console.log(e)
           let error = this.$util.errorFormat(e)
-          this.alert('Error', 'Get Auditors ERROR:' + error.message)
+          this.$util.alert('Error', 'Get Auditors ERROR:' + error.message)
         })
     },
     getIdentity () {
@@ -777,10 +753,10 @@ export default {
     },
     sendVote () {
       if (this.voteActionParams.vote === -1) {
-        this.alert('Warning', 'Please choose your vote')
+        this.$util.alert('Warning', 'Please choose your vote')
       } else
       if (this.myComment === '' && (this.isAuditor || this.isBP)) {
-        this.alert('Warning', 'Please write your opinion of this proposal')
+        this.$util.alert('Warning', 'Please write your opinion of this proposal')
       } else {
         this.voteActionParams.voter = this.account.name
         this.voteActionParams.proposal_name = this.proposalName
@@ -801,13 +777,13 @@ export default {
         this.eos.transaction(transactionOptions, { blocksBehind: 3, expireSeconds: 30 })
           .then(res => {
             let message = `Your vote  has been cast on ${this.proposalName}, data will be updated some time later`
-            this.alert('Success', message)
+            this.$util.alert('Success', message)
             this.$store.commit('addVote', { vote: {
               ...this.voteActionParams
             } })
           }).catch(e => {
             let error = this.$util.errorFormat(e)
-            this.alert('Error', 'Vote ERROR:' + error.message)
+            this.$util.alert('Error', 'Vote ERROR:' + error.message)
             console.log(e)
           })
       }
@@ -832,13 +808,13 @@ export default {
       this.eos.transaction(transactionOptions, { blocksBehind: 3, expireSeconds: 30 })
         .then(res => {
           let message = `Your unvote on ${this.proposalName} was successful, data will be updated some time later`
-          this.alert('Success', 'Vote ERROR:' + message)
+          this.$util.alert('Success', 'Vote ERROR:' + message)
           this.$store.commit('deleteVote', { vote: {
             ...actionParams
           } })
         }).catch(e => {
           let error = this.$util.errorFormat(e)
-          this.alert('Error', 'Unvote ERROR:' + error.message)
+          this.$util.alert('Error', 'Unvote ERROR:' + error.message)
           console.log(e)
         })
     },

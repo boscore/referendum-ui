@@ -1,35 +1,38 @@
 <template>
   <div class="candidate-collapse" :style="{border: selected ? '2px solid #21ba45':'2px solid #ffffff',height: isActive ? '446px' : '96px'}">
-        <div class="collapse-header" >
-          <div class="title-bar">
-            <div class="choose-button" @click="select()" :class="{'is-selected' : selected}">
-              <i class="el-icon-plus" v-if="!selected"></i>
-              <i class="el-icon-check" v-if="selected"></i>
-            </div>
-            <Avatar style="margin: 0 18px" :url="inform.avatar" size="48px"></Avatar>
-            <div class="candidate-info">
-              <p class="name">
-                {{id}}
-                <span v-if="(givenName || familyName)" style="font-family: Roboto-Regular">{{`(${givenName} ${familyName})`}}</span>
-              </p>
-              <p class="vote">
-                {{$t('common.votes')}}: {{formVotes}} &nbsp;&nbsp; {{$t('common.staked')}}:{{staked}}
-              </p>
-            </div>
-            <i
-              @click="isActive = !isActive"
-              class="collapse-item__arrow el-icon-arrow-right"
-              :class="{'is-active': isActive}">
-            </i>
-          </div>
+    <div v-if="progress > 0" class="collapse-tag">
+      {{progress + progressWord}}
+    </div>
+    <div class="collapse-header" >
+      <div class="title-bar">
+        <div class="choose-button" @click="select()" :class="{'is-selected' : selected}">
+          <i class="el-icon-plus" v-if="!selected"></i>
+          <i class="el-icon-check" v-if="selected"></i>
         </div>
-        <div class="collapse-wrap" :style="{display: isActive ? 'block' : 'none'}">
-          <div class="title">
-            <h1>{{$t('auditor.BIO')}}</h1>
-            <p v-if="contact" style="float:right">Email: {{contact}}</p>
-          </div>
-          <div v-html="desc" class="content"></div>
+        <Avatar style="margin: 0 18px" :url="inform.avatar" size="48px"></Avatar>
+        <div class="candidate-info">
+          <p class="name">
+            {{id}}
+            <span v-if="(givenName || familyName)" style="font-family: Roboto-Regular">{{`(${givenName} ${familyName})`}}</span>
+          </p>
+          <p class="vote">
+            {{$t('common.votes')}}: {{formVotes}} &nbsp;&nbsp; {{$t('common.staked')}}:{{staked}}
+          </p>
         </div>
+        <i
+          @click="isActive = !isActive"
+          class="collapse-item__arrow el-icon-arrow-right"
+          :class="{'is-active': isActive}">
+        </i>
+      </div>
+    </div>
+    <div class="collapse-wrap" :style="{display: isActive ? 'block' : 'none'}">
+      <div class="title">
+        <h1>{{$t('auditor.BIO')}}</h1>
+        <p v-if="contact" style="float:right">Email: {{contact}}</p>
+      </div>
+      <div v-html="desc" class="content"></div>
+    </div>
   </div>
 </template>
 
@@ -68,6 +71,10 @@ export default {
     isSelected: {
       type: Boolean,
       default: false
+    },
+    progress: {
+      type: Number,
+      default: 0
     }
   },
   data () {
@@ -101,6 +108,16 @@ export default {
       } else {
         return ''
       }
+    },
+    progressWord () {
+      let word = ''
+      if (this.progress > 1) {
+        word = this.$t('common.days')
+      } else {
+        word = this.$t('common.day')
+      }
+      word += this.$t('common.satisfied')
+      return word
     }
   },
   methods: {
@@ -124,6 +141,18 @@ export default {
   margin-bottom 22px
   box-sizing border-box
   transition .3s height
+  position relative
+.collapse-tag
+  position absolute
+  padding 0 10px
+  top -2px
+  right -2px
+  border-radius 0 8px
+  box-shadow: 0 2px 4px 0 #B0D9FF
+  background-image linear-gradient(-137deg, #27AAF3 0%, #15DDCC 100%)
+  color #fff
+  font-size 12px
+  line-height 20px
 .choose-button
   height 48px
   min-width 48px

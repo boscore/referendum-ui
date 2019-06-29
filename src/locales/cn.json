@@ -8,8 +8,10 @@
     "createdTime": "创建时间",
     "createProp": "创建提案",
     "day": "天",
+    "days": "天",
     "login": "登录",
     "optional": "可选",
+    "OK": "确定",
     "proposal": "提案",
     "poll": "民意调查",
     "register": "注册",
@@ -17,7 +19,7 @@
     "removeId": "注销",
     "result": "结果",
     "no": "反对",
-    "satisfied": "满足条件",
+    "satisfied": "已满足条件",
     "stake": "抵押",
     "staked": "已抵押",
     "unstake": "赎回抵押",
@@ -54,6 +56,11 @@
     "voteRule": "你一次可以最多给3名候选人投票。请选出最能为BOS带来价值的候选人。",
     "youAreCand": "你是一位候选人",
     "youAreAuditor": "你是一位评审员"
+  },
+  "help": {
+    "FAQ": "常见问题",
+    "howToVote": "如何投票",
+    "propProcess": "提案流程"
   },
   "form": {
     "budget": "预算",
