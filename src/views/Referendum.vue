@@ -110,6 +110,7 @@
               clearable
               v-model="searchText"
               @blur="searchBy = searchText"
+              @clear="searchBy = searchText"
               class="search-input">
               <i @click="searchBy = searchText" slot="suffix" class="el-input__icon el-icon-search"></i>
             </el-input>
@@ -146,7 +147,7 @@
           >
             <PropCard
               @click.native="turnDetail(prop)"
-              :type="prop.proposal.proposal_json.type || 'unknown'"
+              :type="prop.proposal.proposal_json.type || $t('common.unknown')"
               :title="prop.proposal.title"
               :desc="prop.proposal.proposal_json.content || ''"
               :votes="prop.stats.staked"

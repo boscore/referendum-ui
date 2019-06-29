@@ -1,42 +1,42 @@
 <template>
   <el-container class="register-auditor">
     <el-main>
-      <h1 style="line-height:30px;margin:15px 0px;">Register Candidate</h1>
+      <h1 style="line-height:30px;margin:15px 0px;">{{$t('auditor.registerCand')}}</h1>
       <div class="card" v-loading="actionLoading">
         <el-form ref="form" :rules="rules" :model="form" label-position="top" label-width="110px">
           <p>Responsibilities outlined in the. BOS Declaration. Please, do not register as a candidate unless you fully understand and can meet the responsibilites of an BOS custodian board member. And you need to transfer some BOS to auditor.bos as staked token.</p>
           <el-form-item prop="auditorName">
-            <label slot="label">Candidate Name (Bos account)</label>
+            <label slot="label">{{$t('auditor.candName')}} (BOS {{$t('common.account').toLocaleLowerCase()}})</label>
             <el-input style="max-width: 400px;" v-model="form.auditorName" ></el-input>
           </el-form-item>
           <el-form-item>
             <label slot="label">
-              Stake Amount
-              (Already staked
+              {{$t('auditor.stakeAmount')}}
+              ({{$t('auditor.alreadyStaked')}}
               <el-checkbox v-model="hasStaked"></el-checkbox>
               )
             </label>
             <el-input disabled style="max-width: 400px;" v-model="form.stakeAmount"></el-input>
           </el-form-item>
           <el-form-item prop="contact">
-            <label slot="label">Email</label>
+            <label slot="label">{{$t('form.email')}}</label>
             <el-input style="max-width: 400px;" v-model="form.contact"></el-input>
           </el-form-item>
           <el-form-item>
-            <label slot="label">Avatar image url (optinal)</label>
+            <label slot="label">{{$t('auditor.avatarUrl')}} ({{$t('common.optional')}})</label>
             <el-input style="max-width: 400px;" v-model="form.avatar" ></el-input>
           </el-form-item>
           <el-form-item prop="bio">
-            <label slot="label">BIO (support markdown)</label>
+            <label slot="label">{{$t('auditor.BIO')}} ({{$t('form.support')}} Markdown)</label>
             <el-input  v-model="form.bio" type="textarea" :rows="10" ></el-input>
           </el-form-item>
           <el-form-item prop="signDeclar">
             <el-checkbox style="margin-right:10px" size="medium" v-model="form.signDeclar"></el-checkbox>
-            <span style="color:#606266">Sign the declaration.</span>
-            <span style="cursor:pointer" @click="showDeclar = true">Read detail</span>
+            <span style="color:#606266">{{$t('auditor.signDeclaration')}}</span>
+            <span style="cursor:pointer;margin-left: 5px" @click="showDeclar = true">{{$t('auditor.readDetail')}}</span>
           </el-form-item>
           <el-form-item>
-            <div @click="register" style="max-width: 400px; margin-top:30px;display: block" class="button square-button">Register</div>
+            <div @click="register" style="max-width: 400px; margin-top:30px;display: block" class="button square-button">{{$t('common.register')}}</div>
           </el-form-item>
         </el-form>
       </div>

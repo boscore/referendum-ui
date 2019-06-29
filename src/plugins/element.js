@@ -16,6 +16,7 @@ import {
   FormItem,
   Header,
   Input,
+  Image,
   Loading,
   Main,
   Menu,
@@ -87,3 +88,5 @@ Vue.use(RadioGroup)
 Vue.use(Checkbox)
 
 Vue.use(Dialog)
+
+Vue.use(Image)

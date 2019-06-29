@@ -1,7 +1,7 @@
 <template>
   <div class="candidate-collapse" :style="{border: selected ? '2px solid #21ba45':'2px solid #ffffff',height: isActive ? '446px' : '96px'}">
     <div v-if="progress > 0" class="collapse-tag">
-      {{progress + progressWord}}
+      {{satisfiedWord}}
     </div>
     <div class="collapse-header" >
       <div class="title-bar">
@@ -109,14 +109,13 @@ export default {
         return ''
       }
     },
-    progressWord () {
+    satisfiedWord () {
       let word = ''
       if (this.progress > 1) {
-        word = this.$t('common.days')
+        word = this.$t('common.daysSatisfied', [this.progress])
       } else {
-        word = this.$t('common.day')
+        word = this.$t('common.daySatisfied', [this.progress])
       }
-      word += this.$t('common.satisfied')
       return word
     }
   },

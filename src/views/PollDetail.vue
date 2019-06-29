@@ -13,7 +13,7 @@
           <span style="margin-right: 10px" class="proposal-info">{{`${proposal.proposal.proposal_name} by ${proposal.proposal.proposer} `}}</span>
           <br v-if="!$store.state.isPC"/>
           <!-- <span style="margin: 0 5px">{{$util.dateConvert(proposal.proposal.expires_at)}} </span> -->
-          <span >{{proposal.proposal.proposal_json.type || 'unknown'}} </span>
+          <span >{{proposal.proposal.proposal_json.type || $t('common.unknown')}} </span>
           <br v-if="!$store.state.isPC"/>
           <span style="font-weight:600">{{$t('proposal.budget')}}: {{incentives}}</span>
         </p>
@@ -63,10 +63,10 @@
           <div v-else class="card" ref="voters">
             <h2>{{$t('proposal.voters')}}</h2>
             <el-table :data="showVoters" :default-sort="{prop: 'staked', order: 'descending'}">
-              <el-table-column sortable label="Name" prop="voter"></el-table-column>
-              <el-table-column sortable label="Votes" prop="staked"></el-table-column>
-              <el-table-column sortable label="Type" prop="type"></el-table-column>
-              <el-table-column sortable label="Vote" prop="result"></el-table-column>
+              <el-table-column sortable :label="$t('proposal.voter')" prop="voter"></el-table-column>
+              <el-table-column sortable :label="$t('common.votes')" prop="staked"></el-table-column>
+              <el-table-column sortable :label="$t('common.type')" prop="type"></el-table-column>
+              <el-table-column sortable :label="$t('common.result')" prop="result"></el-table-column>
             </el-table>
             <div v-if="showVotersNum < votes.length">
               <div class="button" style="margin: 20px auto;padding: 5px 20px" @click="showMoreVoters">Load more voters</div>
@@ -88,7 +88,7 @@
           </div>
 
           <div class="card" ref="comments">
-            <h2>{{$t('comment.auditor')}} {{$t('proposal.comments')}} {{auditorComm.length}}</h2>
+            <h2>{{$t('common.auditor')}} {{$t('proposal.comments')}} {{auditorComm.length}}</h2>
             <Comment v-for="(comment, index) in auditorComm" :key="index" v-bind="comment"></Comment>
           </div>
 
@@ -109,15 +109,12 @@
             <el-progress :stroke-width="10" class="dissent-percent" :percentage="rejectPercent"></el-progress>
             <!-- <el-progress :stroke-width="10" class="abstain-percent" :percentage="abstainPercent"></el-progress> -->
             <div style="margin:15px 0">
-              <p style="margin: 0">{{$util.toThousands((this.proposal.stats.staked.total / 10000).toFixed(0))}} BOS voted</p>
+              <p style="margin: 0">{{$util.toThousands((this.proposal.stats.staked.total / 10000).toFixed(0))}} BOS {{$t('common.voted').toLocaleLowerCase()}}</p>
               <el-progress v-loading="this.votesOfBP === -1" :stroke-width="10" class="voted-percent" :percentage="votedPercent"></el-progress>
             </div>
             <div class="scatter-panel">
               <div v-if="scatter">
-                <div v-if="!scatter.identity" @click="getIdentity" class="button">
-                  Link Scatter to vote
-                </div>
-                <div v-else>
+                <div v-if="scatter.identity">
                   <div style="magin-bottom:10px">
                   <el-radio-group v-model="voteActionParams.vote">
                     <el-radio :label="1">{{$t('common.yes')}}</el-radio>
@@ -126,7 +123,7 @@
                   </el-radio-group>
                   </div>
                   <div v-if="isAuditor || isBP">
-                    <p>Please write your opinion</p>
+                    <p>{{$t('proposal.writeOpinion')}}</p>
                     <el-input
                       type="textarea"
                       :rows="4"
@@ -146,39 +143,40 @@
                     </div>
                   </div>
 
-                  <div v-if="myVote">You voted {{myVote.result}}</div>
+                  <div v-if="myVote">{{$t('common.voted')}} {{myVote.result}}</div>
                   <div style="display: flex; justify-content:flex-start;margin-top:10px">
                     <div @click="sendVote" class="button" style="margin-right: 20px;width:80px">
-                      Vote
+                      {{$t('common.vote')}}
                     </div>
-                    <div v-if="myVote" class="button" @click="sendUnvote" style="background: red;margin-right: 20px;width:80px">Unvote</div>
+                    <div v-if="myVote" class="button" @click="sendUnvote" style="background: red;margin-right: 20px;width:80px">{{$t('common.unvote')}}</div>
                   </div>
                 </div>
               </div>
-              <a v-else target="blank" href="https://get-scatter.com/">
-                <div class="button">
-                  Get Scatter to vote
-                </div>
-              </a>
             </div>
             <hr style="border: none; border-bottom:2px solid #D8D8D8;" />
             <div>
               <div v-if="(this.proposal.meet_conditions_days > 0)">
-                <h3> {{this.proposal.meet_conditions_days}} {{this.proposal.meet_conditions_days > 1 ? 'days' : 'day'}} satisfied</h3>
+                <h3> {{satisfiedWord}}</h3>
                 <el-progress :format="satisfiedText" :stroke-width="10" class="pass-percent" :percentage="satisfiedPercent"></el-progress>
               </div>
-              <p>{{this.proposal ? this.proposal.stats.votes.accounts : 0}} accounts</p>
-              <p>{{this.proposal ? this.calcDays(this.proposal.proposal.created_at, new Date().toString()) : 0}} days since poll started</p>
+              <p>{{this.proposal.stats.votes.total}} {{this.proposal.stats.votes.total > 1 ? $t('proposal.voters') : $t('proposal.voter')}}</p>
+              <p>{{this.proposal.duration > 1 ? $t('proposal.propDays', [this.proposal.duration]) : $t('proposal.propDay', [this.proposal.duration])}}</p>
             </div>
           </div>
-          <div class="card">
+          <div class="card" v-if="$i18n.locale === 'en'">
             <h2>The conditions for the approved proposal</h2>
             <p>1. The votes from token holders is not less than 40% of BP votes from token holders when the proposal was initiated.</p>
             <p>2. The ratio of approved votes/disapproved is greater than 1.5.</p>
             <p>3. The above conditions last for 20 days.</p>
           </div>
+          <div class="card" v-if="$i18n.locale === 'cn'">
+            <h2>提案通过的条件</h2>
+            <p>1. 参与投票数量不少于提案发起时参与BP投票数量的40%。</p>
+            <p>2. ⽀持票/反对票的⽐率⼤于 1.5。</p>
+            <p>3. 以上条件持续 20 天成⽴。</p>
+          </div>
           <h2 v-if="relatedPolls.length">
-            Related Polls
+            {{$t('proposal.relatedProp')}}
           </h2>
           <div id="related-polls">
             <div
@@ -188,7 +186,7 @@
               style="margin-bottom: 30px; cursor: pointer"
             >
             <PropCard
-              :type="prop.proposal.proposal_json.type || 'unknown'"
+              :type="prop.proposal.proposal_json.type || $t('common.unknown')"
               :title="prop.proposal.title"
               :desc="prop.proposal.proposal_json.content || ''"
               :votes="prop.stats.votes"
@@ -520,6 +518,15 @@ export default {
         return 0
       }
     },
+    satisfiedWord () {
+      let word = ''
+      if (this.proposal.meet_conditions_days > 1) {
+        word = this.$t('common.daysSatisfied', [this.proposal.meet_conditions_days])
+      } else {
+        word = this.$t('common.daySatisfied', [this.proposal.meet_conditions_days])
+      }
+      return word
+    },
     agreePercent () {
       if (!this.proposal || this.proposal.stats.staked.total === 0 || !this.proposal.stats.staked[1]) {
         return 0
@@ -657,6 +664,7 @@ export default {
         .then(res => {
           this.propLoading = false
           this.proposal = res
+          this.proposal.duration = this.calcDays(this.proposal.proposal.created_at, new Date().toString())
           if (this.proposal.approved_by_vote && !this.proposal.approved_by_BET && this.proposal.reviewed_by_BET_date && this.proposal.reviewed_by_BET_date !== 'None') {
             const start = new Date(this.proposal.reviewed_by_BET_date).getTime()
             const end = new Date().getTime()

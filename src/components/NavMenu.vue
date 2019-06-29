@@ -13,7 +13,9 @@
       <el-menu-item index="auditor" @click="$router.push('/auditor')">{{$t('common.auditor')}}</el-menu-item>
       <el-submenu index="help">
         <template slot="title">{{$t('help.FAQ')}}</template>
-        <el-menu-item index="help-1" @click="$router.push('/help/process')" style="text-align:center">{{$t('help.propProcess')}}</el-menu-item>
+        <router-link to="/help/process">
+          <el-menu-item index="help-1" style="text-align:center">{{$t('help.propProcess')}}</el-menu-item>
+        </router-link>
         <el-menu-item index="help-2" @click="$router.push('/help/tutorial')" style="text-align:center">{{$t('help.howToVote')}}</el-menu-item>
       </el-submenu>
       <el-submenu index="languages">
@@ -87,7 +89,7 @@ export default {
 </script>
 
 <style lang="stylus">
-@media only screen and (max-width 450px)
+@media only screen and (max-width 780px)
   .nav-menu
     .el-menu-item, .el-submenu
       width 150px
@@ -122,7 +124,7 @@ export default {
     font-size 24px
     margin auto
     cursor pointer
-@media only screen and (max-width 450px)
+@media only screen and (max-width 780px)
   .hidden-menu
     display none
   .mobile-nav

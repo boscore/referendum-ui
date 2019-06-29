@@ -56,17 +56,11 @@
             </div>
           </div>
         </div>
-        <div class="card">
-          <h2>The conditions for the auditor</h2>
-          <p>1. The votes from token holders is not less than 3% of BP votes from token holders when the election was initiated.</p>
-          <p>2. The ratio of approved votes / disapproved is greater than 1.5.</p>
-          <p>3. The above conditions last for 20 days.</p>
-        </div>
         <div style="margin-bottom: 20px" v-if="$store.state.isPC">
           <div v-if="myCandidate && !myAuditor" class="card">
             <h1>{{$t('auditor.youAreCand')}}</h1>
             <p>{{$t('common.votes')}}: {{(myCandidate.total_votes / 10000).toFixed(4)}}</p>
-            <p>{{$t('common.staked')}}: {{myCandidate.locked_tokens}}</p>
+            <p>{{$t('common.staked')}}: {{myCandidate.candidate.locked_tokens}}</p>
             <el-progress
              :text-inside="true"
              :stroke-width="20"
@@ -80,7 +74,7 @@
             </div>
             <div v-else >
               <p>{{$t('auditor.inactiveTip')}}</p>
-              <div v-if="myCandidate.locked_tokens !== '0.0000 BOS' || pendingStake">
+              <div v-if="myCandidate.candidate.locked_tokens !== '0.0000 BOS' || pendingStake">
                 <div @click="active" class="vote-button vote-button-active">{{$t('common.register')}}</div>
                 <div @click="unstake" class="vote-button vote-button-active">{{$t('common.unstake')}}</div>
               </div>
@@ -94,19 +88,24 @@
             <div @click="showUpdate" class="vote-button vote-button-active">{{$t('auditor.updateInfo')}}</div>
           </div>
           <div v-else-if="scatter">
-            <!-- <div v-if="!scatter.identity" class="button square-button"
-              @click="getIdentity"
-            >
-              Pair Scatter
-            </div> -->
             <router-link v-if="scatter.identity" :to="{path: '/auditor/register'}">
-              <div class="button square-button"
-                v-if="!candidateLoading && !auditorLoading"
-              >
-                Register as Candidate
+              <div class="button square-button">
+                {{$t('auditor.registerCand')}}
               </div>
             </router-link>
           </div>
+        </div>
+        <div class="card" v-if="$i18n.locale === 'en'">
+          <h2>The conditions for the auditor</h2>
+          <p>1. The votes from token holders is not less than 3% of BP votes from token holders when the election was initiated.</p>
+          <p>2. The ratio of approved votes / disapproved is greater than 1.5.</p>
+          <p>3. The above conditions last for 20 days.</p>
+        </div>
+        <div class="card" v-if="$i18n.locale === 'cn'">
+          <h2>成为评审员的条件</h2>
+          <p>1. 参与投票数量不少于提案发起时参与BP投票数量的 3%。</p>
+          <p>2. ⽀持票/反对票的⽐率⼤于 1.5。</p>
+          <p>3. 以上条件持续 20 天成⽴。</p>
         </div>
       </el-aside>
     </el-container>
@@ -117,7 +116,7 @@
     v-loading="actionLoading"
     >
     <span>
-      <el-form ref="updateForm" :model="candInfo" label-width="210px" :label-position="screenWidth < 821 ? 'top' : 'left'" :rules="updateRules">
+      <el-form ref="updateForm" :model="candInfo" label-width="210px" :label-position="$store.state.screenWidth < 821 ? 'top' : 'left'" :rules="updateRules">
         <el-form-item prop="contact">
             <label slot="label">Email</label>
             <el-input style="max-width: 400px;" v-model="candInfo.contact"></el-input>
@@ -154,10 +153,6 @@
 import Eos from 'eosjs'
 import { NETWORK, NODE_ENDPOINT, API_URL } from '@/assets/constants.js'
 import Avatar from '@/components/Avatar.vue'
-
-import { MessageBox as MbMessageBox } from 'mint-ui'
-import { MessageBox } from 'element-ui'
-
 import CandidateCollapse from '@/components/CandidateCollapse.vue'
 export default {
   name: 'Auditor',
@@ -192,23 +187,18 @@ export default {
         ]
       },
       pendingStakeTable: [],
-      screenWidth: document.body.clientWidth,
       stakeAmount: '0.0000 BOS',
       stakeVisible: false
     }
   },
   mounted () {
-    window.onresize = () => {
-      this.screenWidth = document.body.clientWidth
-    }
-
     this.getAllInfo()
     this.getConfig()
     this.getPendingStake()
   },
   computed: {
     asideWidth () {
-      if (this.screenWidth < 821) {
+      if (this.$store.state.screenWidth < 821) {
         return '100%'
       }
       return '320px'
@@ -264,17 +254,6 @@ export default {
     }
   },
   methods: {
-    alert (title, msg) {
-      if (this.$store.state.isPC) {
-        MessageBox.alert(msg, title, {
-          confirmButtonText: 'OK'
-        })
-      } else {
-        MbMessageBox.alert(msg, title, {
-          confirmButtonText: 'OK'
-        })
-      }
-    },
     getConfig () {
       const tableOptions = {
         'scope': 'auditor.bos',
@@ -358,45 +337,6 @@ export default {
         this.candidateLoading = false
         console.log(e)
       })
-      // const tableOptions = {
-      //   'scope': 'auditor.bos',
-      //   'code': 'auditor.bos',
-      //   'table': 'candidates',
-      //   'json': true
-      // }
-      // fetch(NODE_ENDPOINT + '/v1/chain/get_table_rows', {
-      //   method: 'POST',
-      //   body: JSON.stringify(tableOptions)
-      // }).then(res => res.json()).then(res => {
-      //   this.allCandList = []
-      //   this.candidatesList = []
-      //   this.candidateLoading = false
-      //   res.rows.forEach(candidate => {
-      //     candidate.isSelected = false
-      //     let inform = this.bioInfo.find(element => {
-      //       return element.candidate_name === candidate.candidate_name
-      //     })
-      //     if (inform) {
-      //       try {
-      //         inform.bio = JSON.parse(inform.bio)
-      //       } catch (e) {
-      //         console.log('json invalid')
-      //       }
-      //       candidate.inform = inform.bio
-      //       candidate.isSelected = false
-      //     }
-      //     this.allCandList.push(candidate)
-      //     if (candidate.is_active) {
-      //       this.candidatesList.push(candidate)
-      //       this.candidatesList.sort((a, b) => { return b.total_votes - a.total_votes })
-      //     }
-      //   })
-      // }).catch(e => {
-      //   this.candidateLoading = false
-      //   let error = this.$util.errorFormat(e)
-      //   this.alert('Error', 'Get candidates ERROR:' + error.message)
-      //   console.log(e)
-      // })
     },
     getAuditors () {
       const tableOptions = {
@@ -427,7 +367,7 @@ export default {
       }).catch(e => {
         this.auditorLoading = false
         let error = this.$util.errorFormat(e)
-        this.alert('Error', 'Get auditors ERROR:' + error.message)
+        this.$util.alert('Error', 'Get auditors ERROR:' + error.message)
         console.log(e)
       })
     },
@@ -451,7 +391,7 @@ export default {
       }
     },
     pushCandidate (id) {
-      if (this.config && this.selectedCandidates.length <= this.config.maxvotes) {
+      if (this.config && this.selectedCandidates.length < this.config.maxvotes) {
         for (let i = 0; i < this.candidatesList.length; i++) {
           if (this.candidatesList[i].id === id) {
             this.candidatesList[i].isSelected = true
@@ -461,7 +401,7 @@ export default {
         }
       } else {
         //  提示
-        this.alert('Warning', `You only can vote to ${this.config.maxvotes} candidates`)
+        this.$util.alert('Warning', `You only can vote to ${this.config.maxvotes} candidates`)
       }
     },
     removeCandidate (id) {
@@ -487,18 +427,23 @@ export default {
     },
     sendVotes () {
       if (!this.scatter) {
-        MessageBox.alert('Get Scatter first', '', {
-          confirmButtonText: 'Get it',
-          distinguishCancelAndClose: true,
-          cancelButtonText: 'Later',
-          callback: action => {
-            if (action === 'confirm') {
-              window.open('https://get-scatter.com/', '_blank')
-            }
+        this.$util.alert('', this.$t('warning.needScatter'), action => {
+          if (action === 'confirm') {
+            window.open('https://get-scatter.com/', '_blank')
           }
         })
+        // MessageBox.alert('Get Scatter first', '', {
+        //   confirmButtonText: 'Get it',
+        //   distinguishCancelAndClose: true,
+        //   cancelButtonText: 'Later',
+        //   callback: action => {
+        //     if (action === 'confirm') {
+        //       window.open('https://get-scatter.com/', '_blank')
+        //     }
+        //   }
+        // })
       } else if (!this.scatter.identity) {
-        this.alert('Warning', 'Pair Scatter first')
+        this.$util.alert('Warning', 'Pair Scatter first')
         this.getIdentity()
       } else {
         this.actionLoading = true
@@ -525,13 +470,13 @@ export default {
         this.eos.transaction(transactionOptions, { blocksBehind: 3, expireSeconds: 30 })
           .then(() => {
             this.actionLoading = false
-            this.alert('Success', 'Your vote has been cast on candidates')
+            this.$util.alert('Success', 'Your vote has been cast on candidates')
             this.getAllInfo()
             this.removeAllCand()
           }).catch(e => {
             this.actionLoading = false
             let error = this.$util.errorFormat(e)
-            this.alert('Error', 'Vote ERROR:' + error.message)
+            this.$util.alert('Error', 'Vote ERROR:' + error.message)
             console.log(e)
           })
       }
@@ -543,12 +488,12 @@ export default {
           this.getCandidates()
           this.getPendingStake()
           this.actionLoading = false
-          this.alert('Success', 'Stake successfully')
+          this.$util.alert('Success', 'Stake successfully')
         })
         .catch(e => {
           this.actionLoading = false
           let error = this.$util.errorFormat(e)
-          this.alert('Error', 'Stake ERROR:' + error.message)
+          this.$util.alert('Error', 'Stake ERROR:' + error.message)
           console.log(e)
         })
     },
@@ -573,12 +518,12 @@ export default {
           this.actionLoading = false
           this.getCandidates()
           this.getPendingStake()
-          this.alert('Success', 'Unstake successfully')
+          this.$util.alert('Success', 'Unstake successfully')
         })
         .catch(e => {
           this.actionLoading = false
           let error = this.$util.errorFormat(e)
-          this.alert('Error', 'Unstake ERROR:' + error.message)
+          this.$util.alert('Error', 'Unstake ERROR:' + error.message)
           console.log(e)
         })
     },
@@ -602,12 +547,12 @@ export default {
         .then(() => {
           this.actionLoading = false
           this.getCandidates()
-          this.alert('Success', 'You are active for auditor elections')
+          this.$util.alert('Success', 'You are active for auditor elections')
         })
         .catch(e => {
           this.actionLoading = false
           let error = this.$util.errorFormat(e)
-          this.alert('Error', 'Be active ERROR:' + error.message)
+          this.$util.alert('Error', 'Be active ERROR:' + error.message)
           console.log(e)
         })
     },
@@ -631,12 +576,12 @@ export default {
         .then(() => {
           this.actionLoading = false
           this.getCandidates()
-          this.alert('Success', 'You are inactive for auditor elections')
+          this.$util.alert('Success', 'You are inactive for auditor elections')
         })
         .catch(e => {
           this.actionLoading = false
           let error = this.$util.errorFormat(e)
-          this.alert('Error', 'Be inactive ERROR:' + error.message)
+          this.$util.alert('Error', 'Be inactive ERROR:' + error.message)
           console.log(e)
         })
     },
@@ -671,12 +616,12 @@ export default {
             .then(res => {
               this.updateDialog = false
               this.actionLoading = false
-              this.alert('Success', 'Update BIO successfully')
+              this.$util.alert('Success', 'Update BIO successfully')
             })
             .catch(e => {
               this.actionLoading = false
               let error = this.$util.errorFormat(e)
-              this.alert('Error', 'Update BIO ERROR:' + error.message)
+              this.$util.alert('Error', 'Update BIO ERROR:' + error.message)
               console.log(e)
             })
         }
@@ -711,7 +656,7 @@ export default {
   .auditor
     .el-container
       flex-wrap wrap
-      flex-direction column-reverse
+      flex-direction column
     .el-aside
       width 100%
       padding 0 20px
