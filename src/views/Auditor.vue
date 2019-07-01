@@ -97,15 +97,15 @@
         </div>
         <div class="card" v-if="$i18n.locale === 'en'">
           <h2>The conditions for the auditor</h2>
-          <p>1. The votes from token holders is not less than 3% of BP votes from token holders when the election was initiated.</p>
-          <p>2. The ratio of approved votes / disapproved is greater than 1.5.</p>
-          <p>3. The above conditions last for 20 days.</p>
+          <p>The votes from token holders is not less than 3% of BP votes from token holders when the election was initiated, and lasts for 20 days.</p>
+          <!-- <p>2. The ratio of approved votes / disapproved is greater than 1.5.</p> -->
+          <!-- <p>2. The above conditions last for 20 days.</p> -->
         </div>
         <div class="card" v-if="$i18n.locale === 'cn'">
           <h2>成为评审员的条件</h2>
-          <p>1. 参与投票数量不少于提案发起时参与BP投票数量的 3%。</p>
-          <p>2. ⽀持票/反对票的⽐率⼤于 1.5。</p>
-          <p>3. 以上条件持续 20 天成⽴。</p>
+          <p>参与投票数量不少于提案发起时参与BP投票数量的 3%,并且持续20天成立。</p>
+          <!-- <p>2. ⽀持票/反对票的⽐率⼤于 1.5。</p>
+          <p>3. 以上条件持续 20 天成⽴。</p> -->
         </div>
       </el-aside>
     </el-container>

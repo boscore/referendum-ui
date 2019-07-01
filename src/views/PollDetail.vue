@@ -954,23 +954,26 @@ export default {
 .prop-content
   overflow-wrap break-word
   >>> h1
-    font-size 1.5em
+    font-size 24px
     color #507DFE
   >>> h2
-    font-size 1.3em
+    font-size 22px
     color #507DFE
   >>> h3
-    font-size 1.1em
+    font-size 20px
     color #507DFE
   >>> h4
+    font-size: 18px;
     color #507DFE
   >>> h5
+    font-size: 16px;
     color #507DFE
   >>> h6
+    font-size: 14px;
     color #507DFE
   >>> p
     font-family: Roboto-Regular;
-    font-size: 18px;
+    font-size: 14px;
     color: #8A8A8A;
     letter-spacing: 0;
   >>> a
