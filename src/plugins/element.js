@@ -16,6 +16,7 @@ import {
   FormItem,
   Header,
   Input,
+  Image,
   Loading,
   Main,
   Menu,
@@ -35,10 +36,10 @@ import {
   TableColumn,
   Tag
 } from 'element-ui'
-import lang from 'element-ui/lib/locale/lang/en'
+import en from 'element-ui/lib/locale/lang/en'
 import locale from 'element-ui/lib/locale'
 
-locale.use(lang)
+locale.use(en)
 
 Vue.use(Button)
 Vue.use(Loading)
@@ -87,3 +88,5 @@ Vue.use(RadioGroup)
 Vue.use(Checkbox)
 
 Vue.use(Dialog)
+
+Vue.use(Image)

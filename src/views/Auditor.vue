@@ -3,7 +3,7 @@
     <el-container v-loading="actionLoading">
       <el-main style="padding-top:0">
         <div class="main-panel">
-          <h1>Auditor Board</h1>
+          <h1>{{$t('auditor.auditorBoard')}}</h1>
           <div class="card board" v-loading="auditorLoading">
             <div v-for="auditor in auditorsList" :key="auditor.auditor_name" class="board-item">
               <Avatar :url="auditor.inform ? auditor.inform.avatar : ''" star></Avatar>
@@ -11,21 +11,21 @@
             </div>
           </div>
           <div class="candidate-list">
-            <h1>Candidate List <span style="color: #91ADFF;">- {{candidatesList.length}}</span></h1>
+            <h1>{{$t('auditor.candidateList') + ' '}}<span style="color: #91ADFF;">- {{candidatesList.length}}</span></h1>
             <!-- <p>The Custodian Board manages the operations and affairs of the DAC, including but not limited to the governance and administration of the assets and liabilities of the DAC. The following DAC members have vested some of their tokens to submit themselves and candidates for a position on the custodian board which last for 7 days. Every 7 days, your votes are recalculated to select who will be part of the next custodian board. Voting is important! Please vote often and stay engaged within the DAC to know who is providing value</p> -->
             <div style="min-height: 50px" v-loading="candidateLoading">
               <div
-
                 v-for="candidate in candidatesList"
-                :key="candidate.candidate_name">
+                :key="candidate.id">
                 <CandidateCollapse
-                  v-if="candidate.is_active"
+                  v-if="candidate.candidate.is_active"
                   @select="handleSelect"
-                  :id="candidate.candidate_name"
+                  :id="candidate.id"
                   :votes="candidate.total_votes"
                   :inform="candidate.inform"
                   :isSelected="candidate.isSelected"
-                  :staked="candidate.locked_tokens"
+                  :staked="candidate.candidate.locked_tokens"
+                  :progress="candidate.meet_conditions_days"
                   ></CandidateCollapse>
               </div>
             </div>
@@ -35,29 +35,32 @@
       <el-aside :width="asideWidth">
         <div class="vote-panel">
           <h1>
-            My Vote <span style="color: #91ADFF;">{{selectedCandidates.length}}/{{config ? config.maxvotes : 5}}</span>
+            {{$t('auditor.myVotes')}} <span style="color: #91ADFF;"> {{selectedCandidates.length}}/{{config ? config.maxvotes : 5}}</span>
           </h1>
           <p>
-            You can vote for up to 5 auditor candidates at a time. Please select candidates who you think will bring value to the BOS.
+            {{$t('auditor.voteRule')}}
           </p>
           <div class="selected-candidates card">
-            <div @click="sendVotes" class="vote-button" :class="{'vote-button-active': selectedCandidates.length}">
-              {{selectedCandidates.length ? 'SUBMIT MY VOTES' : 'MY VOTES'}}
+            <div v-if="selectedCandidates.length" @click="sendVotes" class="vote-button vote-button-active">
+              {{$t('auditor.submitVotes').toLocaleUpperCase()}}
+            </div>
+            <div v-else class="vote-button">
+              {{$t('auditor.myVotes').toLocaleUpperCase()}}
             </div>
             <div v-for="candidate in selectedCandidates" :key="candidate.id" class="selected-candidate-card">
-              <Avatar size="35px" :url="candidate.image"></Avatar>
-              <p>{{candidate.candidate_name}}</p>
-              <div class="remove-button" @click="removeCandidate(candidate.candidate_name)">
+              <Avatar size="35px" :url="candidate.inform.avatar"></Avatar>
+              <p>{{candidate.id}}</p>
+              <div class="remove-button" @click="removeCandidate(candidate.id)">
                 <i class="el-icon-close"></i>
               </div>
             </div>
           </div>
         </div>
-        <div v-if="$store.state.isPC">
+        <div style="margin-bottom: 20px" v-if="$store.state.isPC">
           <div v-if="myCandidate && !myAuditor" class="card">
-            <h1>You are a candidate</h1>
-            <p>Votes: {{(myCandidate.total_votes / 10000).toFixed(4)}}</p>
-            <p>Staked: {{myCandidate.locked_tokens}}</p>
+            <h1>{{$t('auditor.youAreCand')}}</h1>
+            <p>{{$t('common.votes')}}: {{(myCandidate.total_votes / 10000).toFixed(4)}}</p>
+            <p>{{$t('common.staked')}}: {{myCandidate.candidate.locked_tokens}}</p>
             <el-progress
              :text-inside="true"
              :stroke-width="20"
@@ -65,45 +68,44 @@
              class="pass-percent"
              :percentage="stakePercent"></el-progress>
             <div v-if="myCandidate.is_active">
-              <p>you are active for elections</p>
-              <div @click="() => {stakeVisible = true}" class="vote-button vote-button-active">Stake More</div>
-              <div @click="inactive" class="vote-button vote-button-active">Unregister</div>
+              <p>{{$t('auditor.activeTip')}}</p>
+              <div @click="() => {stakeVisible = true}" class="vote-button vote-button-active">{{$t('auditor.stakeMore')}}</div>
+              <div @click="inactive" class="vote-button vote-button-active">{{$t('auditor.unregister')}}</div>
             </div>
             <div v-else >
-              <p>you are inactive for elections</p>
-              <div v-if="myCandidate.locked_tokens !== '0.0000 BOS' || pendingStake">
-                <div @click="active" class="vote-button vote-button-active">Register</div>
-                <div @click="unstake" class="vote-button vote-button-active">Unstake</div>
+              <p>{{$t('auditor.inactiveTip')}}</p>
+              <div v-if="myCandidate.candidate.locked_tokens !== '0.0000 BOS' || pendingStake">
+                <div @click="active" class="vote-button vote-button-active">{{$t('common.register')}}</div>
+                <div @click="unstake" class="vote-button vote-button-active">{{$t('common.unstake')}}</div>
               </div>
-              <div v-else @click="stake(config.lockupasset)" class="vote-button vote-button-active">Stake</div>
+              <div v-else @click="stake(config.lockupasset)" class="vote-button vote-button-active">{{$t('common.stake')}}</div>
             </div>
-            <div @click="showUpdate" class="vote-button vote-button-active">Update info</div>
+            <div @click="showUpdate" class="vote-button vote-button-active">{{$t('auditor.updateInfo')}}</div>
           </div>
           <div v-else-if="myAuditor" class="card">
-            <h1>You are a auditor</h1>
-            <p>Votes: {{(myAuditor.total_votes / 10000).toFixed(4)}}</p>
-            <div @click="showUpdate" class="vote-button vote-button-active">Update info</div>
+            <h1>{{$t('auditor.youAreAuditor')}}</h1>
+            <p>{{$t('common.votes')}}: {{(myAuditor.total_votes / 10000).toFixed(4)}}</p>
+            <div @click="showUpdate" class="vote-button vote-button-active">{{$t('auditor.updateInfo')}}</div>
           </div>
           <div v-else-if="scatter">
-            <div v-if="!scatter.identity" class="button square-button"
-              @click="getIdentity"
-            >
-              Pair Scatter
-            </div>
-            <router-link v-else :to="{path: '/auditor/register'}">
-              <div class="button square-button"
-                v-if="!candidateLoading && !auditorLoading"
-              >
-                Register as Candidate
+            <router-link v-if="scatter.identity" :to="{path: '/auditor/register'}">
+              <div class="button square-button">
+                {{$t('auditor.registerCand')}}
               </div>
             </router-link>
           </div>
-          <div v-else>
-            <!-- <p>Scatter is required!</p> -->
-            <a target="blank" href="https://get-scatter.com/">
-              <div class="button square-button">Get Scatter</div>
-            </a>
-          </div>
+        </div>
+        <div class="card" v-if="$i18n.locale === 'en'">
+          <h2>The conditions for the auditor</h2>
+          <p>1. The votes from token holders is not less than 3% of BP votes from token holders when the election was initiated.</p>
+          <p>2. The ratio of approved votes / disapproved is greater than 1.5.</p>
+          <p>3. The above conditions last for 20 days.</p>
+        </div>
+        <div class="card" v-if="$i18n.locale === 'cn'">
+          <h2>成为评审员的条件</h2>
+          <p>1. 参与投票数量不少于提案发起时参与BP投票数量的 3%。</p>
+          <p>2. ⽀持票/反对票的⽐率⼤于 1.5。</p>
+          <p>3. 以上条件持续 20 天成⽴。</p>
         </div>
       </el-aside>
     </el-container>
@@ -114,7 +116,7 @@
     v-loading="actionLoading"
     >
     <span>
-      <el-form ref="updateForm" :model="candInfo" label-width="210px" :label-position="screenWidth < 821 ? 'top' : 'left'" :rules="updateRules">
+      <el-form ref="updateForm" :model="candInfo" label-width="210px" :label-position="$store.state.screenWidth < 821 ? 'top' : 'left'" :rules="updateRules">
         <el-form-item prop="contact">
             <label slot="label">Email</label>
             <el-input style="max-width: 400px;" v-model="candInfo.contact"></el-input>
@@ -151,10 +153,6 @@
 import Eos from 'eosjs'
 import { NETWORK, NODE_ENDPOINT, API_URL } from '@/assets/constants.js'
 import Avatar from '@/components/Avatar.vue'
-
-import { MessageBox as MbMessageBox } from 'mint-ui'
-import { MessageBox } from 'element-ui'
-
 import CandidateCollapse from '@/components/CandidateCollapse.vue'
 export default {
   name: 'Auditor',
@@ -189,23 +187,18 @@ export default {
         ]
       },
       pendingStakeTable: [],
-      screenWidth: document.body.clientWidth,
       stakeAmount: '0.0000 BOS',
       stakeVisible: false
     }
   },
   mounted () {
-    window.onresize = () => {
-      this.screenWidth = document.body.clientWidth
-    }
-
     this.getAllInfo()
     this.getConfig()
     this.getPendingStake()
   },
   computed: {
     asideWidth () {
-      if (this.screenWidth < 821) {
+      if (this.$store.state.screenWidth < 821) {
         return '100%'
       }
       return '320px'
@@ -225,7 +218,7 @@ export default {
     },
     myCandidate () {
       if (this.account) {
-        return this.allCandList.find(elm => elm.candidate_name === this.account.name)
+        return this.allCandList.find(elm => elm.id === this.account.name)
       }
       return null
     },
@@ -256,22 +249,11 @@ export default {
       return flag
     },
     stakePercent () {
-      let stake = Number(this.myCandidate.locked_tokens.split(' ')[0])
+      let stake = Number(this.myCandidate.candidate.locked_tokens.split(' ')[0])
       return Number((stake * 100 / 100000).toFixed(1))
     }
   },
   methods: {
-    alert (title, msg) {
-      if (this.$store.state.isPC) {
-        MessageBox.alert(msg, title, {
-          confirmButtonText: 'OK'
-        })
-      } else {
-        MbMessageBox.alert(msg, title, {
-          confirmButtonText: 'OK'
-        })
-      }
-    },
     getConfig () {
       const tableOptions = {
         'scope': 'auditor.bos',
@@ -326,7 +308,7 @@ export default {
       })
     },
     getCandidates () {
-      fetch(API_URL.API_AUDITOR_TALLY).then(res => res.json()).then(res => {
+      fetch(API_URL.API_GET_ALL_CANDIDATES).then(res => res.json()).then(res => {
         this.candidateLoading = false
         Object.keys(res).forEach(key => {
           let item = {
@@ -344,52 +326,17 @@ export default {
             }
             item.inform = inform.bio
           }
-          item = Object.assign(item, res[key].candidate)
-          this.candidatesList.push(item)
+          item = Object.assign(item, res[key])
+          this.allCandList.push(item)
+          if (item.candidate.is_active) {
+            this.candidatesList.push(item)
+            this.candidatesList.sort((a, b) => { return b.total_votes - a.total_votes })
+          }
         })
       }).catch(e => {
         this.candidateLoading = false
         console.log(e)
       })
-      // const tableOptions = {
-      //   'scope': 'auditor.bos',
-      //   'code': 'auditor.bos',
-      //   'table': 'candidates',
-      //   'json': true
-      // }
-      // fetch(NODE_ENDPOINT + '/v1/chain/get_table_rows', {
-      //   method: 'POST',
-      //   body: JSON.stringify(tableOptions)
-      // }).then(res => res.json()).then(res => {
-      //   this.allCandList = []
-      //   this.candidatesList = []
-      //   this.candidateLoading = false
-      //   res.rows.forEach(candidate => {
-      //     candidate.isSelected = false
-      //     let inform = this.bioInfo.find(element => {
-      //       return element.candidate_name === candidate.candidate_name
-      //     })
-      //     if (inform) {
-      //       try {
-      //         inform.bio = JSON.parse(inform.bio)
-      //       } catch (e) {
-      //         console.log('json invalid')
-      //       }
-      //       candidate.inform = inform.bio
-      //       candidate.isSelected = false
-      //     }
-      //     this.allCandList.push(candidate)
-      //     if (candidate.is_active) {
-      //       this.candidatesList.push(candidate)
-      //       this.candidatesList.sort((a, b) => { return b.total_votes - a.total_votes })
-      //     }
-      //   })
-      // }).catch(e => {
-      //   this.candidateLoading = false
-      //   let error = this.$util.errorFormat(e)
-      //   this.alert('Error', 'Get candidates ERROR:' + error.message)
-      //   console.log(e)
-      // })
     },
     getAuditors () {
       const tableOptions = {
@@ -420,7 +367,7 @@ export default {
       }).catch(e => {
         this.auditorLoading = false
         let error = this.$util.errorFormat(e)
-        this.alert('Error', 'Get auditors ERROR:' + error.message)
+        this.$util.alert('Error', 'Get auditors ERROR:' + error.message)
         console.log(e)
       })
     },
@@ -444,9 +391,9 @@ export default {
       }
     },
     pushCandidate (id) {
-      if (this.config && this.selectedCandidates.length <= this.config.maxvotes) {
+      if (this.config && this.selectedCandidates.length < this.config.maxvotes) {
         for (let i = 0; i < this.candidatesList.length; i++) {
-          if (this.candidatesList[i].candidate_name === id) {
+          if (this.candidatesList[i].id === id) {
             this.candidatesList[i].isSelected = true
             this.selectedCandidates.push(this.candidatesList[i])
             break
@@ -454,18 +401,18 @@ export default {
         }
       } else {
         //  提示
-        this.alert('Warning', `You only can vote to ${this.config.maxvotes} candidates`)
+        this.$util.alert('Warning', `You only can vote to ${this.config.maxvotes} candidates`)
       }
     },
     removeCandidate (id) {
       for (let i = 0; i < this.selectedCandidates.length; i++) {
-        if (this.selectedCandidates[i].candidate_name === id) {
+        if (this.selectedCandidates[i].id === id) {
           this.selectedCandidates.splice(i, 1)
           break
         }
       }
       for (let i = 0; i < this.candidatesList.length; i++) {
-        if (this.candidatesList[i].candidate_name === id) {
+        if (this.candidatesList[i].id === id) {
           this.candidatesList[i].isSelected = false
           break
         }
@@ -480,24 +427,29 @@ export default {
     },
     sendVotes () {
       if (!this.scatter) {
-        MessageBox.alert('Get Scatter first', '', {
-          confirmButtonText: 'Get it',
-          distinguishCancelAndClose: true,
-          cancelButtonText: 'Later',
-          callback: action => {
-            if (action === 'confirm') {
-              window.open('https://get-scatter.com/', '_blank')
-            }
+        this.$util.alert('', this.$t('warning.needScatter'), action => {
+          if (action === 'confirm') {
+            window.open('https://get-scatter.com/', '_blank')
           }
         })
+        // MessageBox.alert('Get Scatter first', '', {
+        //   confirmButtonText: 'Get it',
+        //   distinguishCancelAndClose: true,
+        //   cancelButtonText: 'Later',
+        //   callback: action => {
+        //     if (action === 'confirm') {
+        //       window.open('https://get-scatter.com/', '_blank')
+        //     }
+        //   }
+        // })
       } else if (!this.scatter.identity) {
-        this.alert('Warning', 'Pair Scatter first')
+        this.$util.alert('Warning', 'Pair Scatter first')
         this.getIdentity()
       } else {
         this.actionLoading = true
         let newvotes = []
         this.selectedCandidates.forEach(item => {
-          newvotes.push(item.candidate_name)
+          newvotes.push(item.id)
         })
         const account = this.scatter.identity.accounts.find(x => x.blockchain === 'eos')
         const transactionOptions = {
@@ -518,13 +470,13 @@ export default {
         this.eos.transaction(transactionOptions, { blocksBehind: 3, expireSeconds: 30 })
           .then(() => {
             this.actionLoading = false
-            this.alert('Success', 'Your vote has been cast on candidates')
+            this.$util.alert('Success', 'Your vote has been cast on candidates')
             this.getAllInfo()
             this.removeAllCand()
           }).catch(e => {
             this.actionLoading = false
             let error = this.$util.errorFormat(e)
-            this.alert('Error', 'Vote ERROR:' + error.message)
+            this.$util.alert('Error', 'Vote ERROR:' + error.message)
             console.log(e)
           })
       }
@@ -536,12 +488,12 @@ export default {
           this.getCandidates()
           this.getPendingStake()
           this.actionLoading = false
-          this.alert('Success', 'Stake successfully')
+          this.$util.alert('Success', 'Stake successfully')
         })
         .catch(e => {
           this.actionLoading = false
           let error = this.$util.errorFormat(e)
-          this.alert('Error', 'Stake ERROR:' + error.message)
+          this.$util.alert('Error', 'Stake ERROR:' + error.message)
           console.log(e)
         })
     },
@@ -566,12 +518,12 @@ export default {
           this.actionLoading = false
           this.getCandidates()
           this.getPendingStake()
-          this.alert('Success', 'Unstake successfully')
+          this.$util.alert('Success', 'Unstake successfully')
         })
         .catch(e => {
           this.actionLoading = false
           let error = this.$util.errorFormat(e)
-          this.alert('Error', 'Unstake ERROR:' + error.message)
+          this.$util.alert('Error', 'Unstake ERROR:' + error.message)
           console.log(e)
         })
     },
@@ -595,12 +547,12 @@ export default {
         .then(() => {
           this.actionLoading = false
           this.getCandidates()
-          this.alert('Success', 'You are active for auditor elections')
+          this.$util.alert('Success', 'You are active for auditor elections')
         })
         .catch(e => {
           this.actionLoading = false
           let error = this.$util.errorFormat(e)
-          this.alert('Error', 'Be active ERROR:' + error.message)
+          this.$util.alert('Error', 'Be active ERROR:' + error.message)
           console.log(e)
         })
     },
@@ -624,12 +576,12 @@ export default {
         .then(() => {
           this.actionLoading = false
           this.getCandidates()
-          this.alert('Success', 'You are inactive for auditor elections')
+          this.$util.alert('Success', 'You are inactive for auditor elections')
         })
         .catch(e => {
           this.actionLoading = false
           let error = this.$util.errorFormat(e)
-          this.alert('Error', 'Be inactive ERROR:' + error.message)
+          this.$util.alert('Error', 'Be inactive ERROR:' + error.message)
           console.log(e)
         })
     },
@@ -664,19 +616,19 @@ export default {
             .then(res => {
               this.updateDialog = false
               this.actionLoading = false
-              this.alert('Success', 'Update BIO successfully')
+              this.$util.alert('Success', 'Update BIO successfully')
             })
             .catch(e => {
               this.actionLoading = false
               let error = this.$util.errorFormat(e)
-              this.alert('Error', 'Update BIO ERROR:' + error.message)
+              this.$util.alert('Error', 'Update BIO ERROR:' + error.message)
               console.log(e)
             })
         }
       })
     },
     stakeText () {
-      let stake = Number(this.myCandidate.locked_tokens.split(' ')[0]).toFixed(0)
+      let stake = Number(this.myCandidate.candidate.locked_tokens.split(' ')[0]).toFixed(0)
       stake = this.$util.toThousands(stake)
       return stake + '/100,000'
     },
@@ -704,7 +656,7 @@ export default {
   .auditor
     .el-container
       flex-wrap wrap
-      flex-direction column-reverse
+      flex-direction column
     .el-aside
       width 100%
       padding 0 20px
@@ -782,6 +734,20 @@ h1
   box-shadow: 0 2px 4px 0 #B0D9FF;
   border-radius: 8px;
   margin-bottom 22px
+  h1
+    font-family: Roboto-Medium;
+    font-size: 24px;
+    color #507DFE
+    letter-spacing: 0;
+  h2
+    font-family: Roboto-Medium;
+    color #507DFE
+    font-size: 20px;
+  p
+    font-family: Roboto-Regular;
+    font-size: 18px;
+    color: #8A8A8A;
+    letter-spacing: 0;
 .selected-candidate-card
   background: #FCFDFF;
   box-shadow: 0 2px 4px 0 #B0D9FF;

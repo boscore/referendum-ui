@@ -3,45 +3,37 @@
     <el-container>
       <el-main>
       <div id="back-button" @click="$router.push({path: '/'})">
-        <i class="el-icon-arrow-left"></i>Back
+        <i class="el-icon-arrow-left"></i>{{$t('common.back')}}
       </div>
-      <h2>Create Proposal</h2>
+      <h2>{{$t('common.createProp')}}</h2>
       <div class="card" v-loading="actionLoading">
         <el-form ref="form" :rules="rules" :model="form" label-position="top" label-width="110px">
           <el-form-item>
-            <label slot="label">Proposer</label>
+            <label slot="label">{{$t('form.proposer')}}</label>
             <span>{{proposer}}</span>
           </el-form-item >
           <el-form-item prop="name">
-            <label slot="label">Proposal Name</label>
+            <label slot="label">{{$t('form.proposalName')}}</label>
             <el-input maxlength="12" v-model="form.name"></el-input>
           </el-form-item>
           <el-form-item prop="title">
-            <label slot="label">Title</label>
+            <label slot="label">{{$t('form.title')}}</label>
             <el-input maxlength="1024" type="textarea" :autosize="{ minRows: 1, maxRows: 3}" v-model="form.title"></el-input>
           </el-form-item>
           <el-form-item prop="incentives">
-            <label slot="label">Number of Tokens Request</label>
+            <label slot="label">{{$t('form.budget')}}</label>
             <el-input max="1000000" @change="formatIncentives(form.incentives)" v-model="form.incentives"></el-input>
           </el-form-item>
           <el-form-item prop="receiptor">
-            <label slot="label">Receipt account</label>
+            <label slot="label">{{$t('form.receiptor')}}</label>
             <el-input v-model="form.receiptor"></el-input>
           </el-form-item>
           <el-form-item prop="content">
-            <label slot="label">Content (support Markdown)</label>
+            <label slot="label">{{$t('form.content')}} ({{$t('form.support')}} Markdown)</label>
             <el-input v-model="form.content" type="textarea" :rows="10"></el-input>
           </el-form-item>
-          <!-- <el-form-item prop="expiry">
-            <label slot="label">Expiry(UTC)</label>
-            <el-date-picker
-              type="datetime"
-              value-format="yyyy-MM-ddThh:mm:ss"
-              placeholder="expiry date"
-              v-model="form.expiry"></el-date-picker>
-          </el-form-item> -->
           <el-form-item prop="type">
-            <label slot="label">Type</label>
+            <label slot="label">{{$t('form.type')}}</label>
             <el-select v-model="form.type">
               <el-option
                 v-for="item in typeOptions"
@@ -53,7 +45,7 @@
           </el-form-item>
           <el-form-item>
             <div class="button" @click="createProp">
-              Propose
+              {{$t('form.submit')}}
             </div>
           </el-form-item>
         </el-form>
@@ -70,21 +62,6 @@ import { Message } from 'element-ui'
 export default {
   name: 'CreateProposal',
   data () {
-    // const checkExpiryDate = (rule, value, callback) => {
-    //   if (!value) {
-    //     return callback(new Error('Please choose proposal expiry date'))
-    //   } else {
-    //     let now = new Date().getTime() + (new Date().getTimezoneOffset() * 60 * 1000)
-    //     let expiry = new Date(value).getTime()
-    //     if (expiry < now) {
-    //       return callback(new Error('Expiry date shouldn\'t be earlier than now(UTC)'))
-    //     } else if ((expiry - now) > (1000 * 60 * 60 * 24 * 180)) {
-    //       return callback(new Error('Expiry date shouldn\'t be later than 6 months in the future'))
-    //     } else {
-    //       callback()
-    //     }
-    //   }
-    // }
     const checkIncentives = (rule, value, callback) => {
       if (value === '') {
         return callback(new Error('Please input a number of incentives'))
@@ -110,16 +87,6 @@ export default {
     }
     return {
       actionLoading: false,
-      typeOptions: [
-        {
-          label: 'Referendum',
-          value: 'referendum-v1'
-        },
-        {
-          label: 'Poll',
-          value: 'poll_default'
-        }
-      ],
       form: {
         name: '',
         title: '',
@@ -164,6 +131,18 @@ export default {
     },
     scatter () {
       return this.$store.state.scatter
+    },
+    typeOptions () {
+      return [
+        {
+          label: this.$t('common.referendum'),
+          value: 'referendum-v1'
+        },
+        {
+          label: this.$t('common.poll'),
+          value: 'poll_default'
+        }
+      ]
     },
     eos () {
       if (this.scatter && this.scatter.identity) {

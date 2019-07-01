@@ -46,6 +46,7 @@ export const API_URL = {
   API_GET_PROPOSAL: BACKEND_URL + '/getProposal',
   API_APPLY_REVIEW: BACKEND_URL + '/review',
   API_APPLY_FINISH: BACKEND_URL + '/finish',
+  API_GET_ALL_CANDIDATES: BACKEND_URL + '/getAllAuditors',
   API_GET_ALL_ACCOUNTS: 'https://s3.amazonaws.com/bos.referendum/referendum/accounts/latest.json',
   API_GET_ALL_VOTES: 'https://s3.amazonaws.com/bos.referendum/eosio.forum/vote/latest.json',
   API_POLL_TALLY: 'https://s3.amazonaws.com/bos.referendum/referendum/tallies/latest.json',

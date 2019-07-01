@@ -3,7 +3,7 @@
     <el-container>
       <el-main class="header">
         <div id="back-button" @click="$router.push({path: '/'})">
-          <i class="el-icon-arrow-left"></i>View All Polls
+          <i class="el-icon-arrow-left"></i>{{$t('proposal.back')}}
         </div>
         <h1>{{proposal.proposal.title}}
         </h1>
@@ -13,43 +13,43 @@
           <span style="margin-right: 10px" class="proposal-info">{{`${proposal.proposal.proposal_name} by ${proposal.proposal.proposer} `}}</span>
           <br v-if="!$store.state.isPC"/>
           <!-- <span style="margin: 0 5px">{{$util.dateConvert(proposal.proposal.expires_at)}} </span> -->
-          <span >{{proposal.proposal.proposal_json.type || 'unknown'}} </span>
+          <span >{{proposal.proposal.proposal_json.type || $t('common.unknown')}} </span>
           <br v-if="!$store.state.isPC"/>
-          <span style="font-weight:600">Budget: {{incentives}}</span>
+          <span style="font-weight:600">{{$t('proposal.budget')}}: {{incentives}}</span>
         </p>
         <div v-if="$store.state.isPC" style="margin-bottom:30px">
           <div
             class="radio-button"
             @click="activeButton = 'desc'"
             :class="{'radio-button-active': activeButton === 'desc'}">
-            Description
+            {{$t('proposal.desc')}}
           </div>
           <div
             v-if="votes.length"
             class="radio-button"
             @click="turnTo('stats')"
             :class="{'radio-button-active': activeButton === 'stats'}">
-            Stats
+            {{$t('proposal.stats')}}
           </div>
           <div
             class="radio-button"
             @click="activeButton = 'voters'"
             :class="{'radio-button-active': activeButton === 'voters'}">
-            Voters
+            {{$t('proposal.voters')}}
           </div>
           <div
             class="radio-button"
             @click="turnTo('comments')"
             :class="{'radio-button-active': activeButton === 'comments'}">
-            Comments
+            {{$t('proposal.comments')}}
           </div>
         </div>
         <div ref="steps" class="steps-bar">
           <el-steps  style="background: #fff;min-width:500px;margin-bottom: 0"  class="card" :active="activeStep" simple finish-status="success" process-status="finish">
-            <el-step ref="stepItem" title="Vote"></el-step>
-            <el-step title="Develop"></el-step>
-            <el-step title="Review"></el-step>
-            <el-step title="Finish"></el-step>
+            <el-step ref="stepItem" :title="$t('proposal.vote')"></el-step>
+            <el-step :title="$t('proposal.develop')"></el-step>
+            <el-step :title="$t('proposal.review')"></el-step>
+            <el-step :title="$t('proposal.finish')"></el-step>
           </el-steps>
         </div>
       <el-container v-loading="propLoading">
@@ -61,12 +61,12 @@
             <div class="radio-button" :class="{'radio-button-active': false}">中文</div>
           </div> -->
           <div v-else class="card" ref="voters">
-            <h2>Voters</h2>
+            <h2>{{$t('proposal.voters')}}</h2>
             <el-table :data="showVoters" :default-sort="{prop: 'staked', order: 'descending'}">
-              <el-table-column sortable label="Name" prop="voter"></el-table-column>
-              <el-table-column sortable label="Votes" prop="staked"></el-table-column>
-              <el-table-column sortable label="Type" prop="type"></el-table-column>
-              <el-table-column sortable label="Vote" prop="result"></el-table-column>
+              <el-table-column sortable :label="$t('proposal.voter')" prop="voter"></el-table-column>
+              <el-table-column sortable :label="$t('common.votes')" prop="staked"></el-table-column>
+              <el-table-column sortable :label="$t('common.type')" prop="type"></el-table-column>
+              <el-table-column sortable :label="$t('common.result')" prop="result"></el-table-column>
             </el-table>
             <div v-if="showVotersNum < votes.length">
               <div class="button" style="margin: 20px auto;padding: 5px 20px" @click="showMoreVoters">Load more voters</div>
@@ -77,7 +77,7 @@
             v-loading="chartLoading"
             class="chart-card card"
             ref="stats">
-            <h3>Votes by vote size</h3>
+            <h3>{{$t('proposal.voteSize')}}</h3>
             <div class="chart-panel">
 
               <IEcharts
@@ -88,45 +88,42 @@
           </div>
 
           <div class="card" ref="comments">
-            <h2>Auditor comments {{auditorComm.length}}</h2>
+            <h2>{{$t('common.auditor')}} {{$t('proposal.comments')}} {{auditorComm.length}}</h2>
             <Comment v-for="(comment, index) in auditorComm" :key="index" v-bind="comment"></Comment>
           </div>
 
           <div class="card">
-            <h2>BP comments {{BPComm.length}}</h2>
+            <h2>{{$t('proposal.BP')}} {{$t('proposal.comments')}} {{BPComm.length}}</h2>
             <Comment v-for="(comment, index) in BPComm" :key="index" v-bind="comment"></Comment>
           </div>
 
           <div class="card">
-            <h2>Other comments {{otherComm.length}}</h2>
+            <h2>{{$t('proposal.other')}} {{$t('proposal.comments')}} {{otherComm.length}}</h2>
             <Comment v-for="(comment, index) in otherComm" :key="index" v-bind="comment"></Comment>
           </div>
         </el-main>
         <el-aside class="aside-right" :width="asideWidth">
           <div class="card" id="poll-status">
-            <h2>Poll Status</h2>
+            <h2>{{$t('proposal.propStatus')}}</h2>
             <el-progress :stroke-width="10" class="pass-percent" :percentage="agreePercent"></el-progress>
             <el-progress :stroke-width="10" class="dissent-percent" :percentage="rejectPercent"></el-progress>
             <!-- <el-progress :stroke-width="10" class="abstain-percent" :percentage="abstainPercent"></el-progress> -->
             <div style="margin:15px 0">
-              <p style="margin: 0">{{$util.toThousands((this.proposal.stats.staked.total / 10000).toFixed(0))}} BOS voted</p>
+              <p style="margin: 0">{{$util.toThousands((this.proposal.stats.staked.total / 10000).toFixed(0))}} BOS {{$t('common.voted').toLocaleLowerCase()}}</p>
               <el-progress v-loading="this.votesOfBP === -1" :stroke-width="10" class="voted-percent" :percentage="votedPercent"></el-progress>
             </div>
             <div class="scatter-panel">
               <div v-if="scatter">
-                <div v-if="!scatter.identity" @click="getIdentity" class="button">
-                  Link Scatter to vote
-                </div>
-                <div v-else>
+                <div v-if="scatter.identity">
                   <div style="magin-bottom:10px">
                   <el-radio-group v-model="voteActionParams.vote">
-                    <el-radio :label="1">YES</el-radio>
-                    <el-radio :label="0">NO</el-radio>
-                    <el-radio :label="255">ABSTAIN</el-radio>
+                    <el-radio :label="1">{{$t('common.yes')}}</el-radio>
+                    <el-radio :label="0">{{$t('common.no')}}</el-radio>
+                    <el-radio :label="255">{{$t('common.abstain')}}</el-radio>
                   </el-radio-group>
                   </div>
                   <div v-if="isAuditor || isBP">
-                    <p>Please write your opinion</p>
+                    <p>{{$t('proposal.writeOpinion')}}</p>
                     <el-input
                       type="textarea"
                       :rows="4"
@@ -135,7 +132,7 @@
                   </div>
                   <div v-else style="margin:5px 0">
                     <el-checkbox v-model="writeComment">
-                      Post a public comment (optional)
+                      {{$t('proposal.publicComment')}} ({{$t('common.optional')}})
                     </el-checkbox>
                     <div v-if="writeComment">
                       <el-input
@@ -143,43 +140,43 @@
                         :rows="4"
                         v-model="myComment"
                       ></el-input>
-                      <p>Select Yes/No to cast your vote and make your comment public on the EOS blockchain. Your comment and vote will be recorded on-chain for ever, if you want to change your comment please vote again and our algorithm will attempt to just show your latest comment.</p>
                     </div>
                   </div>
 
-                  <div v-if="myVote">You voted {{myVote.result}}</div>
+                  <div v-if="myVote">{{$t('common.voted')}} {{myVote.result}}</div>
                   <div style="display: flex; justify-content:flex-start;margin-top:10px">
                     <div @click="sendVote" class="button" style="margin-right: 20px;width:80px">
-                      Vote
+                      {{$t('common.vote')}}
                     </div>
-                    <div v-if="myVote" class="button" @click="sendUnvote" style="background: red;margin-right: 20px;width:80px">Unvote</div>
+                    <div v-if="myVote" class="button" @click="sendUnvote" style="background: red;margin-right: 20px;width:80px">{{$t('common.unvote')}}</div>
                   </div>
                 </div>
               </div>
-              <a v-else target="blank" href="https://get-scatter.com/">
-                <div class="button">
-                  Get Scatter to vote
-                </div>
-              </a>
             </div>
             <hr style="border: none; border-bottom:2px solid #D8D8D8;" />
             <div>
               <div v-if="(this.proposal.meet_conditions_days > 0)">
-                <h3> {{this.proposal.meet_conditions_days}} {{this.proposal.meet_conditions_days > 1 ? 'days' : 'day'}} satisfied</h3>
+                <h3> {{satisfiedWord}}</h3>
                 <el-progress :format="satisfiedText" :stroke-width="10" class="pass-percent" :percentage="satisfiedPercent"></el-progress>
               </div>
-              <p>{{this.proposal ? this.proposal.stats.votes.accounts : 0}} accounts</p>
-              <p>{{this.proposal ? this.calcDays(this.proposal.proposal.created_at, new Date().toString()) : 0}} days since poll started</p>
+              <p>{{this.proposal.stats.votes.total}} {{this.proposal.stats.votes.total > 1 ? $t('proposal.voters') : $t('proposal.voter')}}</p>
+              <p>{{this.proposal.duration > 1 ? $t('proposal.propDays', [this.proposal.duration]) : $t('proposal.propDay', [this.proposal.duration])}}</p>
             </div>
           </div>
-          <div class="card">
+          <div class="card" v-if="$i18n.locale === 'en'">
             <h2>The conditions for the approved proposal</h2>
             <p>1. The votes from token holders is not less than 40% of BP votes from token holders when the proposal was initiated.</p>
             <p>2. The ratio of approved votes/disapproved is greater than 1.5.</p>
             <p>3. The above conditions last for 20 days.</p>
           </div>
+          <div class="card" v-if="$i18n.locale === 'cn'">
+            <h2>提案通过的条件</h2>
+            <p>1. 参与投票数量不少于提案发起时参与BP投票数量的40%。</p>
+            <p>2. ⽀持票/反对票的⽐率⼤于 1.5。</p>
+            <p>3. 以上条件持续 20 天成⽴。</p>
+          </div>
           <h2 v-if="relatedPolls.length">
-            Related Polls
+            {{$t('proposal.relatedProp')}}
           </h2>
           <div id="related-polls">
             <div
@@ -189,7 +186,7 @@
               style="margin-bottom: 30px; cursor: pointer"
             >
             <PropCard
-              :type="prop.proposal.proposal_json.type || 'unknown'"
+              :type="prop.proposal.proposal_json.type || $t('common.unknown')"
               :title="prop.proposal.title"
               :desc="prop.proposal.proposal_json.content || ''"
               :votes="prop.stats.votes"
@@ -209,8 +206,6 @@
 <script>
 import marked from 'marked'
 import Eos from 'eosjs'
-import { MessageBox as MbMessageBox } from 'mint-ui'
-import { MessageBox } from 'element-ui'
 import { NETWORK, API_URL, NODE_ENDPOINT, EOSFORUM } from '@/assets/constants.js'
 import IEcharts from 'vue-echarts-v3/src/lite.js'
 import 'echarts/lib/chart/pie'
@@ -523,6 +518,15 @@ export default {
         return 0
       }
     },
+    satisfiedWord () {
+      let word = ''
+      if (this.proposal.meet_conditions_days > 1) {
+        word = this.$t('common.daysSatisfied', [this.proposal.meet_conditions_days])
+      } else {
+        word = this.$t('common.daySatisfied', [this.proposal.meet_conditions_days])
+      }
+      return word
+    },
     agreePercent () {
       if (!this.proposal || this.proposal.stats.staked.total === 0 || !this.proposal.stats.staked[1]) {
         return 0
@@ -649,17 +653,6 @@ export default {
     this.$refs['steps'].scrollLeft += this.$refs['steps'].scrollWidth * this.activeStep / 4
   },
   methods: {
-    alert (title, msg) {
-      if (this.$store.state.isPC) {
-        MessageBox.alert(msg, title, {
-          confirmButtonText: 'OK'
-        })
-      } else {
-        MbMessageBox.alert(msg, title, {
-          confirmButtonText: 'OK'
-        })
-      }
-    },
     getProposal () {
       fetch(API_URL.API_GET_PROPOSAL + '/' + this.proposalName)
         .then(res => {
@@ -671,6 +664,7 @@ export default {
         .then(res => {
           this.propLoading = false
           this.proposal = res
+          this.proposal.duration = this.calcDays(this.proposal.proposal.created_at, new Date().toString())
           if (this.proposal.approved_by_vote && !this.proposal.approved_by_BET && this.proposal.reviewed_by_BET_date && this.proposal.reviewed_by_BET_date !== 'None') {
             const start = new Date(this.proposal.reviewed_by_BET_date).getTime()
             const end = new Date().getTime()
@@ -691,12 +685,12 @@ export default {
               content: ' '
             }
             let error = this.$util.errorFormat(e)
-            this.alert('Error', 'proposal_json ERROR:' + error.message)
+            this.$util.alert('Error', 'proposal_json ERROR:' + error.message)
           }
         }).catch(e => {
           this.propLoading = false
           let error = this.$util.errorFormat(e)
-          this.alert('Error', 'Get Proposal ERROR:' + error.message)
+          this.$util.alert('Error', 'Get Proposal ERROR:' + error.message)
           console.log(e)
         })
     },
@@ -713,16 +707,8 @@ export default {
           this.producers = res.producer
         }).catch(e => {
           let error = this.$util.errorFormat(e)
-          this.alert('Error', 'Get Producers ERROR:' + error.message)
-          // Message({
-          //   showClose: true,
-          //   message: 'Get Producers ERROR\n' + String(e),
-          //   type: 'error'
-          // })
+          this.$util.alert('Error', 'Get Producers ERROR:' + error.message)
           console.log(e)
-        // MessageBox.alert(e, 'Get Producers ERROR', {
-        //   confirmButtonText: 'OK'
-        // })
         })
     },
     getAuditors () {
@@ -747,12 +733,9 @@ export default {
         .then(res => {
           this.auditorsList = res.rows
         }).catch(e => {
-        // MessageBox.alert(e, 'Get Auditors ERROR', {
-        //   confirmButtonText: 'OK'
-        // })
           console.log(e)
           let error = this.$util.errorFormat(e)
-          this.alert('Error', 'Get Auditors ERROR:' + error.message)
+          this.$util.alert('Error', 'Get Auditors ERROR:' + error.message)
         })
     },
     getIdentity () {
@@ -778,10 +761,10 @@ export default {
     },
     sendVote () {
       if (this.voteActionParams.vote === -1) {
-        this.alert('Warning', 'Please choose your vote')
+        this.$util.alert('Warning', 'Please choose your vote')
       } else
       if (this.myComment === '' && (this.isAuditor || this.isBP)) {
-        this.alert('Warning', 'Please write your opinion of this proposal')
+        this.$util.alert('Warning', 'Please write your opinion of this proposal')
       } else {
         this.voteActionParams.voter = this.account.name
         this.voteActionParams.proposal_name = this.proposalName
@@ -802,13 +785,13 @@ export default {
         this.eos.transaction(transactionOptions, { blocksBehind: 3, expireSeconds: 30 })
           .then(res => {
             let message = `Your vote  has been cast on ${this.proposalName}, data will be updated some time later`
-            this.alert('Success', message)
+            this.$util.alert('Success', message)
             this.$store.commit('addVote', { vote: {
               ...this.voteActionParams
             } })
           }).catch(e => {
             let error = this.$util.errorFormat(e)
-            this.alert('Error', 'Vote ERROR:' + error.message)
+            this.$util.alert('Error', 'Vote ERROR:' + error.message)
             console.log(e)
           })
       }
@@ -833,13 +816,13 @@ export default {
       this.eos.transaction(transactionOptions, { blocksBehind: 3, expireSeconds: 30 })
         .then(res => {
           let message = `Your unvote on ${this.proposalName} was successful, data will be updated some time later`
-          this.alert('Success', 'Vote ERROR:' + message)
+          this.$util.alert('Success', 'Vote ERROR:' + message)
           this.$store.commit('deleteVote', { vote: {
             ...actionParams
           } })
         }).catch(e => {
           let error = this.$util.errorFormat(e)
-          this.alert('Error', 'Unvote ERROR:' + error.message)
+          this.$util.alert('Error', 'Unvote ERROR:' + error.message)
           console.log(e)
         })
     },

@@ -3,10 +3,10 @@
     <div class="card-top" :class="cardTopClass">
       <div class="card-top-bar">
         <div v-if="percent > 0" class="card-top-tag card-top-tag-left clear-float">
-            <span>{{percent}} days satisfied</span>
+          <span>{{satisfiedWord}}</span>
         </div>
         <div class="card-top-tag clear-float" :class="cardTagClass">
-          {{type.search('referendum') !== -1 ? 'referendum' : 'poll'}}
+          {{type.search('referendum') !== -1 ? $t('common.referendum') : $t('common.poll')}}
         </div>
       </div>
       <p>{{title}}</p>
@@ -22,7 +22,7 @@
         <div class="card-bottom-board-right">
           <el-progress :stroke-width="10" class="pass-percent" :percentage="agreePercent"></el-progress>
           <el-progress  :stroke-width="10" class="dissent-percent" :percentage="rejectPercent"></el-progress>
-          <p>{{$util.toThousands((staked / 10000).toFixed(0))}} BOS voted</p>
+          <p>{{$util.toThousands((staked / 10000).toFixed(0))}} BOS {{$t('common.voted').toLocaleLowerCase()}}</p>
         </div>
       </div>
     </div>
@@ -129,6 +129,15 @@ export default {
     },
     propDesc () {
       return this.desc.replace(/#/g, '')
+    },
+    satisfiedWord () {
+      let word = ''
+      if (this.percent > 1) {
+        word = this.$t('common.daysSatisfied', [this.percent])
+      } else {
+        word = this.$t('common.daySatisfied', [this.percent])
+      }
+      return word
     }
   }
 }

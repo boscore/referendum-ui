@@ -29,6 +29,10 @@ export default {
     }
   },
   created () {
+    this.$i18n.locale = localStorage.getItem('language')
+    this.$util.changeLanguage = this.$util.changeLanguage.bind(this)
+    this.$util.alert = this.$util.alert.bind(this)
+
     this.$store.commit('setIsPC', { isPC: this.$util.isPC() })
     let init = () => {
       this.$store.dispatch('getAccounts')
