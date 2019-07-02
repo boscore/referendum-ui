@@ -26,11 +26,12 @@
     "stake": "抵押",
     "staked": "已抵押",
     "unknown": "未知",
+    "update": "更新",
     "unstake": "赎回抵押",
     "unvote": "取消投票",
     "vote": "投票",
     "voted": "已投",
-    "votes": "投票",
+    "votes": "票数",
     "votedTime": "投票时间",
     "yes": "同意"
   },

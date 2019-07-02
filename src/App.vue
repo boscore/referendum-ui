@@ -13,8 +13,6 @@ import Footer from '@/components/Footer.vue'
 import NavMenu from '@/components/NavMenu.vue'
 import ScatterJS from 'scatterjs-core'
 import ScatterEOS from 'scatterjs-plugin-eosjs'
-// import { API_URL } from '@/assets/constants.js'
-// import { connect } from 'http2'
 
 ScatterJS.plugins(new ScatterEOS())
 export default {
@@ -29,7 +27,9 @@ export default {
     }
   },
   created () {
-    this.$i18n.locale = localStorage.getItem('language')
+    if (localStorage.getItem('language')) {
+      this.$i18n.locale = localStorage.getItem('language')
+    }
     this.$util.changeLanguage = this.$util.changeLanguage.bind(this)
     this.$util.alert = this.$util.alert.bind(this)
 

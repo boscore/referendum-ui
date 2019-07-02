@@ -19,7 +19,7 @@
         <el-menu-item index="help-2" @click="$router.push('/help/tutorial')" style="text-align:center">{{$t('help.howToVote')}}</el-menu-item>
       </el-submenu>
       <el-submenu index="languages">
-        <template slot="title">{{languages[$i18n.locale]}}</template>
+        <template slot="title">{{language}}</template>
         <el-menu-item index="languages-1" @click="changeLang('en')" style="text-align:center">English</el-menu-item>
         <el-menu-item index="languages-2" @click="changeLang('cn')" style="text-align:center">中文</el-menu-item>
       </el-submenu>
@@ -39,11 +39,7 @@ export default {
   name: 'NavMenu',
   data () {
     return {
-      showMenu: false,
-      languages: {
-        en: 'English',
-        cn: '中文'
-      }
+      showMenu: false
     }
   },
   computed: {
@@ -55,6 +51,14 @@ export default {
         return this.$store.state.scatter.identity.accounts.find(x => x.blockchain === 'eos').name
       }
       return null
+    },
+    language () {
+      let languages = {
+        en: 'English',
+        cn: '中文'
+      }
+      console.log(this.$i18n)
+      return languages[this.$i18n.locale]
     },
     scatter () {
       return this.$store.state.scatter

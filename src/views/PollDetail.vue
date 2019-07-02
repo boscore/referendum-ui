@@ -2,8 +2,10 @@
   <div v-loading="!proposal" class="poll-detail">
     <el-container>
       <el-main class="header">
-        <div id="back-button" @click="$router.push({path: '/'})">
-          <i class="el-icon-arrow-left"></i>{{$t('proposal.back')}}
+        <div class="clear-float">
+          <div id="back-button" @click="$router.push({path: '/'})">
+            <i class="el-icon-arrow-left"></i>{{$t('proposal.back')}}
+          </div>
         </div>
         <h1>{{proposal.proposal.title}}
         </h1>
@@ -700,7 +702,6 @@ export default {
           if (res.status !== 200) {
             console.log(res.statusText)
           }
-
           return res.json()
         })
         .then(res => {
@@ -954,23 +955,26 @@ export default {
 .prop-content
   overflow-wrap break-word
   >>> h1
-    font-size 1.5em
+    font-size 24px
     color #507DFE
   >>> h2
-    font-size 1.3em
+    font-size 22px
     color #507DFE
   >>> h3
-    font-size 1.1em
+    font-size 20px
     color #507DFE
   >>> h4
+    font-size: 18px;
     color #507DFE
   >>> h5
+    font-size: 16px;
     color #507DFE
   >>> h6
+    font-size: 14px;
     color #507DFE
   >>> p
     font-family: Roboto-Regular;
-    font-size: 18px;
+    font-size: 14px;
     color: #8A8A8A;
     letter-spacing: 0;
   >>> a
@@ -978,8 +982,9 @@ export default {
   >>> img
     max-width 100%
 #back-button
+  float left
   cursor pointer
-  width 160px
+  padding 0 10px
   height 32px
   line-height 32px
   background: #507DFE;
