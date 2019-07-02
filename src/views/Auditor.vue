@@ -108,9 +108,9 @@
             <!-- <p>2. ⽀持票/反对票的⽐率⼤于 1.5。</p>
             <p>3. 以上条件持续 20 天成⽴。</p> -->
           </div>
-          <div v-if="false && $store.state.summaries.bp_votes">
-            <h2 style="font-size:16px; color: #507DFE; padding: 10px 0; margin: 0;border-top:1px solid #eee">BP {{$t('common.votes') + ': '}}{{($store.state.summaries.bp_votes / 10000).toFixed(4)}}</h2>
-            <div class="chart-panel" >
+          <div v-if="$store.state.summaries.bp_votes">
+            <h2 style="font-size:16px; color: #507DFE; padding: 10px 0; margin: 0;border-top:1px solid #eee">BP 3% {{$t('common.votes') + ': '}}{{($store.state.summaries.bp_votes * 0.03 / 10000).toFixed(4)}}</h2>
+            <div style="display: none" class="chart-panel" >
               <IEcharts
                 ref="chart"
                 :option="chartOption"

@@ -19,7 +19,7 @@
     "http2": "^3.3.7",
     "marked": "^0.6.2",
     "mint-ui": "^2.2.13",
-    "scatterjs-core": "^2.7.17",
+    "scatterjs-core": "^2.7.18",
     "scatterjs-plugin-eosjs": "^1.5.1",
     "vue": "^2.6.6",
     "vue-echarts-v3": "^2.0.1",
