@@ -95,17 +95,28 @@
             </router-link>
           </div>
         </div>
-        <div class="card" v-if="$i18n.locale === 'en'">
-          <h2>The conditions for the auditor</h2>
-          <p>The votes from token holders is not less than 3% of BP votes from token holders when the election was initiated, and lasts for 20 days.</p>
-          <!-- <p>2. The ratio of approved votes / disapproved is greater than 1.5.</p> -->
-          <!-- <p>2. The above conditions last for 20 days.</p> -->
-        </div>
-        <div class="card" v-if="$i18n.locale === 'cn'">
-          <h2>成为评审员的条件</h2>
-          <p>参与投票数量不少于提案发起时参与BP投票数量的 3%,并且持续20天成立。</p>
-          <!-- <p>2. ⽀持票/反对票的⽐率⼤于 1.5。</p>
-          <p>3. 以上条件持续 20 天成⽴。</p> -->
+        <div class="card" >
+          <div v-if="$i18n.locale === 'en'">
+            <h2>The conditions for the auditor</h2>
+            <p>The votes from token holders is not less than 3% of BP votes from token holders when the election was initiated, and lasts for 20 days.</p>
+            <!-- <p>2. The ratio of approved votes / disapproved is greater than 1.5.</p> -->
+            <!-- <p>2. The above conditions last for 20 days.</p> -->
+          </div>
+          <div v-if="$i18n.locale === 'cn'">
+            <h2>成为评审员的条件</h2>
+            <p>参与投票数量不少于提案发起时参与BP投票数量的 3%,并且持续20天成立。</p>
+            <!-- <p>2. ⽀持票/反对票的⽐率⼤于 1.5。</p>
+            <p>3. 以上条件持续 20 天成⽴。</p> -->
+          </div>
+          <div v-if="false && $store.state.summaries.bp_votes">
+            <h2 style="font-size:16px; color: #507DFE; padding: 10px 0; margin: 0;border-top:1px solid #eee">BP {{$t('common.votes') + ': '}}{{($store.state.summaries.bp_votes / 10000).toFixed(4)}}</h2>
+            <div class="chart-panel" >
+              <IEcharts
+                ref="chart"
+                :option="chartOption"
+              ></IEcharts>
+            </div>
+          </div>
         </div>
       </el-aside>
     </el-container>
@@ -118,22 +129,22 @@
     <span>
       <el-form ref="updateForm" :model="candInfo" label-width="210px" :label-position="$store.state.screenWidth < 821 ? 'top' : 'left'" :rules="updateRules">
         <el-form-item prop="contact">
-            <label slot="label">Email</label>
+            <label slot="label">{{$t('form.email')}}</label>
             <el-input style="max-width: 400px;" v-model="candInfo.contact"></el-input>
           </el-form-item>
           <el-form-item>
-            <label slot="label">Avatar image url</label>
+            <label slot="label">{{$t('auditor.avatarUrl')}}</label>
             <el-input style="max-width: 400px;" v-model="candInfo.avatar" ></el-input>
           </el-form-item>
           <el-form-item prop="bio">
-            <label slot="label">BIO</label>
+            <label slot="label">{{$t('auditor.BIO')}}</label>
             <el-input  v-model="candInfo.bio" type="textarea" :rows="10" ></el-input>
           </el-form-item>
       </el-form>
     </span>
     <span slot="footer">
-      <el-button @click="updateDialog=false">Cancel</el-button>
-      <el-button type="primary" @click="updateBio">Update</el-button>
+      <el-button @click="updateDialog=false">{{$t('common.cancel')}}</el-button>
+      <el-button type="primary" @click="updateBio">{{$t('common.update')}}</el-button>
     </span>
   </el-dialog>
   <el-dialog
@@ -142,8 +153,8 @@
     width="30%">
     <el-input @change="formatStakeAmount" v-model="stakeAmount"></el-input>
     <span slot="footer" class="dialog-footer">
-      <el-button @click="stakeVisible = false">Cancel</el-button>
-      <el-button type="primary" @click="stake(stakeAmount)">Stake</el-button>
+      <el-button @click="stakeVisible = false">{{$t('common.cancel')}}</el-button>
+      <el-button type="primary" @click="stake(stakeAmount)">{{$t('common.stake')}}</el-button>
     </span>
   </el-dialog>
   </div>
@@ -154,11 +165,17 @@ import Eos from 'eosjs'
 import { NETWORK, NODE_ENDPOINT, API_URL } from '@/assets/constants.js'
 import Avatar from '@/components/Avatar.vue'
 import CandidateCollapse from '@/components/CandidateCollapse.vue'
+import IEcharts from 'vue-echarts-v3/src/lite.js'
+import 'echarts/lib/chart/pie'
+import 'echarts/lib/component/tooltip'
+import 'echarts/lib/component/title'
+import 'echarts/lib/component/grid'
 export default {
   name: 'Auditor',
   components: {
     Avatar,
-    CandidateCollapse
+    CandidateCollapse,
+    IEcharts
   },
   data () {
     return {
@@ -208,6 +225,67 @@ export default {
         return this.scatter.identity.accounts.find(x => x.blockchain === 'eos')
       } else {
         return null
+      }
+    },
+    chartOption () {
+      let aimVotes = (this.$store.state.summaries.bp_votes / 10000 * 0.03).toFixed(4)
+      let data = [
+        {
+          value: this.$store.state.summaries.bp_votes / 10000 - aimVotes,
+          name: '',
+          itemStyle: {
+            color: 'rgb(97, 169, 19)'
+          },
+          label: {
+            show: false
+          },
+          labelLine: {
+            show: false
+          }
+        },
+        {
+          value: aimVotes,
+          name: 'candition votes',
+          itemStyle: {
+            color: 'rgb(217, 83, 79)'
+          },
+          label: {
+            show: false
+          },
+          labelLine: {
+            show: false
+          }
+        }
+      ]
+      return {
+        tooltip: {
+          trigger: 'item',
+          formatter: '{c} BOS ({d}%)',
+          position: ['10px', '100px']
+        },
+        series: [
+          {
+            type: 'pie',
+            radius: '65%',
+            center: ['50%', '50%'],
+            selectedMode: 'single',
+            data: data,
+            label: {
+              normal: {
+                textStyle: {
+                  fontSize: 18,
+                  color: '#235894'
+                }
+              }
+            },
+            itemStyle: {
+              normal: {
+                borderWidth: 1,
+                borderColor: '#fff'
+              }
+            }
+          }
+        ]
       }
     },
     dialogWidth () {
@@ -681,6 +759,9 @@ h1
   font-size: 20px;
   color: #507DFE;
   letter-spacing: 0;
+.chart-panel
+  min-width 250px
+  height 200px
 .main-panel
   p
     font-family: Roboto-Regular;

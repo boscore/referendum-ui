@@ -27,7 +27,9 @@ export default {
     }
   },
   created () {
-    this.$i18n.locale = localStorage.getItem('language')
+    if (localStorage.getItem('language')) {
+      this.$i18n.locale = localStorage.getItem('language')
+    }
     this.$util.changeLanguage = this.$util.changeLanguage.bind(this)
     this.$util.alert = this.$util.alert.bind(this)
 

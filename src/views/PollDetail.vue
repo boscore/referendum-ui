@@ -2,8 +2,10 @@
   <div v-loading="!proposal" class="poll-detail">
     <el-container>
       <el-main class="header">
-        <div id="back-button" @click="$router.push({path: '/'})">
-          <i class="el-icon-arrow-left"></i>{{$t('proposal.back')}}
+        <div class="clear-float">
+          <div id="back-button" @click="$router.push({path: '/'})">
+            <i class="el-icon-arrow-left"></i>{{$t('proposal.back')}}
+          </div>
         </div>
         <h1>{{proposal.proposal.title}}
         </h1>
@@ -700,7 +702,6 @@ export default {
           if (res.status !== 200) {
             console.log(res.statusText)
           }
-
           return res.json()
         })
         .then(res => {
@@ -981,8 +982,9 @@ export default {
   >>> img
     max-width 100%
 #back-button
+  float left
   cursor pointer
-  width 160px
+  padding 0 10px
   height 32px
   line-height 32px
   background: #507DFE;
