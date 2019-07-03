@@ -24,7 +24,6 @@ export default {
   data () {
     return {
       connectCount: 0,
-      connectFailed: false,
       connectInterval: null,
       interval: null
     }
@@ -60,7 +59,7 @@ export default {
       this.$store.state.summaries.hasOwnProperty('bp_votes') === false) {
         this.$util.alert(this.$t('common.tip'), this.$t('alert.networkSlow'))
       }
-    }, 10000)
+    }, 30000)
   },
   mounted () {
     this.$store.dispatch('setScreenWidth', { screenWidth: document.body.clientWidth })
@@ -76,19 +75,20 @@ export default {
         if (!connected) {
           this.connectCount++
           if (this.connectCount >= 3) {
-            this.connectFailed = true
             clearInterval(this.connectInterval)
           }
           return false
         }
         // 有scatter
-        const requiredFields = {
-          accounts: [ NETWORK ]
+        if (!this.$store.state.isPC) {
+          const requiredFields = {
+            accounts: [ NETWORK ]
+          }
+          ScatterJS.scatter.getIdentity(requiredFields).then(() => {
+            // console.log(this.scatter.identity)
+            this.$store.dispatch('setScatter', { scatter: ScatterJS.scatter })
+          })
         }
-        ScatterJS.scatter.getIdentity(requiredFields).then(() => {
-        // console.log(this.scatter.identity)
-          this.$store.dispatch('setScatter', { scatter: ScatterJS.scatter })
-        })
         clearInterval(this.connectInterval)
         console.log(ScatterJS.scatter)
         this.$store.dispatch('setScatter', { scatter: ScatterJS.scatter })
@@ -99,17 +99,6 @@ export default {
     clearInterval(this.interval)
   },
   methods: {
-  },
-  watch: {
-    connectFailed (newValue, oldValue) {
-      if (newValue && !oldValue) {
-        this.$util.alert('', this.$t('warning.needScatter'), this.$t('common.OK'), this.$t('warning.getScatter'), (action) => {
-          if (action === 'cancel') {
-            window.open('https://get-scatter.com/', '_blank')
-          }
-        })
-      }
-    }
   }
 }
 </script>

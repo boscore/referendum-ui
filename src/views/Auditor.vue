@@ -7,7 +7,7 @@
           <div class="card board" v-loading="auditorLoading">
             <div v-for="auditor in auditorsList" :key="auditor.auditor_name" class="board-item">
               <Avatar :url="auditor.inform ? auditor.inform.avatar : ''" star></Avatar>
-              <p>{{auditor.auditor_name}}</p>
+              <p>{{auditor.candidate.candidate_name}}</p>
             </div>
           </div>
           <div class="candidate-list">
@@ -74,7 +74,7 @@
             </div>
             <div v-else >
               <p>{{$t('auditor.inactiveTip')}}</p>
-              <div v-if="myCandidate.candidate.locked_tokens !== '0.0000 BOS' || pendingStake">
+              <div v-if="myCandidate.candidate.locked_tokens !== '0.0000 BOS'">
                 <div @click="active" class="vote-button vote-button-active">{{$t('common.register')}}</div>
                 <div @click="unstake" class="vote-button vote-button-active">{{$t('common.unstake')}}</div>
               </div>
@@ -203,7 +203,6 @@ export default {
           { required: true, message: 'Contact way can\'t be empty', trigger: 'blur' }
         ]
       },
-      pendingStakeTable: [],
       stakeAmount: '0.0000 BOS',
       stakeVisible: false
     }
@@ -211,7 +210,6 @@ export default {
   mounted () {
     this.getAllInfo()
     this.getConfig()
-    this.getPendingStake()
   },
   computed: {
     asideWidth () {
@@ -302,7 +300,7 @@ export default {
     },
     myAuditor () {
       if (this.account) {
-        return this.auditorsList.find(elm => elm.auditor_name === this.account.name)
+        return this.auditorsList.find(elm => elm.candidate.candidate_name === this.account.name)
       }
       return null
     },
@@ -317,15 +315,6 @@ export default {
       }
       return null
     },
-    pendingStake () {
-      let flag = false
-      this.pendingStakeTable.forEach(item => {
-        if (item.sender === this.account.name && item.quantity >= this.config.lockupasset) {
-          flag = true
-        }
-      })
-      return flag
-    },
     stakePercent () {
       let stake = Number(this.myCandidate.candidate.locked_tokens.split(' ')[0])
       return Number((stake * 100 / 100000).toFixed(1))
@@ -333,49 +322,17 @@ export default {
   },
   methods: {
     getConfig () {
-      const tableOptions = {
-        'scope': 'auditor.bos',
-        'code': 'auditor.bos',
-        'table': 'config',
-        'json': true
-      }
-      fetch(NODE_ENDPOINT + '/v1/chain/get_table_rows', {
-        method: 'POST',
-        body: JSON.stringify(tableOptions)
-      }).then(res => res.json())
+      fetch(API_URL.API_AUDITOR_CONFIG).then(res => res.json())
         .then((res) => {
-          this.config = res.rows[0]
+          this.config = res
         }).catch(e => {
           console.log(e)
         })
     },
-    getPendingStake () {
-      const tableOptions = {
-        'scope': 'auditor.bos',
-        'code': 'auditor.bos',
-        'table': 'pendingstake',
-        'json': true
-      }
-      fetch(NODE_ENDPOINT + '/v1/chain/get_table_rows', {
-        method: 'POST',
-        body: JSON.stringify(tableOptions)
-      }).then(res => res.json()).then((res) => {
-        this.pendingStakeTable = res.rows
-      }).catch(e => { console.log(e) })
-    },
     getAllInfo () {
-      const tableOptions = {
-        'scope': 'auditor.bos',
-        'code': 'auditor.bos',
-        'table': 'bios',
-        'json': true
-      }
-      fetch(NODE_ENDPOINT + '/v1/chain/get_table_rows', {
-        method: 'POST',
-        body: JSON.stringify(tableOptions)
-      }).then(res => res.json()).then(res => {
-        this.bioInfo = res.rows
-        this.getAuditors()
+      fetch(API_URL.API_AUDITOR_BIOS).then(res => res.json()).then(res => {
+        this.bioInfo = res
+        // this.getAuditors()
         this.getCandidates()
       }).catch(e => {
         this.candidateLoading = false
@@ -388,6 +345,7 @@ export default {
     getCandidates () {
       fetch(API_URL.API_GET_ALL_CANDIDATES).then(res => res.json()).then(res => {
         this.candidateLoading = false
+        this.auditorLoading = false
         Object.keys(res).forEach(key => {
           let item = {
             total_votes: res[key].stats.staked.total,
@@ -405,6 +363,9 @@ export default {
             item.inform = inform.bio
           }
           item = Object.assign(item, res[key])
+          if (item.is_auditor) {
+            this.auditorsList.push(item)
+          }
           this.allCandList.push(item)
           if (item.candidate.is_active) {
             this.candidatesList.push(item)
@@ -413,39 +374,6 @@ export default {
         })
       }).catch(e => {
         this.candidateLoading = false
-        console.log(e)
-      })
-    },
-    getAuditors () {
-      const tableOptions = {
-        'scope': 'auditor.bos',
-        'code': 'auditor.bos',
-        'table': 'auditors',
-        'json': true
-      }
-      fetch(NODE_ENDPOINT + '/v1/chain/get_table_rows', {
-        method: 'POST',
-        body: JSON.stringify(tableOptions)
-      }).then(res => res.json()).then(res => {
-        this.auditorLoading = false
-        this.auditorsList = res.rows
-        this.auditorsList.map(auditor => {
-          let inform = this.bioInfo.find(element => {
-            return element.candidate_name === auditor.auditor_name
-          })
-          if (inform) {
-            try {
-              inform.bio = JSON.parse(inform.bio)
-            } catch (e) {
-            }
-            auditor.inform = inform.bio
-            return auditor
-          }
-        })
-      }).catch(e => {
-        this.auditorLoading = false
-        let error = this.$util.errorFormat(e)
-        this.$util.alert('Error', 'Get auditors ERROR:' + error.message)
         console.log(e)
       })
     },
