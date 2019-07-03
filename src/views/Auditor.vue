@@ -162,7 +162,7 @@
 
 <script>
 import Eos from 'eosjs'
-import { NETWORK, NODE_ENDPOINT, API_URL } from '@/assets/constants.js'
+import { NETWORK, API_URL } from '@/assets/constants.js'
 import Avatar from '@/components/Avatar.vue'
 import CandidateCollapse from '@/components/CandidateCollapse.vue'
 import IEcharts from 'vue-echarts-v3/src/lite.js'
