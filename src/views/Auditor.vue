@@ -6,8 +6,8 @@
           <h1>{{$t('auditor.auditorBoard')}}</h1>
           <div class="card board" v-loading="auditorLoading">
             <div v-for="auditor in auditorsList" :key="auditor.auditor_name" class="board-item">
-              <Avatar :url="auditor.inform ? auditor.inform.avatar : ''" star></Avatar>
-              <p>{{auditor.auditor_name}}</p>
+              <Avatar :url="auditor.bio ? auditor.bio.avatar : ''" star></Avatar>
+              <p>{{auditor.candidate.candidate_name}}</p>
             </div>
           </div>
           <div class="candidate-list">
@@ -22,7 +22,7 @@
                   @select="handleSelect"
                   :id="candidate.id"
                   :votes="candidate.total_votes"
-                  :inform="candidate.inform"
+                  :inform="candidate.bio"
                   :isSelected="candidate.isSelected"
                   :staked="candidate.candidate.locked_tokens"
                   :progress="candidate.meet_conditions_days"
@@ -48,7 +48,7 @@
               {{$t('auditor.myVotes').toLocaleUpperCase()}}
             </div>
             <div v-for="candidate in selectedCandidates" :key="candidate.id" class="selected-candidate-card">
-              <Avatar size="35px" :url="candidate.inform.avatar"></Avatar>
+              <Avatar size="35px" :url="candidate.bio.avatar"></Avatar>
               <p>{{candidate.id}}</p>
               <div class="remove-button" @click="removeCandidate(candidate.id)">
                 <i class="el-icon-close"></i>
@@ -59,7 +59,7 @@
         <div style="margin-bottom: 20px" v-if="$store.state.isPC">
           <div v-if="myCandidate && !myAuditor" class="card">
             <h1>{{$t('auditor.youAreCand')}}</h1>
-            <p>{{$t('common.votes')}}: {{(myCandidate.total_votes / 10000).toFixed(4)}}</p>
+            <p>{{$t('common.votes')}}: {{(myCandidate.candidate.total_votes / 10000).toFixed(4)}}</p>
             <p>{{$t('common.staked')}}: {{myCandidate.candidate.locked_tokens}}</p>
             <el-progress
              :text-inside="true"
@@ -74,7 +74,7 @@
             </div>
             <div v-else >
               <p>{{$t('auditor.inactiveTip')}}</p>
-              <div v-if="myCandidate.candidate.locked_tokens !== '0.0000 BOS' || pendingStake">
+              <div v-if="myCandidate.candidate.locked_tokens !== '0.0000 BOS'">
                 <div @click="active" class="vote-button vote-button-active">{{$t('common.register')}}</div>
                 <div @click="unstake" class="vote-button vote-button-active">{{$t('common.unstake')}}</div>
               </div>
@@ -84,7 +84,8 @@
           </div>
           <div v-else-if="myAuditor" class="card">
             <h1>{{$t('auditor.youAreAuditor')}}</h1>
-            <p>{{$t('common.votes')}}: {{(myAuditor.total_votes / 10000).toFixed(4)}}</p>
+            <p>{{$t('common.votes')}}: {{(myAuditor.candidate.total_votes / 10000).toFixed(4)}}</p>
+            <p>{{$t('common.staked')}}: {{myAuditor.candidate.locked_tokens}}</p>
             <div @click="showUpdate" class="vote-button vote-button-active">{{$t('auditor.updateInfo')}}</div>
           </div>
           <div v-else-if="scatter">
@@ -108,9 +109,9 @@
             <!-- <p>2. ⽀持票/反对票的⽐率⼤于 1.5。</p>
             <p>3. 以上条件持续 20 天成⽴。</p> -->
           </div>
-          <div v-if="false && $store.state.summaries.bp_votes">
-            <h2 style="font-size:16px; color: #507DFE; padding: 10px 0; margin: 0;border-top:1px solid #eee">BP {{$t('common.votes') + ': '}}{{($store.state.summaries.bp_votes / 10000).toFixed(4)}}</h2>
-            <div class="chart-panel" >
+          <div v-if="$store.state.summaries.bp_votes">
+            <h2 style="font-size:16px; color: #507DFE; padding: 10px 0; margin: 0;border-top:1px solid #eee">BP 3% {{$t('common.votes') + ': '}}{{($store.state.summaries.bp_votes * 0.03 / 10000).toFixed(4)}}</h2>
+            <div style="display: none" class="chart-panel" >
               <IEcharts
                 ref="chart"
                 :option="chartOption"
@@ -162,7 +163,7 @@
 
 <script>
 import Eos from 'eosjs'
-import { NETWORK, NODE_ENDPOINT, API_URL } from '@/assets/constants.js'
+import { NETWORK, API_URL } from '@/assets/constants.js'
 import Avatar from '@/components/Avatar.vue'
 import CandidateCollapse from '@/components/CandidateCollapse.vue'
 import IEcharts from 'vue-echarts-v3/src/lite.js'
@@ -181,7 +182,6 @@ export default {
     return {
       actionLoading: false,
       auditorLoading: true,
-      bioInfo: [],
       candidateLoading: true,
       selectedCandidates: [],
       auditorsList: [],
@@ -203,15 +203,13 @@ export default {
           { required: true, message: 'Contact way can\'t be empty', trigger: 'blur' }
         ]
       },
-      pendingStakeTable: [],
       stakeAmount: '0.0000 BOS',
       stakeVisible: false
     }
   },
   mounted () {
-    this.getAllInfo()
+    this.getCandidates()
     this.getConfig()
-    this.getPendingStake()
   },
   computed: {
     asideWidth () {
@@ -302,7 +300,7 @@ export default {
     },
     myAuditor () {
       if (this.account) {
-        return this.auditorsList.find(elm => elm.auditor_name === this.account.name)
+        return this.auditorsList.find(elm => elm.candidate.candidate_name === this.account.name)
       }
       return null
     },
@@ -317,15 +315,6 @@ export default {
       }
       return null
     },
-    pendingStake () {
-      let flag = false
-      this.pendingStakeTable.forEach(item => {
-        if (item.sender === this.account.name && item.quantity >= this.config.lockupasset) {
-          flag = true
-        }
-      })
-      return flag
-    },
     stakePercent () {
       let stake = Number(this.myCandidate.candidate.locked_tokens.split(' ')[0])
       return Number((stake * 100 / 100000).toFixed(1))
@@ -333,119 +322,38 @@ export default {
   },
   methods: {
     getConfig () {
-      const tableOptions = {
-        'scope': 'auditor.bos',
-        'code': 'auditor.bos',
-        'table': 'config',
-        'json': true
-      }
-      fetch(NODE_ENDPOINT + '/v1/chain/get_table_rows', {
-        method: 'POST',
-        body: JSON.stringify(tableOptions)
-      }).then(res => res.json())
+      fetch(API_URL.API_AUDITOR_CONFIG).then(res => res.json())
         .then((res) => {
-          this.config = res.rows[0]
+          this.config = res
         }).catch(e => {
           console.log(e)
         })
     },
-    getPendingStake () {
-      const tableOptions = {
-        'scope': 'auditor.bos',
-        'code': 'auditor.bos',
-        'table': 'pendingstake',
-        'json': true
-      }
-      fetch(NODE_ENDPOINT + '/v1/chain/get_table_rows', {
-        method: 'POST',
-        body: JSON.stringify(tableOptions)
-      }).then(res => res.json()).then((res) => {
-        this.pendingStakeTable = res.rows
-      }).catch(e => { console.log(e) })
-    },
-    getAllInfo () {
-      const tableOptions = {
-        'scope': 'auditor.bos',
-        'code': 'auditor.bos',
-        'table': 'bios',
-        'json': true
-      }
-      fetch(NODE_ENDPOINT + '/v1/chain/get_table_rows', {
-        method: 'POST',
-        body: JSON.stringify(tableOptions)
-      }).then(res => res.json()).then(res => {
-        this.bioInfo = res.rows
-        this.getAuditors()
-        this.getCandidates()
-      }).catch(e => {
-        this.candidateLoading = false
-        console.log(e)
-        // MessageBox.alert(e, 'ERROR.\n', {
-        //   confirmButtonText: 'OK'
-        // })
-      })
-    },
     getCandidates () {
+      this.auditorsList = []
+      this.allCandList = []
+      this.candidatesList = []
       fetch(API_URL.API_GET_ALL_CANDIDATES).then(res => res.json()).then(res => {
         this.candidateLoading = false
+        this.auditorLoading = false
         Object.keys(res).forEach(key => {
           let item = {
             total_votes: res[key].stats.staked.total,
             isSelected: false
           }
-          let inform = this.bioInfo.find(element => {
-            return element.candidate_name === res[key].id
-          })
-          if (inform) {
-            try {
-              inform.bio = JSON.parse(inform.bio)
-            } catch (e) {
-              console.log('json invalid')
-            }
-            item.inform = inform.bio
-          }
           item = Object.assign(item, res[key])
-          this.allCandList.push(item)
-          if (item.candidate.is_active) {
-            this.candidatesList.push(item)
-            this.candidatesList.sort((a, b) => { return b.total_votes - a.total_votes })
+          if (item.is_auditor) {
+            this.auditorsList.push(item)
+          } else {
+            this.allCandList.push(item)
+            if (item.candidate.is_active) {
+              this.candidatesList.push(item)
+              this.candidatesList.sort((a, b) => { return b.total_votes - a.total_votes })
+            }
           }
         })
       }).catch(e => {
         this.candidateLoading = false
-        console.log(e)
-      })
-    },
-    getAuditors () {
-      const tableOptions = {
-        'scope': 'auditor.bos',
-        'code': 'auditor.bos',
-        'table': 'auditors',
-        'json': true
-      }
-      fetch(NODE_ENDPOINT + '/v1/chain/get_table_rows', {
-        method: 'POST',
-        body: JSON.stringify(tableOptions)
-      }).then(res => res.json()).then(res => {
-        this.auditorLoading = false
-        this.auditorsList = res.rows
-        this.auditorsList.map(auditor => {
-          let inform = this.bioInfo.find(element => {
-            return element.candidate_name === auditor.auditor_name
-          })
-          if (inform) {
-            try {
-              inform.bio = JSON.parse(inform.bio)
-            } catch (e) {
-            }
-            auditor.inform = inform.bio
-            return auditor
-          }
-        })
-      }).catch(e => {
-        this.auditorLoading = false
-        let error = this.$util.errorFormat(e)
-        this.$util.alert('Error', 'Get auditors ERROR:' + error.message)
         console.log(e)
       })
     },
@@ -510,16 +418,6 @@ export default {
             window.open('https://get-scatter.com/', '_blank')
           }
         })
-        // MessageBox.alert('Get Scatter first', '', {
-        //   confirmButtonText: 'Get it',
-        //   distinguishCancelAndClose: true,
-        //   cancelButtonText: 'Later',
-        //   callback: action => {
-        //     if (action === 'confirm') {
-        //       window.open('https://get-scatter.com/', '_blank')
-        //     }
-        //   }
-        // })
       } else if (!this.scatter.identity) {
         this.$util.alert('Warning', 'Pair Scatter first')
         this.getIdentity()
@@ -534,14 +432,15 @@ export default {
           actions: [
             {
               account: 'auditor.bos',
-              name: 'voteauditor',
+              name: 'vote',
               authorization: [{
                 actor: account.name,
                 permission: account.authority
               }],
               data: {
                 voter: account.name,
-                newvotes: newvotes
+                candidates: newvotes,
+                vote_json: ''
               }
             }]
         }
@@ -549,7 +448,7 @@ export default {
           .then(() => {
             this.actionLoading = false
             this.$util.alert('Success', 'Your vote has been cast on candidates')
-            this.getAllInfo()
+            this.getCandidates()
             this.removeAllCand()
           }).catch(e => {
             this.actionLoading = false
@@ -665,9 +564,9 @@ export default {
     },
     showUpdate () {
       this.candInfo = {
-        avatar: this.myCandidate.inform.avatar || '',
-        bio: this.myCandidate.inform.bio,
-        contact: this.myCandidate.inform.contact
+        avatar: this.myCandidate.bio.avatar || '',
+        bio: this.myCandidate.bio.bio,
+        contact: this.myCandidate.bio.contact
       }
       this.updateDialog = true
     },
@@ -721,7 +620,7 @@ export default {
   },
   watch: {
     $route () {
-      this.getAllInfo()
+      this.getCandidates()
       this.getConfig()
       this.getPendingStake()
     }

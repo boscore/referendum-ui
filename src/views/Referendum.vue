@@ -95,13 +95,6 @@
                 </div>
               </div>
             </el-tab-pane>
-            <!-- 提案流程 -->
-            <!-- <el-tab-pane :label="$t('referendum.propProcess')" name="process">
-              <router-view></router-view>
-            </el-tab-pane>
-            <el-tab-pane v-if="$store.state.isPC" :label="$t('referendum.howToVote')" name="tutorial">
-              <router-view></router-view>
-            </el-tab-pane> -->
           </el-tabs>
         </div>
         <div class="clear-float" style="margin: 10px 0">

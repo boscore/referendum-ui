@@ -75,11 +75,11 @@ export default {
         }
         this.scatter.getIdentity(requiredFields).then(() => {
           // console.log(this.scatter.identity)
-          this.$store.dispatch('setScatter', { scatter: this.scatter })
+          this.$store.commit('setScatter', { scatter: this.scatter })
         })
       } else {
-        this.$util.alert('', this.$t('warning.needScatter'), (action) => {
-          if (action === 'confirm') {
+        this.$util.alert('', this.$t('warning.needScatter'), this.$t('common.OK'), this.$t('warning.getScatter'), (action) => {
+          if (action === 'cancel') {
             window.open('https://get-scatter.com/', '_blank')
           }
         })

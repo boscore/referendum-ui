@@ -9,10 +9,12 @@
     "createdTime": "Created Time",
     "createProp": "Create Proposal",
     "loading": "Loading",
+    "loadMore": "Load More",
     "login": "Login",
     "optional": "optional",
     "OK": "OK",
     "proposal": "Proposal",
+    "poll": "Poll",
     "register": "Register",
     "referendum": "Referendum",
     "removeId": "Remove Identity",
@@ -23,7 +25,7 @@
     "daysSatisfied": "{0} days satisfied",
     "stake": "Stake",
     "staked": "Staked",
-    "type": "type",
+    "tip": "Tip",
     "unknown": "unknown",
     "update": "Update",
     "unstake": "Unstake",
@@ -33,6 +35,9 @@
     "votes": "Votes",
     "votedTime": "Voted Time",
     "yes": "YES"
+  },
+  "alert": {
+    "networkSlow": "Current network is too slow, it's better to use VPN."
   },
   "auditor": {
     "alreadyStaked": "Already staked",
@@ -91,6 +96,7 @@
     "propStatus": "Proposal Status",
     "propDays": "{0} days since proposal started",
     "propDay": "{0} day since proposal started",
+    "proxy": "Proxy",
     "publicComment": "Post a public comment",
     "review": "Review",
     "relatedProp": "Related Proposals",
@@ -113,7 +119,7 @@
     }
   },
   "warning": {
-    "needScatter": "Scatter is required!",
+    "needScatter": "Scatter is required! If you lanched Scatter, please refresh your broswer.",
     "pairScatter": "Pair Scatter",
     "getScatter": "Get Scatter",
     "noRecord": "No record found",

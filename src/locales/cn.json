@@ -11,6 +11,7 @@
     "days": "天",
     "login": "登录",
     "loading": "加载中",
+    "loadMore": "加载更多",
     "optional": "可选",
     "OK": "确定",
     "proposal": "提案",
@@ -25,6 +26,7 @@
     "daysSatisfied": "已满足条件{0}天",
     "stake": "抵押",
     "staked": "已抵押",
+    "tip": "提示",
     "unknown": "未知",
     "update": "更新",
     "unstake": "赎回抵押",
@@ -47,6 +49,9 @@
       "newest": "按日期倒序",
       "oldest": "按日期顺序"
     }
+  },
+  "alert": {
+    "networkSlow": "当前网络加载过于缓慢，使用VPN翻墙或许将有所帮助"
   },
   "auditor": {
     "alreadyStaked": "已经抵押",
@@ -105,6 +110,7 @@
     "propStatus": "提案状态",
     "propDays": "提案已开始{0}天",
     "propDay": "提案已开始{0}天",
+    "proxy": "代理",
     "publicComment": "发表评论",
     "review": "评审",
     "relatedProp": "相关提案",
@@ -119,7 +125,7 @@
     "writeOpinion": "请写下你的评审意见"
   },
   "warning": {
-    "needScatter": "需要使用Scatter",
+    "needScatter": "需要使用Scatter，如果已启动Scatter请刷新页面",
     "pairScatter": "登录",
     "getScatter": "获取Scatter",
     "noRecord": "无记录",

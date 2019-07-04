@@ -114,20 +114,30 @@ function errorFormat (e) {
   return error
 }
 
-function alert (title, msg, confirm, callback) {
+function alert (title, msg, confirm, cancel, callback) {
   if (typeof confirm === 'function') {
     callback = confirm
     confirm = null
   }
+  if (typeof cancel === 'function') {
+    callback = cancel
+    cancel = null
+  }
   if (isPC()) {
     MessageBox.alert(msg, title, {
       confirmButtonText: confirm || this.$t('common.OK'),
-      callback: callback
+      cancelButtonText: cancel,
+      callback: callback,
+      distinguishCancelAndClose: true,
+      showCancelButton: cancel
     })
   } else {
     MbMessageBox.alert(msg, title, {
       confirmButtonText: confirm || this.$t('common.OK'),
-      callback: callback
+      cancelButtonText: cancel,
+      callback: callback,
+      distinguishCancelAndClose: true,
+      showCancelButton: cancel
     })
   }
 }

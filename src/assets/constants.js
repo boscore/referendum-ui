@@ -14,18 +14,23 @@
 // export const NODE_ENDPOINT = 'https://bos-testnet.eosphere.io'
 
 // // const BACKEND_URL = `https://boswps.eosplay.me`
-// const BACKEND_URL = `http://boswps-test.eosplay.me:4000`
+// const BACKEND_URL = `https://boswps-test.eosplay.me`
 // export const API_URL = {
 //   API_GET_PRODUCERS: BACKEND_URL + '/getBPs',
 //   API_GET_ALL_PROPOSALS: BACKEND_URL + '/getAllProposals',
 //   API_GET_PROPOSAL: BACKEND_URL + '/getProposal',
 //   API_APPLY_REVIEW: BACKEND_URL + '/review',
 //   API_APPLY_FINISH: BACKEND_URL + '/finish',
-//   API_POLL_TALLY: 'https://s3.amazonaws.com/bostest.referendum/referendum/tallies/latest.json',
+//   API_GET_ALL_CANDIDATES: BACKEND_URL + '/getAllAuditors',
+//   API_POLL_TALLY: 'https://s3.amazonaws.com/bostest.referendum/referendum/forum.tallies/latest.json',
+//   API_AUDITOR_CONFIG: 'https://s3.amazonaws.com/bostest.referendum/auditor.bos/config/latest.json',
+//   API_AUDITOR_BIOS: 'https://s3.amazonaws.com/bostest.referendum/auditor.bos/bios/latest.json',
 //   API_GET_ALL_VOTES: 'https://s3.amazonaws.com/bostest.referendum/eosio.forum/vote/latest.json',
-//   API_GET_ALL_ACCOUNTS: 'https://s3.amazonaws.com/bostest.referendum/referendum/accounts/latest.json',
-//   API_GET_ALL_PROXIES: 'https://s3.amazonaws.com/bostest.referendum/referendum/proxies/latest.json' }
-
+//   API_GET_ALL_ACCOUNTS: 'https://s3.amazonaws.com/bostest.referendum/referendum/forum.accounts/latest.json',
+//   API_GET_ALL_PROXIES: 'https://s3.amazonaws.com/bostest.referendum/referendum/forum.proxies/latest.json',
+//   API_GET_SUMMARIES: 'https://s3.amazonaws.com/bostest.referendum/eosio/stats/latest.json',
+//   API_AUDITOR_TALLY: 'https://s3.amazonaws.com/bostest.referendum/referendum/auditor.tallies/latest.json'
+// }
 export const EOSFORUM = 'eosio.forum'
 
 export const NETWORK = {
@@ -47,10 +52,12 @@ export const API_URL = {
   API_APPLY_REVIEW: BACKEND_URL + '/review',
   API_APPLY_FINISH: BACKEND_URL + '/finish',
   API_GET_ALL_CANDIDATES: BACKEND_URL + '/getAllAuditors',
-  API_GET_ALL_ACCOUNTS: 'https://s3.amazonaws.com/bos.referendum/referendum/accounts/latest.json',
+  API_POLL_TALLY: 'https://s3.amazonaws.com/bos.referendum/referendum/forum.tallies/latest.json',
+  API_AUDITOR_CONFIG: 'https://s3.amazonaws.com/bos.referendum/auditor.bos/config/latest.json',
+  API_AUDITOR_BIOS: 'https://s3.amazonaws.com/bos.referendum/auditor.bos/bios/latest.json',
   API_GET_ALL_VOTES: 'https://s3.amazonaws.com/bos.referendum/eosio.forum/vote/latest.json',
-  API_POLL_TALLY: 'https://s3.amazonaws.com/bos.referendum/referendum/tallies/latest.json',
-  API_GET_ALL_PROXIES: 'https://s3.amazonaws.com/bos.referendum/referendum/proxies/latest.json',
-  API_GET_SUMMARIES: 'https://s3.amazonaws.com/bos.referendum/referendum/summaries/latest.json',
+  API_GET_ALL_ACCOUNTS: 'https://s3.amazonaws.com/bos.referendum/referendum/forum.accounts/latest.json',
+  API_GET_ALL_PROXIES: 'https://s3.amazonaws.com/bos.referendum/referendum/forum.proxies/latest.json',
+  API_GET_SUMMARIES: 'https://s3.amazonaws.com/bos.referendum/eosio/stats/latest.json',
   API_AUDITOR_TALLY: 'https://s3.amazonaws.com/bos.referendum/referendum/auditor.tallies/latest.json'
 }

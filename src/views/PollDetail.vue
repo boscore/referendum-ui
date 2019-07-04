@@ -67,11 +67,11 @@
             <el-table :data="showVoters" :default-sort="{prop: 'staked', order: 'descending'}">
               <el-table-column sortable :label="$t('proposal.voter')" prop="voter"></el-table-column>
               <el-table-column sortable :label="$t('common.votes')" prop="staked"></el-table-column>
-              <el-table-column sortable :label="$t('common.type')" prop="type"></el-table-column>
+              <el-table-column sortable :label="$t('proposal.type')" prop="type"></el-table-column>
               <el-table-column sortable :label="$t('common.result')" prop="result"></el-table-column>
             </el-table>
             <div v-if="showVotersNum < votes.length">
-              <div class="button" style="margin: 20px auto;padding: 5px 20px" @click="showMoreVoters">Load more voters</div>
+              <div class="button" style="margin: 20px auto;padding: 5px 20px" @click="showMoreVoters">{{$t('common.loadMore')}}</div>
             </div>
           </div>
           <div
@@ -150,7 +150,7 @@
                     <div @click="sendVote" class="button" style="margin-right: 20px;width:80px">
                       {{$t('common.vote')}}
                     </div>
-                    <div v-if="myVote" class="button" @click="sendUnvote" style="background: red;margin-right: 20px;width:80px">{{$t('common.unvote')}}</div>
+                    <div v-if="myVote" class="button" @click="sendUnvote" style="background: red;margin-right: 20px">{{$t('common.unvote')}}</div>
                   </div>
                 </div>
               </div>
@@ -337,11 +337,11 @@ export default {
         allVotes.forEach(vote => {
           if (vote.proposal_name === this.proposalName) {
             if (vote.vote === 1) {
-              vote.result = 'YES'
+              vote.result = this.$t('common.yes')
             } else if (vote.vote === 0) {
-              vote.result = 'NO'
+              vote.result = this.$t('common.no')
             } else {
-              vote.result = 'ABSTAIN'
+              vote.result = this.$t('common.abstain')
             }
             if (allAccounts[vote.voter]) {
               vote.type = 'Voter'
@@ -472,11 +472,11 @@ export default {
         if (myVotes && myVotes.votes[this.proposalName]) {
           let vote = { ...myVotes.votes[this.proposalName] }
           if (vote.vote === 1) {
-            vote.result = 'YES'
+            vote.result = this.$t('common.yes')
           } else if (vote.vote === 0) {
-            vote.result = 'NO'
+            vote.result = this.$t('common.no')
           } else {
-            vote.result = 'ABSTAIN'
+            vote.result = this.$t('common.abstain')
           }
           return vote
         }
