@@ -6,7 +6,7 @@
           <h1>{{$t('auditor.auditorBoard')}}</h1>
           <div class="card board" v-loading="auditorLoading">
             <div v-for="auditor in auditorsList" :key="auditor.auditor_name" class="board-item">
-              <Avatar :url="auditor.inform ? auditor.inform.avatar : ''" star></Avatar>
+              <Avatar :url="auditor.bio ? auditor.bio.avatar : ''" star></Avatar>
               <p>{{auditor.candidate.candidate_name}}</p>
             </div>
           </div>
@@ -22,7 +22,7 @@
                   @select="handleSelect"
                   :id="candidate.id"
                   :votes="candidate.total_votes"
-                  :inform="candidate.inform"
+                  :inform="candidate.bio"
                   :isSelected="candidate.isSelected"
                   :staked="candidate.candidate.locked_tokens"
                   :progress="candidate.meet_conditions_days"
@@ -48,7 +48,7 @@
               {{$t('auditor.myVotes').toLocaleUpperCase()}}
             </div>
             <div v-for="candidate in selectedCandidates" :key="candidate.id" class="selected-candidate-card">
-              <Avatar size="35px" :url="candidate.inform.avatar"></Avatar>
+              <Avatar size="35px" :url="candidate.bio.avatar"></Avatar>
               <p>{{candidate.id}}</p>
               <div class="remove-button" @click="removeCandidate(candidate.id)">
                 <i class="el-icon-close"></i>
@@ -59,7 +59,7 @@
         <div style="margin-bottom: 20px" v-if="$store.state.isPC">
           <div v-if="myCandidate && !myAuditor" class="card">
             <h1>{{$t('auditor.youAreCand')}}</h1>
-            <p>{{$t('common.votes')}}: {{(myCandidate.total_votes / 10000).toFixed(4)}}</p>
+            <p>{{$t('common.votes')}}: {{(myCandidate.candidate.total_votes / 10000).toFixed(4)}}</p>
             <p>{{$t('common.staked')}}: {{myCandidate.candidate.locked_tokens}}</p>
             <el-progress
              :text-inside="true"
@@ -84,7 +84,8 @@
           </div>
           <div v-else-if="myAuditor" class="card">
             <h1>{{$t('auditor.youAreAuditor')}}</h1>
-            <p>{{$t('common.votes')}}: {{(myAuditor.total_votes / 10000).toFixed(4)}}</p>
+            <p>{{$t('common.votes')}}: {{(myAuditor.candidate.total_votes / 10000).toFixed(4)}}</p>
+            <p>{{$t('common.staked')}}: {{myAuditor.candidate.locked_tokens}}</p>
             <div @click="showUpdate" class="vote-button vote-button-active">{{$t('auditor.updateInfo')}}</div>
           </div>
           <div v-else-if="scatter">
@@ -181,7 +182,6 @@ export default {
     return {
       actionLoading: false,
       auditorLoading: true,
-      bioInfo: [],
       candidateLoading: true,
       selectedCandidates: [],
       auditorsList: [],
@@ -208,7 +208,7 @@ export default {
     }
   },
   mounted () {
-    this.getAllInfo()
+    this.getCandidates()
     this.getConfig()
   },
   computed: {
@@ -329,20 +329,10 @@ export default {
           console.log(e)
         })
     },
-    getAllInfo () {
-      fetch(API_URL.API_AUDITOR_BIOS).then(res => res.json()).then(res => {
-        this.bioInfo = res
-        // this.getAuditors()
-        this.getCandidates()
-      }).catch(e => {
-        this.candidateLoading = false
-        console.log(e)
-        // MessageBox.alert(e, 'ERROR.\n', {
-        //   confirmButtonText: 'OK'
-        // })
-      })
-    },
     getCandidates () {
+      this.auditorsList = []
+      this.allCandList = []
+      this.candidatesList = []
       fetch(API_URL.API_GET_ALL_CANDIDATES).then(res => res.json()).then(res => {
         this.candidateLoading = false
         this.auditorLoading = false
@@ -351,25 +341,15 @@ export default {
             total_votes: res[key].stats.staked.total,
             isSelected: false
           }
-          let inform = this.bioInfo.find(element => {
-            return element.candidate_name === res[key].id
-          })
-          if (inform) {
-            try {
-              inform.bio = JSON.parse(inform.bio)
-            } catch (e) {
-              console.log('json invalid')
-            }
-            item.inform = inform.bio
-          }
           item = Object.assign(item, res[key])
           if (item.is_auditor) {
             this.auditorsList.push(item)
-          }
-          this.allCandList.push(item)
-          if (item.candidate.is_active) {
-            this.candidatesList.push(item)
-            this.candidatesList.sort((a, b) => { return b.total_votes - a.total_votes })
+          } else {
+            this.allCandList.push(item)
+            if (item.candidate.is_active) {
+              this.candidatesList.push(item)
+              this.candidatesList.sort((a, b) => { return b.total_votes - a.total_votes })
+            }
           }
         })
       }).catch(e => {
@@ -438,16 +418,6 @@ export default {
             window.open('https://get-scatter.com/', '_blank')
           }
         })
-        // MessageBox.alert('Get Scatter first', '', {
-        //   confirmButtonText: 'Get it',
-        //   distinguishCancelAndClose: true,
-        //   cancelButtonText: 'Later',
-        //   callback: action => {
-        //     if (action === 'confirm') {
-        //       window.open('https://get-scatter.com/', '_blank')
-        //     }
-        //   }
-        // })
       } else if (!this.scatter.identity) {
         this.$util.alert('Warning', 'Pair Scatter first')
         this.getIdentity()
@@ -462,14 +432,15 @@ export default {
           actions: [
             {
               account: 'auditor.bos',
-              name: 'voteauditor',
+              name: 'vote',
               authorization: [{
                 actor: account.name,
                 permission: account.authority
               }],
               data: {
                 voter: account.name,
-                newvotes: newvotes
+                candidates: newvotes,
+                vote_json: ''
               }
             }]
         }
@@ -477,7 +448,7 @@ export default {
           .then(() => {
             this.actionLoading = false
             this.$util.alert('Success', 'Your vote has been cast on candidates')
-            this.getAllInfo()
+            this.getCandidates()
             this.removeAllCand()
           }).catch(e => {
             this.actionLoading = false
@@ -593,9 +564,9 @@ export default {
     },
     showUpdate () {
       this.candInfo = {
-        avatar: this.myCandidate.inform.avatar || '',
-        bio: this.myCandidate.inform.bio,
-        contact: this.myCandidate.inform.contact
+        avatar: this.myCandidate.bio.avatar || '',
+        bio: this.myCandidate.bio.bio,
+        contact: this.myCandidate.bio.contact
       }
       this.updateDialog = true
     },
@@ -649,7 +620,7 @@ export default {
   },
   watch: {
     $route () {
-      this.getAllInfo()
+      this.getCandidates()
       this.getConfig()
       this.getPendingStake()
     }
