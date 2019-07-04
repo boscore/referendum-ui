@@ -618,7 +618,6 @@ export default {
     width 100%
     margin-bottom 10px
   .select-button
-    width 50%
     margin 0 0 5px 0
 @media only screen and (max-width 450px)
   .prop-list
