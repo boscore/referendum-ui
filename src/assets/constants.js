@@ -31,6 +31,7 @@ export const API_URL = {
   API_GET_SUMMARIES: 'https://s3.amazonaws.com/bostest.referendum/eosio/stats/latest.json',
   API_AUDITOR_TALLY: 'https://s3.amazonaws.com/bostest.referendum/referendum/auditor.tallies/latest.json'
 }
+
 // export const EOSFORUM = 'eosio.forum'
 
 // export const NETWORK = {

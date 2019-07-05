@@ -38,6 +38,8 @@
     "yes": "同意"
   },
   "referendum": {
+    "applyReview": "申请评审",
+    "claimRewards": "申领奖励",
     "discoverProps": "浏览提案",
     "howToVote": "如何投票",
     "myProps": "我的提案",
@@ -130,5 +132,9 @@
     "getScatter": "获取Scatter",
     "noRecord": "无记录",
     "noResult": "无结果"
+  },
+  "alert": {
+    "reviewTip": "请将申请review的提案名和提案完成的工作（如代码或文档）发送到邮箱 bet@boscore.io",
+    "success": "成功"
   }
 }

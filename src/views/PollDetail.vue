@@ -691,8 +691,8 @@ export default {
           }
         }).catch(e => {
           this.propLoading = false
-          let error = this.$util.errorFormat(e)
-          this.$util.alert('Error', 'Get Proposal ERROR:' + error.message)
+          // let error = this.$util.errorFormat(e)
+          // this.$util.alert('Error', 'Get Proposal ERROR:' + error.message)
           console.log(e)
         })
     },
@@ -707,8 +707,8 @@ export default {
         .then(res => {
           this.producers = res.producer
         }).catch(e => {
-          let error = this.$util.errorFormat(e)
-          this.$util.alert('Error', 'Get Producers ERROR:' + error.message)
+          // let error = this.$util.errorFormat(e)
+          // this.$util.alert('Error', 'Get Producers ERROR:' + error.message)
           console.log(e)
         })
     },
@@ -735,8 +735,8 @@ export default {
           this.auditorsList = res.rows
         }).catch(e => {
           console.log(e)
-          let error = this.$util.errorFormat(e)
-          this.$util.alert('Error', 'Get Auditors ERROR:' + error.message)
+          // let error = this.$util.errorFormat(e)
+          // this.$util.alert('Error', 'Get Auditors ERROR:' + error.message)
         })
     },
     getIdentity () {

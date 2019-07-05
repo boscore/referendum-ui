@@ -108,6 +108,8 @@
     "writeOpinion": "Please write your opinion"
   },
   "referendum": {
+    "applyReview": "Apply for Review",
+    "claimRewards": "Claim Rewards",
     "discoverProps": "Discover Proposals",
     "myProps": "My proposals",
     "myVotes": "My votes",
@@ -124,5 +126,9 @@
     "getScatter": "Get Scatter",
     "noRecord": "No record found",
     "noResult": "No result found"
+  },
+  "alert": {
+    "reviewTip": "Please send your proposal name and proposal content (like code or documents) to email: bet@boscore.io",
+    "success": "Success"
   }
 }
