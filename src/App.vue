@@ -57,7 +57,7 @@ export default {
       this.$store.state.proposals === null ||
       this.$store.state.votes.length === 0 ||
       this.$store.state.summaries.hasOwnProperty('bp_votes') === false) {
-        this.$util.alert(this.$t('common.tip'), this.$t('alert.networkSlow'))
+        // this.$util.alert(this.$t('common.tip'), this.$t('alert.networkSlow'))
       }
     }, 30000)
   },
