@@ -378,7 +378,7 @@ export default {
     },
     applyReview (proposal) {
       this.actionLoading = true
-      fetch(API_URL.API_APPLY_REVIEW)
+      fetch(API_URL.API_APPLY_REVIEW + '/' + proposal)
         .then(res => res.json())
         .then(res => {
           this.actionLoading = false

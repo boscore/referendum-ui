@@ -37,7 +37,9 @@
     "yes": "YES"
   },
   "alert": {
-    "networkSlow": "Current network is too slow, it's better to use VPN."
+    "networkSlow": "Current network is too slow, it's better to use VPN.",
+    "reviewTip": "Please send your proposal name and proposal content (like code or documents) to email: bet@boscore.io",
+    "success": "Success"
   },
   "auditor": {
     "alreadyStaked": "Already staked",
@@ -126,9 +128,5 @@
     "getScatter": "Get Scatter",
     "noRecord": "No record found",
     "noResult": "No result found"
-  },
-  "alert": {
-    "reviewTip": "Please send your proposal name and proposal content (like code or documents) to email: bet@boscore.io",
-    "success": "Success"
   }
 }

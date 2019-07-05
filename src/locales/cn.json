@@ -53,6 +53,8 @@
     }
   },
   "alert": {
+    "reviewTip": "请将申请review的提案名和提案完成的工作（如代码或文档）发送到邮箱 bet@boscore.io",
+    "success": "成功",
     "networkSlow": "当前网络加载过于缓慢，使用VPN翻墙或许将有所帮助"
   },
   "auditor": {
@@ -132,9 +134,5 @@
     "getScatter": "获取Scatter",
     "noRecord": "无记录",
     "noResult": "无结果"
-  },
-  "alert": {
-    "reviewTip": "请将申请review的提案名和提案完成的工作（如代码或文档）发送到邮箱 bet@boscore.io",
-    "success": "成功"
   }
 }

@@ -1,5 +1,6 @@
 
-export const EOSFORUM = 'eosforumdapp'
+export const EOSFORUM = 'eosio.forum'
+// 'eosforumdapp'
 
 export const NETWORK = {
   blockchain: 'eos',
