@@ -38,6 +38,8 @@
     "yes": "同意"
   },
   "referendum": {
+    "applyReview": "申请评审",
+    "claimRewards": "申领奖励",
     "discoverProps": "浏览提案",
     "howToVote": "如何投票",
     "myProps": "我的提案",
@@ -51,6 +53,8 @@
     }
   },
   "alert": {
+    "reviewTip": "请将申请review的提案名和提案完成的工作（如代码或文档）发送到邮箱 bet@boscore.io",
+    "success": "成功",
     "networkSlow": "当前网络加载过于缓慢，使用VPN翻墙或许将有所帮助"
   },
   "auditor": {
@@ -66,7 +70,7 @@
     "readDetail": "查看详情",
     "registerCand": "注册成为候选人",
     "signDeclaration": "签署声明",
-    "submitVotes": "提交我的投票",
+    "submitVotes": "提交我的新投票",
     "stakeMore": "继续抵押",
     "stakeAmount": "抵押数量",
     "updateInfo": "更新信息",

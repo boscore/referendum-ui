@@ -105,7 +105,7 @@
           </div>
         </el-main>
         <el-aside class="aside-right" :width="asideWidth">
-          <div class="card" id="poll-status">
+          <div v-loading="actionLoading" class="card" id="poll-status">
             <h2>{{$t('proposal.propStatus')}}</h2>
             <el-progress :stroke-width="10" class="pass-percent" :percentage="agreePercent"></el-progress>
             <el-progress :stroke-width="10" class="dissent-percent" :percentage="rejectPercent"></el-progress>
@@ -586,6 +586,7 @@ export default {
     return {
       title: 'Should EOS tokens sent to eosio.ramfee and eosio.names accounts in the future be allocated to REX?',
       activeButton: 'desc',
+      actionLoading: false,
       auditorsList: [],
       CDToBP: -1,
       CDToAuditor: -1,
@@ -691,8 +692,8 @@ export default {
           }
         }).catch(e => {
           this.propLoading = false
-          let error = this.$util.errorFormat(e)
-          this.$util.alert('Error', 'Get Proposal ERROR:' + error.message)
+          // let error = this.$util.errorFormat(e)
+          // this.$util.alert('Error', 'Get Proposal ERROR:' + error.message)
           console.log(e)
         })
     },
@@ -707,8 +708,8 @@ export default {
         .then(res => {
           this.producers = res.producer
         }).catch(e => {
-          let error = this.$util.errorFormat(e)
-          this.$util.alert('Error', 'Get Producers ERROR:' + error.message)
+          // let error = this.$util.errorFormat(e)
+          // this.$util.alert('Error', 'Get Producers ERROR:' + error.message)
           console.log(e)
         })
     },
@@ -735,8 +736,8 @@ export default {
           this.auditorsList = res.rows
         }).catch(e => {
           console.log(e)
-          let error = this.$util.errorFormat(e)
-          this.$util.alert('Error', 'Get Auditors ERROR:' + error.message)
+          // let error = this.$util.errorFormat(e)
+          // this.$util.alert('Error', 'Get Auditors ERROR:' + error.message)
         })
     },
     getIdentity () {
@@ -767,10 +768,13 @@ export default {
       if (this.myComment === '' && (this.isAuditor || this.isBP)) {
         this.$util.alert('Warning', 'Please write your opinion of this proposal')
       } else {
+        this.actionLoading = true
         this.voteActionParams.voter = this.account.name
         this.voteActionParams.proposal_name = this.proposalName
         if (this.myComment !== '' && (this.writeComment || this.isAuditor || this.isBP)) {
           this.voteActionParams.vote_json = JSON.stringify({ comment: this.myComment })
+        } else {
+          this.voteActionParams.vote_json = ''
         }
         const transactionOptions = {
           actions: [{
@@ -785,12 +789,14 @@ export default {
         }
         this.eos.transaction(transactionOptions, { blocksBehind: 3, expireSeconds: 30 })
           .then(res => {
+            this.actionLoading = false
             let message = `Your vote  has been cast on ${this.proposalName}, data will be updated some time later`
             this.$util.alert('Success', message)
             this.$store.commit('addVote', { vote: {
               ...this.voteActionParams
             } })
           }).catch(e => {
+            this.actionLoading = false
             let error = this.$util.errorFormat(e)
             this.$util.alert('Error', 'Vote ERROR:' + error.message)
             console.log(e)
@@ -798,6 +804,7 @@ export default {
       }
     },
     sendUnvote () {
+      this.actionLoading = true
       const account = this.scatter.identity.accounts.find(x => x.blockchain === 'eos')
       const actionParams = {
         voter: account.name,
@@ -816,12 +823,14 @@ export default {
       }
       this.eos.transaction(transactionOptions, { blocksBehind: 3, expireSeconds: 30 })
         .then(res => {
+          this.actionLoading = false
           let message = `Your unvote on ${this.proposalName} was successful, data will be updated some time later`
           this.$util.alert('Success', 'Vote ERROR:' + message)
           this.$store.commit('deleteVote', { vote: {
             ...actionParams
           } })
         }).catch(e => {
+          this.actionLoading = false
           let error = this.$util.errorFormat(e)
           this.$util.alert('Error', 'Unvote ERROR:' + error.message)
           console.log(e)

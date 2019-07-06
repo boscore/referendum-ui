@@ -40,10 +40,10 @@
                               <el-dropdown-item type="primary" >
                                 <p @click="cancelProp(scope.row.proposal_name)">{{$t('common.cancel')}} </p>
                               </el-dropdown-item>
-                              <el-dropdown-item v-if="scope.row.shouldReview" type="primary" @click="applyReview(scope.row.proposal_name)">
-                                Apply for Review
+                              <el-dropdown-item v-if="scope.row.shouldReview" type="primary" @click.native="applyReview(scope.row.proposal_name)">
+                                {{$t('referendum.applyReview')}}
                               </el-dropdown-item>
-                              <el-dropdown-item v-if="scope.row.approved_by_BET" type="primary" @click="claimRewards()">Claim Rewards</el-dropdown-item>
+                              <el-dropdown-item v-if="scope.row.approved_by_BET" type="primary" @click.native="claimRewards()">{{$t('referendum.claimRewards')}}</el-dropdown-item>
                             </el-dropdown-menu>
                           </el-dropdown>
                         </template>
@@ -377,18 +377,22 @@ export default {
       }
     },
     applyReview (proposal) {
-      fetch(API_URL.API_APPLY_REVIEW)
+      this.actionLoading = true
+      fetch(API_URL.API_APPLY_REVIEW + '/' + proposal)
         .then(res => res.json())
         .then(res => {
-          this.alert('Success', 'Apply for review success')
+          this.actionLoading = false
+          this.alert(this.$t('alert.success'), this.$t('alert.reviewTip'))
         })
         .catch(e => {
+          this.actionLoading = false
           let error = this.$util.errorFormat(e)
           this.alert('Error', 'Error: ' + error.message)
           console.log(e)
         })
     },
     claimRewards () {
+      this.actionLoading = true
       const account = this.scatter.identity.accounts.find(x => x.blockchain === 'eos')
       const transactionOptions = {
         actions: [{
@@ -403,9 +407,11 @@ export default {
       }
       this.eos.transaction(transactionOptions, { blocksBehind: 3, expireSeconds: 30 })
         .then(res => {
+          this.actionLoading = false
           this.alert('Success', 'Claim success')
         })
         .catch(e => {
+          this.actionLoading = false
           let error = this.$util.errorFormat(e)
           this.alert('Error', 'Claim ERROR:' + error.message)
           console.log(e)
@@ -618,7 +624,6 @@ export default {
     width 100%
     margin-bottom 10px
   .select-button
-    width 50%
     margin 0 0 5px 0
 @media only screen and (max-width 450px)
   .prop-list

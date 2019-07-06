@@ -1,5 +1,6 @@
 
-// export const EOSFORUM = 'eosforumdapp'
+// export const EOSFORUM = 'eosio.forum'
+// // 'eosforumdapp'
 
 // export const NETWORK = {
 //   blockchain: 'eos',
@@ -31,6 +32,7 @@
 //   API_GET_SUMMARIES: 'https://s3.amazonaws.com/bostest.referendum/eosio/stats/latest.json',
 //   API_AUDITOR_TALLY: 'https://s3.amazonaws.com/bostest.referendum/referendum/auditor.tallies/latest.json'
 // }
+
 export const EOSFORUM = 'eosio.forum'
 
 export const NETWORK = {
@@ -55,6 +57,7 @@ export const API_URL = {
   API_POLL_TALLY: 'https://s3.amazonaws.com/bos.referendum/referendum/forum.tallies/latest.json',
   API_AUDITOR_CONFIG: 'https://s3.amazonaws.com/bos.referendum/auditor.bos/config/latest.json',
   API_AUDITOR_BIOS: 'https://s3.amazonaws.com/bos.referendum/auditor.bos/bios/latest.json',
+  API_AUDITOR_ACCOUNTS: 'https://s3.amazonaws.com/bos.referendum/referendum/auditor.accounts/latest.json',
   API_GET_ALL_VOTES: 'https://s3.amazonaws.com/bos.referendum/eosio.forum/vote/latest.json',
   API_GET_ALL_ACCOUNTS: 'https://s3.amazonaws.com/bos.referendum/referendum/forum.accounts/latest.json',
   API_GET_ALL_PROXIES: 'https://s3.amazonaws.com/bos.referendum/referendum/forum.proxies/latest.json',

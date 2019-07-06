@@ -37,7 +37,9 @@
     "yes": "YES"
   },
   "alert": {
-    "networkSlow": "Current network is too slow, it's better to use VPN."
+    "networkSlow": "Current network is too slow, it's better to use VPN.",
+    "reviewTip": "Please send your proposal name and proposal content (like code or documents) to email: bet@boscore.io",
+    "success": "Success"
   },
   "auditor": {
     "alreadyStaked": "Already staked",
@@ -52,7 +54,7 @@
     "registerCand": "Register as Candidate",
     "readDetail": "read detail",
     "signDeclaration": "Sign the declaration",
-    "submitVotes": "Submit My Votes",
+    "submitVotes": "Submit My New Votes",
     "stakeMore": "Stake More",
     "stakeAmount": "Stake Amount",
     "updateInfo": "Update Info",
@@ -108,6 +110,8 @@
     "writeOpinion": "Please write your opinion"
   },
   "referendum": {
+    "applyReview": "Apply for Review",
+    "claimRewards": "Claim Rewards",
     "discoverProps": "Discover Proposals",
     "myProps": "My proposals",
     "myVotes": "My votes",

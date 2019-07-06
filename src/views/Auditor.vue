@@ -33,6 +33,7 @@
         </div>
       </el-main>
       <el-aside :width="asideWidth">
+        <!-- 投票面板 -->
         <div class="vote-panel">
           <h1>
             {{$t('auditor.myVotes')}} <span style="color: #91ADFF;"> {{selectedCandidates.length}}/{{config ? config.maxvotes : 5}}</span>
@@ -44,8 +45,17 @@
             <div v-if="selectedCandidates.length" @click="sendVotes" class="vote-button vote-button-active">
               {{$t('auditor.submitVotes').toLocaleUpperCase()}}
             </div>
+            <div v-else-if="myVoted.length" @click="unvote" class="vote-button vote-button-active" style="background: #E74C3C">
+              {{$t('common.unvote').toLocaleUpperCase()}}
+            </div>
             <div v-else class="vote-button">
               {{$t('auditor.myVotes').toLocaleUpperCase()}}
+            </div>
+            <div v-if="selectedCandidates.length === 0">
+              <div v-for="cand in myVoted" :key="cand" style="justify-content: space-around" class="selected-candidate-card">
+                <Avatar size="35px" :url="''"></Avatar>
+                <p>{{cand}}</p>
+              </div>
             </div>
             <div v-for="candidate in selectedCandidates" :key="candidate.id" class="selected-candidate-card">
               <Avatar size="35px" :url="candidate.bio.avatar"></Avatar>
@@ -183,12 +193,14 @@ export default {
       actionLoading: false,
       auditorLoading: true,
       candidateLoading: true,
+      accountList: null,
       selectedCandidates: [],
       auditorsList: [],
       allCandList: [],
       candidatesList: [],
       config: null,
       contract: 'auditor.bos',
+      myVotes: [],
       updateDialog: false,
       candInfo: {
         avatar: '',
@@ -209,6 +221,7 @@ export default {
   },
   mounted () {
     this.getCandidates()
+    this.getAccounts()
     this.getConfig()
   },
   computed: {
@@ -304,6 +317,12 @@ export default {
       }
       return null
     },
+    myVoted () {
+      if (this.account && this.accountList) {
+        return Object.keys(this.accountList[this.account.name].votes)
+      }
+      return []
+    },
     scatter () {
       return this.$store.state.scatter
     },
@@ -326,6 +345,7 @@ export default {
         .then((res) => {
           this.config = res
         }).catch(e => {
+          this.$util.alert('warning', 'Loading system config failed, Please check your network and refresh page')
           console.log(e)
         })
     },
@@ -365,6 +385,12 @@ export default {
         this.$store.dispatch('setScatter', { scatter: this.scatter })
       })
     },
+    getAccounts () {
+      fetch(API_URL.API_AUDITOR_ACCOUNTS).then(res => res.json())
+        .then(res => {
+          this.accountList = res
+        })
+    },
     handleSelect (msg, err) {
       if (err) {
         console.log(err)
@@ -377,17 +403,19 @@ export default {
       }
     },
     pushCandidate (id) {
-      if (this.config && this.selectedCandidates.length < this.config.maxvotes) {
-        for (let i = 0; i < this.candidatesList.length; i++) {
-          if (this.candidatesList[i].id === id) {
-            this.candidatesList[i].isSelected = true
-            this.selectedCandidates.push(this.candidatesList[i])
-            break
+      if (this.config) {
+        if (this.selectedCandidates.length < this.config.maxvotes) {
+          for (let i = 0; i < this.candidatesList.length; i++) {
+            if (this.candidatesList[i].id === id) {
+              this.candidatesList[i].isSelected = true
+              this.selectedCandidates.push(this.candidatesList[i])
+              break
+            }
           }
+        } else {
+          //  提示
+          this.$util.alert('Warning', `You only can vote to ${this.config.maxvotes} candidates`)
         }
-      } else {
-        //  提示
-        this.$util.alert('Warning', `You only can vote to ${this.config.maxvotes} candidates`)
       }
     },
     removeCandidate (id) {
@@ -569,6 +597,34 @@ export default {
         contact: this.myCandidate.bio.contact
       }
       this.updateDialog = true
+    },
+    unvote () {
+      this.actionLoading = true
+      const transactionOptions = {
+        actions: [
+          {
+            account: 'auditor.bos',
+            name: 'unvote',
+            authorization: [{
+              actor: this.account.name,
+              permission: this.account.authority
+            }],
+            data: {
+              voter: this.account.name
+            }
+          }]
+      }
+      this.eos.transaction(transactionOptions, { blocksBehind: 3, expireSeconds: 30 })
+        .then(() => {
+          this.actionLoading = false
+          this.$util.alert('Success', 'Unvote successfully')
+          this.accountList = null
+        }).catch(e => {
+          this.actionLoading = false
+          let error = this.$util.errorFormat(e)
+          this.$util.alert('Error', 'Unote ERROR:' + error.message)
+          console.log(e)
+        })
     },
     updateBio () {
       this.$refs['updateForm'].validate(valid => {
