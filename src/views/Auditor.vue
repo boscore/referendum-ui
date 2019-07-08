@@ -319,7 +319,9 @@ export default {
     },
     myVoted () {
       if (this.account && this.accountList) {
-        return Object.keys(this.accountList[this.account.name].votes)
+        if (this.accountList[this.account.name]) {
+          return Object.keys(this.accountList[this.account.name].votes)
+        }
       }
       return []
     },

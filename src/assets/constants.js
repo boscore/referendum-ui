@@ -1,18 +1,18 @@
 
-// export const EOSFORUM = 'eosio.forum'
+// export const EOSFORUM = 'eosforumdapp'
 // // 'eosforumdapp'
 
 // export const NETWORK = {
 //   blockchain: 'eos',
-//   protocol: 'https',
+//   protocol: 'http',
 
-//   host: 'bos-testnet.eosphere.io',
+//   host: 'bos-test.eoshenzhen.io',
 
-//   port: 443,
+//   port: 8888,
 //   chainId: '33cc2426f1b258ef8c798c34c0360b31732ea27a2d7e35a65797850a86d1ba85'
 // }
 
-// export const NODE_ENDPOINT = 'https://bos-testnet.eosphere.io'
+// export const NODE_ENDPOINT = 'https://bostest.api.blockgo.vip'
 
 // // const BACKEND_URL = `https://boswps.eosplay.me`
 // const BACKEND_URL = `https://boswps-test.eosplay.me`
