@@ -26,7 +26,7 @@
           </el-form-item>
           <el-form-item prop="receiptor">
             <label slot="label">{{$t('form.receiptor')}}</label>
-            <el-input v-model="form.receiptor"></el-input>
+            <el-input  maxlength="12" v-model="form.receiptor"></el-input>
           </el-form-item>
           <el-form-item prop="content">
             <label slot="label">{{$t('form.content')}} ({{$t('form.support')}} Markdown)</label>
@@ -85,6 +85,18 @@ export default {
         }
       }
     }
+    const checkReceiptorName = (rule, value, cb) => {
+      if (value === '') {
+        return cb(new Error('Please input receiptor account of incentives'))
+      } else {
+        const regex = /^([a-z]|[1-5]){12}$/g
+        if (regex.test(value)) {
+          cb()
+        } else {
+          return cb(new Error('Name should be 12 characters and only contains the following symbol (1-5,a-z)'))
+        }
+      }
+    }
     return {
       actionLoading: false,
       form: {
@@ -101,22 +113,22 @@ export default {
           { required: true, validator: checkPropName, trigger: 'blur' }
         ],
         title: [
-          { required: true, message: 'please input proposal title', trigger: 'blur' }
+          { required: true, message: 'Please input proposal title', trigger: 'blur' }
         ],
         content: [
-          { required: true, message: 'please input proposal content', trigger: 'blur' }
+          { required: true, message: 'Please input proposal content', trigger: 'blur' }
         ],
         // expiry: [
         //   { required: true, validator: checkExpiryDate, trigger: 'blur' }
         // ],
         type: [
-          { message: 'please choose proposal type', trigger: 'blur' }
+          { message: 'Please choose proposal type', trigger: 'blur' }
         ],
         incentives: [
           { required: true, validator: checkIncentives, trigger: 'blur' }
         ],
         receiptor: [
-          { required: true, message: 'please input receipt account of incentives', trigger: 'blur' }
+          { required: true, validator: checkReceiptorName, trigger: 'blur' }
         ]
       }
     }
