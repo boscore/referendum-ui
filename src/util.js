@@ -30,7 +30,7 @@ function changeLanguage (lang) {
 function dateConvert (date) {
   // convert date to current time zone
   const diff = new Date().getTimezoneOffset()
-  const newDateTime = new Date(date).getTime() + (diff * 60 * 1000)
+  const newDateTime = new Date(date).getTime() - (diff * 60 * 1000)
   const newDate = new Date(newDateTime)
   function formatNumber (n) {
     if (n < 10) {
