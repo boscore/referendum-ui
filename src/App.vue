@@ -38,10 +38,6 @@ export default {
     this.$store.commit('setIsPC', { isPC: this.$util.isPC() })
 
     let init = () => { // get all data
-      if (this.interval != null) {
-        clearInterval(this.interval)
-        this.interval = null
-      }
       this.$store.dispatch('getAccounts')
       this.$store.dispatch('getVotes')
       this.$store.dispatch('getProxies')
@@ -68,10 +64,6 @@ export default {
     }
     this.connectInterval = setInterval(() => {
       ScatterJS.scatter.connect('BOSCore-Referendum').then(connected => {
-        if (this.connectInterval != null) {
-          clearInterval(this.connectInterval)
-          this.connectInterval = null
-        }
         if (!connected) {
           this.connectCount++
           if (this.connectCount >= 3) {

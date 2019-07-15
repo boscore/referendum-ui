@@ -84,7 +84,6 @@ export default new Vuex.Store({
       commit('setCurrentProposal', { proposal: payload.proposal })
     },
     getProposals ({ commit, dispatch }, payload) {
-      fetch(API_URL.API_POLL_TALLY).then(res => res.json()).then(res => { console.log(res) })
       fetch(API_URL.API_GET_ALL_PROPOSALS)
         .then(res => {
           if (res.status !== 200) {
