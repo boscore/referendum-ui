@@ -197,7 +197,7 @@ export default {
               this.actionLoading = false
               Message({
                 showClose: true,
-                type: this.$t('alert.success'),
+                type: 'success',
                 message: this.$t('alert.proposal.createSUC')
               })
               this.$router.replace('/referendum')
