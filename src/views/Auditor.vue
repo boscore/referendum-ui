@@ -77,7 +77,7 @@
              :format="stakeText"
              class="pass-percent"
              :percentage="stakePercent"></el-progress>
-            <div v-if="myCandidate.is_active">
+            <div v-if="myCandidate.candidate.is_active">
               <p>{{$t('auditor.activeTip')}}</p>
               <div @click="() => {stakeVisible = true}" class="vote-button vote-button-active">{{$t('auditor.stakeMore')}}</div>
               <div @click="inactive" class="vote-button vote-button-active">{{$t('auditor.unregister')}}</div>
@@ -209,10 +209,10 @@ export default {
       },
       updateRules: {
         bio: [
-          { required: true, message: 'Bio can\'t be empty', trigger: 'blur' }
+          { required: true, message: this.$t('alert.auditor.BIOEmpty'), trigger: 'blur' }
         ],
         contact: [
-          { required: true, message: 'Contact way can\'t be empty', trigger: 'blur' }
+          { required: true, message: this.$t('alert.auditor.contactEmpty'), trigger: 'blur' }
         ]
       },
       stakeAmount: '0.0000 BOS',
@@ -347,7 +347,7 @@ export default {
         .then((res) => {
           this.config = res
         }).catch(e => {
-          this.$util.alert('warning', 'Loading system config failed, Please check your network and refresh page')
+          this.$util.alert(this.$t('alert.warning'), this.$t('alert.auditor.configLoadFailed'))
           console.log(e)
         })
     },
@@ -416,7 +416,7 @@ export default {
           }
         } else {
           //  提示
-          this.$util.alert('Warning', `You only can vote to ${this.config.maxvotes} candidates`)
+          this.$util.alert(this.$t('alert.warning'), this.$t('alert.auditor.votesExceeded', [this.config.maxvotes]))
         }
       }
     },
@@ -449,7 +449,7 @@ export default {
           }
         })
       } else if (!this.scatter.identity) {
-        this.$util.alert('Warning', 'Pair Scatter first')
+        this.$util.alert(this.$t('alert.warning'), this.$t('alert.auditor.notLogin'))
         this.getIdentity()
       } else {
         this.actionLoading = true
@@ -477,13 +477,12 @@ export default {
         this.eos.transaction(transactionOptions, { blocksBehind: 3, expireSeconds: 30 })
           .then(() => {
             this.actionLoading = false
-            this.$util.alert('Success', 'Your vote has been cast on candidates')
+            this.$util.alert(this.$t('alert.success'), this.$t('alert.auditor.voteSUC'))
             this.getCandidates()
             this.removeAllCand()
           }).catch(e => {
             this.actionLoading = false
-            let error = this.$util.errorFormat(e)
-            this.$util.alert('Error', 'Vote ERROR:' + error.message)
+            this.$util.eosErrorAlert(e)
             console.log(e)
           })
       }
@@ -493,14 +492,13 @@ export default {
       this.eos.transfer(this.account.name, this.contract, amount, '')
         .then(res => {
           this.getCandidates()
-          this.getPendingStake()
+          // this.getPendingStake()
           this.actionLoading = false
-          this.$util.alert('Success', 'Stake successfully')
+          this.$util.alert(this.$t('alert.success'), this.$t('alert.auditor.stakeSUC'))
         })
         .catch(e => {
           this.actionLoading = false
-          let error = this.$util.errorFormat(e)
-          this.$util.alert('Error', 'Stake ERROR:' + error.message)
+          this.$util.eosErrorAlert(e)
           console.log(e)
         })
     },
@@ -524,13 +522,12 @@ export default {
         .then(() => {
           this.actionLoading = false
           this.getCandidates()
-          this.getPendingStake()
-          this.$util.alert('Success', 'Unstake successfully')
+          // this.getPendingStake()
+          this.$util.alert(this.$t('alert.success'), this.$t('alert.auditor.unstakeSUC'))
         })
         .catch(e => {
           this.actionLoading = false
-          let error = this.$util.errorFormat(e)
-          this.$util.alert('Error', 'Unstake ERROR:' + error.message)
+          this.$util.eosErrorAlert(e)
           console.log(e)
         })
     },
@@ -554,12 +551,11 @@ export default {
         .then(() => {
           this.actionLoading = false
           this.getCandidates()
-          this.$util.alert('Success', 'You are active for auditor elections')
+          this.$util.alert(this.$t('alert.success'), this.$t('alert.auditor.activeSUC'))
         })
         .catch(e => {
           this.actionLoading = false
-          let error = this.$util.errorFormat(e)
-          this.$util.alert('Error', 'Be active ERROR:' + error.message)
+          this.$util.eosErrorAlert(e)
           console.log(e)
         })
     },
@@ -583,12 +579,11 @@ export default {
         .then(() => {
           this.actionLoading = false
           this.getCandidates()
-          this.$util.alert('Success', 'You are inactive for auditor elections')
+          this.$util.alert(this.$t('alert.success'), this.$t('alert.auditor.inactiveSUC'))
         })
         .catch(e => {
           this.actionLoading = false
-          let error = this.$util.errorFormat(e)
-          this.$util.alert('Error', 'Be inactive ERROR:' + error.message)
+          this.$util.eosErrorAlert(e)
           console.log(e)
         })
     },
@@ -619,12 +614,11 @@ export default {
       this.eos.transaction(transactionOptions, { blocksBehind: 3, expireSeconds: 30 })
         .then(() => {
           this.actionLoading = false
-          this.$util.alert('Success', 'Unvote successfully')
+          this.$util.alert(this.$t('alert.success'), this.$t('alert.auditor.unvoteSUC'))
           this.accountList = null
         }).catch(e => {
           this.actionLoading = false
-          let error = this.$util.errorFormat(e)
-          this.$util.alert('Error', 'Unote ERROR:' + error.message)
+          this.$util.eosErrorAlert(e)
           console.log(e)
         })
     },
@@ -651,12 +645,11 @@ export default {
             .then(res => {
               this.updateDialog = false
               this.actionLoading = false
-              this.$util.alert('Success', 'Update BIO successfully')
+              this.$util.alert(this.$t('alert.success'), this.$t('alert.auditor.updateBioSUC'))
             })
             .catch(e => {
               this.actionLoading = false
-              let error = this.$util.errorFormat(e)
-              this.$util.alert('Error', 'Update BIO ERROR:' + error.message)
+              this.$util.eosErrorAlert(e)
               console.log(e)
             })
         }
@@ -680,7 +673,7 @@ export default {
     $route () {
       this.getCandidates()
       this.getConfig()
-      this.getPendingStake()
+      // this.getPendingStake()
     }
   }
 }

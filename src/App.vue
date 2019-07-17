@@ -32,16 +32,12 @@ export default {
     if (localStorage.getItem('language')) {
       this.$i18n.locale = localStorage.getItem('language')
     }
+    this.$util.eosErrorAlert = this.$util.eosErrorAlert.bind(this)
     this.$util.changeLanguage = this.$util.changeLanguage.bind(this)
     this.$util.alert = this.$util.alert.bind(this)
-
     this.$store.commit('setIsPC', { isPC: this.$util.isPC() })
 
     let init = () => { // get all data
-      if (this.interval != null) {
-        clearInterval(this.interval)
-        this.interval = null
-      }
       this.$store.dispatch('getAccounts')
       this.$store.dispatch('getVotes')
       this.$store.dispatch('getProxies')
@@ -68,10 +64,6 @@ export default {
     }
     this.connectInterval = setInterval(() => {
       ScatterJS.scatter.connect('BOSCore-Referendum').then(connected => {
-        if (this.connectInterval != null) {
-          clearInterval(this.connectInterval)
-          this.connectInterval = null
-        }
         if (!connected) {
           this.connectCount++
           if (this.connectCount >= 3) {
@@ -92,6 +84,11 @@ export default {
         clearInterval(this.connectInterval)
         console.log(ScatterJS.scatter)
         this.$store.dispatch('setScatter', { scatter: ScatterJS.scatter })
+      }).catch(e => {
+        this.connectCount++
+        if (this.connectCount >= 3) {
+          clearInterval(this.connectInterval)
+        }
       })
     }, 500)
   },

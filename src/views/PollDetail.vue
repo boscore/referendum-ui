@@ -9,8 +9,8 @@
         </div>
         <h1>{{proposal.proposal.title}}
         </h1>
-        <h2 v-if="CDToAuditor > 0" style="color: #E74C3C">The countdown to auditors giving opinions ends in {{CDToAuditor}} days</h2>
-        <h2 v-if="CDToBP > 0" style="color: #E74C3C">The countdown to BPs voting ends in {{CDToBP}} days</h2>
+        <!-- <h2 v-if="CDToAuditor > 0" style="color: #E74C3C">The countdown to auditors giving opinions ends in {{CDToAuditor}} days</h2>
+        <h2 v-if="CDToBP > 0" style="color: #E74C3C">The countdown to BPs voting ends in {{CDToBP}} days</h2> -->
         <p>
           <span style="margin-right: 10px" class="proposal-info">{{`${proposal.proposal.proposal_name} by ${proposal.proposal.proposer} `}}</span>
           <br v-if="!$store.state.isPC"/>
@@ -40,6 +40,7 @@
             {{$t('proposal.voters')}}
           </div>
           <div
+            v-if="otherComm.length || BPComm.length || auditorComm.length"
             class="radio-button"
             @click="turnTo('comments')"
             :class="{'radio-button-active': activeButton === 'comments'}">
@@ -56,12 +57,16 @@
         </div>
       <el-container v-loading="propLoading">
         <el-main class="main">
-          <div v-if="activeButton !=='voters'" v-html="content" ref="desc" class="card prop-content">
+          <div v-if="activeButton !=='voters'" ref="desc" class="card prop-content">
+            <!-- <el-select v-model="translateTo">
+              <el-option
+                v-for="lang in translateOptions"
+                :key="lang.value"
+                :label="lang.label"
+                :value="lang.value"></el-option>
+            </el-select> -->
+            <div v-html="content"></div>
           </div>
-          <!-- <div class="card">
-            <div class="radio-button" :class="{'radio-button-active': true}">English</div>
-            <div class="radio-button" :class="{'radio-button-active': false}">中文</div>
-          </div> -->
           <div v-else class="card" ref="voters">
             <h2>{{$t('proposal.voters')}}</h2>
             <el-table :data="showVoters" :default-sort="{prop: 'staked', order: 'descending'}">
@@ -88,20 +93,21 @@
               ></IEcharts>
             </div>
           </div>
+          <div ref="comments">
+            <div v-if="auditorComm.length" class="card">
+              <h2>{{$t('common.auditor')}} {{$t('proposal.comments')}} {{auditorComm.length}}</h2>
+              <Comment v-for="(comment, index) in auditorComm" :key="index" v-bind="comment"></Comment>
+            </div>
 
-          <div class="card" ref="comments">
-            <h2>{{$t('common.auditor')}} {{$t('proposal.comments')}} {{auditorComm.length}}</h2>
-            <Comment v-for="(comment, index) in auditorComm" :key="index" v-bind="comment"></Comment>
-          </div>
+            <div v-if="BPComm.length" class="card">
+              <h2>{{$t('proposal.BP')}} {{$t('proposal.comments')}} {{BPComm.length}}</h2>
+              <Comment v-for="(comment, index) in BPComm" :key="index" v-bind="comment"></Comment>
+            </div>
 
-          <div class="card">
-            <h2>{{$t('proposal.BP')}} {{$t('proposal.comments')}} {{BPComm.length}}</h2>
-            <Comment v-for="(comment, index) in BPComm" :key="index" v-bind="comment"></Comment>
-          </div>
-
-          <div class="card">
-            <h2>{{$t('proposal.other')}} {{$t('proposal.comments')}} {{otherComm.length}}</h2>
-            <Comment v-for="(comment, index) in otherComm" :key="index" v-bind="comment"></Comment>
+            <div v-if="otherComm.lenght" class="card">
+              <h2>{{$t('proposal.other')}} {{$t('proposal.comments')}} {{otherComm.length}}</h2>
+              <Comment v-for="(comment, index) in otherComm" :key="index" v-bind="comment"></Comment>
+            </div>
           </div>
         </el-main>
         <el-aside class="aside-right" :width="asideWidth">
@@ -216,6 +222,7 @@ import 'echarts/lib/component/title'
 import 'echarts/lib/component/grid'
 import PropCard from '@/components/PropCard.vue'
 import Comment from '@/components/Comment.vue'
+
 export default {
   name: 'PollDetail',
   components: {
@@ -252,8 +259,45 @@ export default {
       }
       return '374px'
     },
-    votesOfBP () { // cunrrent active votes of BP election
-      return this.$store.state.summaries.bp_votes || -1
+    auditorComm () {
+      let comm = []
+      this.votes.forEach(vote => {
+        if (vote.vote_json && vote.vote_json.comment) {
+          let comment = {
+            avatar: '',
+            name: vote.voter,
+            time: vote.updated_at,
+            comment: vote.vote_json.comment
+          }
+          let isAuditor = this.auditorsList.find(auditor => {
+            return Boolean(auditor.auditor_name === vote.voter)
+          })
+          if (isAuditor) {
+            comm.push(comment)
+          }
+        }
+      })
+      return comm
+    },
+    BPComm () {
+      let comm = []
+      this.votes.forEach(vote => {
+        if (vote.vote_json && vote.vote_json.comment) {
+          let comment = {
+            avatar: '',
+            name: vote.voter,
+            time: vote.updated_at,
+            comment: vote.vote_json.comment
+          }
+          let isBP = this.producers.find(producer => {
+            return Boolean(producer.owner === vote.voter)
+          })
+          if (isBP) {
+            comm.push(comment)
+          }
+        }
+      })
+      return comm
     },
     chartLoading () {
       if (this.votes) {
@@ -325,102 +369,12 @@ export default {
         ]
       }
     },
-    votes () { // votes for this proposal
-      let allVotes = this.$store.state.votes
-      let allAccounts = this.$store.state.accounts
-      let allProxies = this.$store.state.proxies
-      if (allVotes && allAccounts && allProxies) {
-        if (typeof allVotes === 'string') {
-          allVotes = JSON.parse(allVotes)
-        }
-        let votes = []
-        allVotes.forEach(vote => {
-          if (vote.proposal_name === this.proposalName) {
-            if (vote.vote === 1) {
-              vote.result = this.$t('common.yes')
-            } else if (vote.vote === 0) {
-              vote.result = this.$t('common.no')
-            } else {
-              vote.result = this.$t('common.abstain')
-            }
-            if (allAccounts[vote.voter]) {
-              vote.type = 'Voter'
-              vote.staked = Number((allAccounts[vote.voter].staked / 10000).toFixed(0))
-            } else if (allProxies[vote.voter]) {
-              vote.type = 'Proxy'
-              vote.staked = Number((allProxies[vote.voter].votes[this.proposalName].staked_proxy / 10000).toFixed(0))
-            } else {
-              vote.type = 'Voter'
-              vote.staked = 0
-            }
-            // sort votes
-            if (votes.length === 0 || vote.staked <= votes[votes.length - 1].staked) {
-              votes.push(vote)
-            } else {
-              for (let i = votes.length - 1; i >= 0; i--) {
-                if (vote.staked < votes[i].staked) {
-                  votes.splice(i + 1, 0, vote) // 插在该元素后面
-                  break
-                } else if (i === 0) {
-                  votes.splice(0, 0, vote)
-                }
-              }
-            }
-          }
-        })
-        return votes
-      } else {
-        return []
-      }
-    },
-    auditorComm () {
-      let comm = []
-      this.votes.forEach(vote => {
-        if (vote.vote_json && vote.vote_json.comment) {
-          let comment = {
-            avatar: '',
-            name: vote.voter,
-            time: vote.updated_at,
-            comment: vote.vote_json.comment
-          }
-          let isAuditor = this.auditorsList.find(auditor => {
-            return Boolean(auditor.auditor_name === vote.voter)
-          })
-          if (isAuditor) {
-            comm.push(comment)
-          }
-        }
-      })
-      return comm
-    },
-    BPComm () {
-      let comm = []
-      this.votes.forEach(vote => {
-        if (vote.vote_json && vote.vote_json.comment) {
-          let comment = {
-            avatar: '',
-            name: vote.voter,
-            time: vote.updated_at,
-            comment: vote.vote_json.comment
-          }
-          let isBP = this.producers.find(producer => {
-            return Boolean(producer.owner === vote.voter)
-          })
-          if (isBP) {
-            comm.push(comment)
-          }
-        }
-      })
-      return comm
-    },
     incentives () {
       if (this.proposal) {
         if (this.proposal.proposal.proposal_json.incentives !== undefined) {
           let incentives = Number(this.proposal.proposal.proposal_json.incentives.split(' ')[0])
-          console.log(incentives)
           let integer = Number(incentives.toFixed(0))
           let decimals = String(incentives * 10000 % 10000)
-          console.log(decimals)
           while (decimals.length < 4) {
             decimals = '0' + decimals
           }
@@ -503,13 +457,6 @@ export default {
       }
       return related
     },
-    content () {
-      if (this.proposal) {
-        return marked(this.proposal.proposal.proposal_json.content, { sanitize: true })
-      } else {
-        return 'no content'
-      }
-    },
     satisfiedPercent () {
       if (this.proposal) {
         if (this.proposal.meet_conditions_days > 20) {
@@ -542,6 +489,57 @@ export default {
       } else {
         return Number((100 * this.proposal.stats.staked[0] / this.proposal.stats.staked.total).toFixed(1))
       }
+    },
+    votes () { // votes for this proposal
+      let allVotes = this.$store.state.votes
+      let allAccounts = this.$store.state.accounts
+      let allProxies = this.$store.state.proxies
+      if (allVotes && allAccounts && allProxies) {
+        if (typeof allVotes === 'string') {
+          allVotes = JSON.parse(allVotes)
+        }
+        let votes = []
+        allVotes.forEach(vote => {
+          if (vote.proposal_name === this.proposalName) {
+            if (vote.vote === 1) {
+              vote.result = this.$t('common.yes')
+            } else if (vote.vote === 0) {
+              vote.result = this.$t('common.no')
+            } else {
+              vote.result = this.$t('common.abstain')
+            }
+            if (allAccounts[vote.voter]) {
+              vote.type = 'Voter'
+              vote.staked = Number((allAccounts[vote.voter].staked / 10000).toFixed(0))
+            } else if (allProxies[vote.voter]) {
+              vote.type = 'Proxy'
+              vote.staked = Number((allProxies[vote.voter].votes[this.proposalName].staked_proxy / 10000).toFixed(0))
+            } else {
+              vote.type = 'Voter'
+              vote.staked = 0
+            }
+            // sort votes
+            if (votes.length === 0 || vote.staked <= votes[votes.length - 1].staked) {
+              votes.push(vote)
+            } else {
+              for (let i = votes.length - 1; i >= 0; i--) {
+                if (vote.staked < votes[i].staked) {
+                  votes.splice(i + 1, 0, vote) // 插在该元素后面
+                  break
+                } else if (i === 0) {
+                  votes.splice(0, 0, vote)
+                }
+              }
+            }
+          }
+        })
+        return votes
+      } else {
+        return []
+      }
+    },
+    votesOfBP () { // cunrrent active votes of BP election
+      return this.$store.state.summaries.bp_votes || -1
     },
     votedPercent () {
       if (this.votesOfBP === 0 || this.votesOfBP === -1) {
@@ -584,18 +582,23 @@ export default {
   },
   data () {
     return {
-      title: 'Should EOS tokens sent to eosio.ramfee and eosio.names accounts in the future be allocated to REX?',
       activeButton: 'desc',
       actionLoading: false,
       auditorsList: [],
+      budgetList: {
+        'historyindex': '250000.0000',
+        'eosiosg11111': '1000000.0000',
+        'bosnationwps': '515000.0000',
+        'constantstab': '350000.0000',
+        'hyperion.api': '995600.0000',
+        'chintaionbos': '1000000.0000',
+        'omegaautodex': '450000.0000',
+        'btconbos': '400000.0000',
+        'universal': '800000.0000'
+      },
       CDToBP: -1,
       CDToAuditor: -1,
-      voteActionParams: {
-        voter: '',
-        proposal_name: '',
-        vote: -1,
-        vote_json: ''
-      },
+      content: '',
       myComment: '',
       producers: [],
       proposal: {
@@ -627,20 +630,26 @@ export default {
         }
       },
       propLoading: true,
-      writeComment: false,
       showVotersNum: 30,
       screenWidth: document.body.clientWidth,
-      budgetList: {
-        'historyindex': '250000.0000',
-        'eosiosg11111': '1000000.0000',
-        'bosnationwps': '515000.0000',
-        'constantstab': '350000.0000',
-        'hyperion.api': '995600.0000',
-        'chintaionbos': '1000000.0000',
-        'omegaautodex': '450000.0000',
-        'btconbos': '400000.0000',
-        'universal': '800000.0000'
-      }
+      translateTo: 'en',
+      translateOptions: [{
+        value: 'en',
+        label: 'English'
+      }, {
+        value: 'zh-cn',
+        label: '简体中文'
+      }, {
+        value: 'zh-tw',
+        label: '繁体中文'
+      }],
+      voteActionParams: {
+        voter: '',
+        proposal_name: '',
+        vote: -1,
+        vote_json: ''
+      },
+      writeComment: false
     }
   },
   created () {
@@ -656,6 +665,18 @@ export default {
     this.$refs['steps'].scrollLeft += this.$refs['steps'].scrollWidth * this.activeStep / 4
   },
   methods: {
+    calcDays (start, end) {
+      let startDay = new Date(start)
+      let endDay = new Date(end)
+      return ((endDay.getTime() - startDay.getTime()) / 1000 / 3600 / 24).toFixed(0)
+    },
+    calcPercent (numerator, denominator) {
+      if (!denominator === 0) {
+        return 0
+      } else {
+        return Number((numerator * 100 / denominator).toFixed(2))
+      }
+    },
     getProposal () {
       fetch(API_URL.API_GET_PROPOSAL + '/' + this.proposalName)
         .then(res => {
@@ -690,6 +711,9 @@ export default {
             let error = this.$util.errorFormat(e)
             this.$util.alert('Error', 'proposal_json ERROR:' + error.message)
           }
+
+          // 将提案内容MD解析并翻译
+          this.content = marked(this.proposal.proposal.proposal_json.content, { sanitize: true })
         }).catch(e => {
           this.propLoading = false
           // let error = this.$util.errorFormat(e)
@@ -749,18 +773,6 @@ export default {
         this.$store.dispatch('setScatter', { scatter: this.scatter })
       })
     },
-    calcDays (start, end) {
-      let startDay = new Date(start)
-      let endDay = new Date(end)
-      return ((endDay.getTime() - startDay.getTime()) / 1000 / 3600 / 24).toFixed(0)
-    },
-    calcPercent (numerator, denominator) {
-      if (!denominator === 0) {
-        return 0
-      } else {
-        return Number((numerator * 100 / denominator).toFixed(2))
-      }
-    },
     sendVote () {
       if (this.voteActionParams.vote === -1) {
         this.$util.alert('Warning', 'Please choose your vote')
@@ -797,8 +809,7 @@ export default {
             } })
           }).catch(e => {
             this.actionLoading = false
-            let error = this.$util.errorFormat(e)
-            this.$util.alert('Error', 'Vote ERROR:' + error.message)
+            this.$util.eosErrorAlert(e)
             console.log(e)
           })
       }
@@ -831,10 +842,18 @@ export default {
           } })
         }).catch(e => {
           this.actionLoading = false
-          let error = this.$util.errorFormat(e)
-          this.$util.alert('Error', 'Unvote ERROR:' + error.message)
+          this.$util.eosErrorAlert(e)
           console.log(e)
         })
+    },
+    showMoreVoters () {
+      this.showVotersNum += 30
+      if (this.showVotersNum > this.votes.length) {
+        this.showVotersNum = this.votes.length
+      }
+    },
+    satisfiedText (percentage) {
+      return `${this.proposal.meet_conditions_days}/20`
     },
     turnTo (target) {
       // 跳转到某个card
@@ -857,15 +876,6 @@ export default {
       window.open(routeUrl.href, '_blank')
       // this.$router.push({ path: '/poll_detail', query: { proposal: prop.proposal.proposal_name } })
       // this.getProposal()
-    },
-    showMoreVoters () {
-      this.showVotersNum += 30
-      if (this.showVotersNum > this.votes.length) {
-        this.showVotersNum = this.votes.length
-      }
-    },
-    satisfiedText (percentage) {
-      return `${this.proposal.meet_conditions_days}/20`
     }
   },
   watch: {
@@ -963,6 +973,7 @@ export default {
   padding 0 12px
 .prop-content
   overflow-wrap break-word
+  color: #010101;
   >>> h1
     font-size 24px
     color #507DFE
@@ -984,7 +995,6 @@ export default {
   >>> p
     font-family: Roboto-Regular;
     font-size: 14px;
-    color: #8A8A8A;
     letter-spacing: 0;
   >>> a
     color #0366d6
@@ -1038,6 +1048,8 @@ export default {
     padding 0
   .radio-button
     margin-bottom 5px
+  .aside-right
+    padding 0
 @media only screen and (max-width 450px)
   .chart-card
     height 300px

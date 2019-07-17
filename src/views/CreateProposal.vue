@@ -64,10 +64,11 @@ export default {
   data () {
     const checkIncentives = (rule, value, callback) => {
       if (value === '') {
-        return callback(new Error('Please input a number of incentives'))
+        return callback(new Error('Please input a number of budget'))
       } else {
-        if (Number(value) > 1000000) {
-          return callback(new Error('No more than 1,000,000.0000 BOS'))
+        const v = Number(value.split(' ')[0])
+        if (Number(v) > 1000000) {
+          return callback(new Error(this.$t('alert.proposal.budgetOverstep')))
         } else {
           callback()
         }
@@ -75,25 +76,25 @@ export default {
     }
     const checkPropName = (rule, value, cb) => {
       if (value === '') {
-        return cb(new Error('Please input proposal name'))
+        return cb(new Error(this.$t('alert.proposal.emptyPropName')))
       } else {
         const regex = /^([a-z]|[1-5]){12}$/g
         if (regex.test(value)) {
           cb()
         } else {
-          return cb(new Error('Name should be 12 characters and only contains the following symbol (1-5,a-z)'))
+          return cb(new Error(this.$t('alert.proposal.wrongName')))
         }
       }
     }
     const checkReceiptorName = (rule, value, cb) => {
       if (value === '') {
-        return cb(new Error('Please input receiptor account of incentives'))
+        return cb(new Error(this.$t('alert.proposal.emptyReceiptor')))
       } else {
         const regex = /^([a-z]|[1-5]){12}$/g
         if (regex.test(value)) {
           cb()
         } else {
-          return cb(new Error('Name should be 12 characters and only contains the following symbol (1-5,a-z)'))
+          return cb(new Error(this.$t('alert.proposal.wrongName')))
         }
       }
     }
@@ -113,14 +114,11 @@ export default {
           { required: true, validator: checkPropName, trigger: 'blur' }
         ],
         title: [
-          { required: true, message: 'Please input proposal title', trigger: 'blur' }
+          { required: true, message: this.$t('alert.proposal.emptyPropTitle'), trigger: 'blur' }
         ],
         content: [
-          { required: true, message: 'Please input proposal content', trigger: 'blur' }
+          { required: true, message: this.$t('alert.proposal.emptyPropContent'), trigger: 'blur' }
         ],
-        // expiry: [
-        //   { required: true, validator: checkExpiryDate, trigger: 'blur' }
-        // ],
         type: [
           { message: 'Please choose proposal type', trigger: 'blur' }
         ],
@@ -200,31 +198,13 @@ export default {
               Message({
                 showClose: true,
                 type: 'success',
-                message: 'You create a new proposal successfully'
+                message: this.$t('alert.proposal.createSUC')
               })
               this.$router.replace('/referendum')
-              // MessageBox.alert(`You create a new proposal successfully`, '', {
-              //   confirmButtonText: 'OK',
-              //   callback: action => {
-              //     if (action === 'confirm') {
-              //       this.$router.replace('/referendum')
-              //     }
-              //   }
-              // })
             }).catch(e => {
-              // if (typeof e === 'string') {
-              //   e = JSON.parse(e)
-              // }
               this.actionLoading = false
-              Message({
-                showClose: true,
-                type: 'error',
-                message: 'Create ERROR:' + e.message
-              })
+              this.$util.eosErrorAlert(e)
               console.log(e)
-              // MessageBox.alert(e, 'ERROR', {
-              //   confirmButtonText: 'OK'
-              // })
             })
         }
       })
