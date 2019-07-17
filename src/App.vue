@@ -32,9 +32,9 @@ export default {
     if (localStorage.getItem('language')) {
       this.$i18n.locale = localStorage.getItem('language')
     }
+    this.$util.eosErrorAlert = this.$util.eosErrorAlert.bind(this)
     this.$util.changeLanguage = this.$util.changeLanguage.bind(this)
     this.$util.alert = this.$util.alert.bind(this)
-
     this.$store.commit('setIsPC', { isPC: this.$util.isPC() })
 
     let init = () => { // get all data
@@ -84,6 +84,11 @@ export default {
         clearInterval(this.connectInterval)
         console.log(ScatterJS.scatter)
         this.$store.dispatch('setScatter', { scatter: ScatterJS.scatter })
+      }).catch(e => {
+        this.connectCount++
+        if (this.connectCount >= 3) {
+          clearInterval(this.connectInterval)
+        }
       })
     }, 500)
   },

@@ -4,10 +4,10 @@
       <h1 style="line-height:30px;margin:15px 0px;">{{$t('auditor.registerCand')}}</h1>
       <div class="card" v-loading="actionLoading">
         <el-form ref="form" :rules="rules" :model="form" label-position="top" label-width="110px">
-          <p>Responsibilities outlined in the. BOS Declaration. Please, do not register as a candidate unless you fully understand and can meet the responsibilites of an BOS custodian board member. And you need to transfer some BOS to auditor.bos as staked token.</p>
+          <p>{{$t("auditor.regiterIntro")}}</p>
           <el-form-item prop="auditorName">
             <label slot="label">{{$t('auditor.candName')}} (BOS {{$t('common.account').toLocaleLowerCase()}})</label>
-            <el-input style="max-width: 400px;" v-model="form.auditorName" ></el-input>
+            <el-input style="max-width: 400px;"  maxlength="12" v-model="form.auditorName" ></el-input>
           </el-form-item>
           <el-form-item>
             <label slot="label">
@@ -45,7 +45,8 @@
         title="Declaration"
         :visible.sync="showDeclar"
       >
-      <h3>Auditor’s Declaration of Independence and Impartiality</h3>
+      <div v-if="$i18n.locale === 'en'">
+        <h3>Auditor’s Declaration of Independence and Impartiality</h3>
         <p>
           I, the undersigned,<br>
           <br>
@@ -60,8 +61,26 @@
           <br>
           <b>DECLARE</b> not to seek any stake in, or exert undue influence over, other block producers and shall take appropriate measures to protect my own independence and impartiality. <br>
         </p>
+      </div>
+        <div v-if="$i18n.locale === 'cn'">
+          <h3>Auditor’s Declaration of Independence and Impartiality</h3>
+          <p>
+            I, the undersigned,<br>
+            <br>
+            accept to serve as Auditor, in accordance with the BOS Rules.<br>
+            <br>
+            I<br>
+            <b>DECLARE</b> to be and to intend to remain independent and impartial during the auditing procedure.<br>
+            <br>
+            <b>DECLARE</b> that, to my knowledge, there are no facts, circumstances or relationships which may affect my independence and impartiality.<br>
+            <br>
+            <b>DECLARE</b> to treat all BOS members fairly, reward contributions appropriately and not seek unmerited profits. No member should have less or more information about an auditing decision than others.<br>
+            <br>
+            <b>DECLARE</b> not to seek any stake in, or exert undue influence over, other block producers and shall take appropriate measures to protect my own independence and impartiality. <br>
+          </p>
+        </div>
         <span slot="footer">
-          <el-button type="primary" @click="showDeclar=false;form.signDeclar=true">Agree</el-button>
+          <el-button type="primary" @click="showDeclar=false;form.signDeclar=true">{{$t('common.agree')}}</el-button>
         </span>
       </el-dialog>
     </el-main>
@@ -79,16 +98,27 @@
 <script>
 import Eos from 'eosjs'
 import { NETWORK, NODE_ENDPOINT } from '@/assets/constants.js'
-import { Message } from 'element-ui'
 import { setInterval, clearInterval } from 'timers'
 export default {
   name: 'RegisterAuditor',
   data () {
-    var validateDeclar = (rule, value, callback) => {
+    const validateDeclar = (rule, value, callback) => {
       if (value === false) {
-        callback(new Error('Please read and sign the declaration'))
+        callback(new Error(this.$t('alert.auditor.notSignDec')))
       } else {
         callback()
+      }
+    }
+    const checkCandName = (rule, value, cb) => {
+      if (value === '') {
+        return cb(new Error(this.$t('alert.auditor.candidateEmpty')))
+      } else {
+        const regex = /^([a-z]|[1-5]){12}$/g
+        if (regex.test(value)) {
+          cb()
+        } else {
+          return cb(new Error(this.$t('alert.proposal.wrongName')))
+        }
       }
     }
     return {
@@ -104,13 +134,13 @@ export default {
       hasStaked: false,
       rules: {
         auditorName: [
-          { required: true, message: 'Please input the candidate account', trigger: 'blur' }
+          { validator: checkCandName, trigger: 'blur' }
         ],
         contact: [
-          { required: true, message: 'Please input candidate\'s public email', trigger: 'blur' }
+          { required: true, message: this.$t('alert.auditor.contactEmpty'), trigger: 'blur' }
         ],
         bio: [
-          { required: true, message: 'Please input candidate\'s bio', trigger: 'blur' }
+          { required: true, message: this.$t('alert.auditor.BIOEmpty'), trigger: 'blur' }
         ],
         signDeclar: [
           { validator: validateDeclar, trigger: 'blur' }
@@ -157,11 +187,7 @@ export default {
         await this.eos.transfer(account.name, this.contract, this.form.stakeAmount, '')
       } catch (e) {
         this.actionLoading = false
-        Message({
-          showClose: true,
-          type: 'error',
-          message: 'Stake ERROR' + e.message
-        })
+        this.$util.eosErrorAlert(e)
         console.log(e)
       }
     },
@@ -227,12 +253,11 @@ export default {
           this.eos.transaction(transactionOptions, { blocksBehind: 3, expireSeconds: 30 })
             .then(res => {
               this.actionLoading = false
-              this.$util.alert('Success', 'You register as a new candidate successfully')
+              this.$util.alert(this.$t('alert.success'), this.$t('alert.auditor.registerSuccessful'))
               this.$router.replace('/auditor')
             }).catch(e => {
               this.actionLoading = false
-              let error = this.$util.errorFormat(e)
-              this.$util.alert('Error', 'Register ERROR:' + error.message)
+              this.$util.eosErrorAlert(e)
               console.log(e)
             })
         } else {

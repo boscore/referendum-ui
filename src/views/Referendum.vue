@@ -320,11 +320,11 @@ export default {
           Object.keys(myVotes.votes).forEach(key => {
             let vote = { ...myVotes.votes[key] }
             if (vote.vote === 1) {
-              vote.result = 'YES'
+              vote.result = this.$t('common.yes')
             } else if (vote.vote === 0) {
-              vote.result = 'NO'
+              vote.result = this.$t('common.no')
             } else {
-              vote.result = 'ABSTAIN'
+              vote.result = this.$t('common.abstain')
             }
             list.push(vote)
           })
@@ -408,12 +408,11 @@ export default {
       this.eos.transaction(transactionOptions, { blocksBehind: 3, expireSeconds: 30 })
         .then(res => {
           this.actionLoading = false
-          this.alert('Success', 'Claim success')
+          this.alert(this.$t('alert.success'), this.$t('alert.proposal.claimRewardsSUC'))
         })
         .catch(e => {
           this.actionLoading = false
-          let error = this.$util.errorFormat(e)
-          this.alert('Error', 'Claim ERROR:' + error.message)
+          this.$util.eosErrorAlert(e)
           console.log(e)
         })
     },
@@ -437,11 +436,10 @@ export default {
       this.eos.transaction(transactionOptions, { blocksBehind: 3, expireSeconds: 30 })
         .then(res => {
           this.actionLoading = false
-          this.alert('Success', `Canceled ${proposal}`)
+          this.alert(this.$t('alert.success'), this.$t('alert.proposal.cancelPropSUC', [proposal]))
         }).catch(e => {
           this.actionLoading = false
-          let error = this.$util.errorFormat(e)
-          this.alert('Error', 'Cancel ERROR:' + error.message)
+          this.$util.eosErrorAlert(e)
           console.log(e)
         })
     },
@@ -465,11 +463,10 @@ export default {
       this.eos.transaction(transactionOptions, { blocksBehind: 3, expireSeconds: 30 })
         .then(res => {
           this.actionLoading = false
-          this.alert('Success', `Unvote ${proposal}`)
+          this.alert(this.$t('alert.success'), this.$t('alert.proposal.unvoteSUC', [proposal]))
         }).catch(e => {
           this.actionLoading = false
-          let error = this.$util.errorFormat(e)
-          this.alert('Error', 'Unvote ERROR:' + error.message)
+          this.$util.eosErrorAlert(e)
           console.log(e)
         })
     },

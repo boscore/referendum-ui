@@ -14,11 +14,40 @@ export default {
   dateConvert,
   changeLanguage,
   errorFormat,
+  eosErrorAlert,
   toThousands,
   isExpired,
   isPC,
   transSpecialChar,
   unTransSpecialChar
+}
+
+function alert (title, msg, confirm, cancel, callback) {
+  if (typeof confirm === 'function') {
+    callback = confirm
+    confirm = null
+  }
+  if (typeof cancel === 'function') {
+    callback = cancel
+    cancel = null
+  }
+  if (isPC()) {
+    MessageBox.alert(msg, title, {
+      confirmButtonText: confirm || this.$t('common.OK'),
+      cancelButtonText: cancel,
+      callback: callback,
+      distinguishCancelAndClose: true,
+      showCancelButton: cancel
+    })
+  } else {
+    MbMessageBox.alert(msg, title, {
+      confirmButtonText: confirm || this.$t('common.OK'),
+      cancelButtonText: cancel,
+      callback: callback,
+      distinguishCancelAndClose: true,
+      showCancelButton: cancel
+    })
+  }
 }
 
 function changeLanguage (lang) {
@@ -39,6 +68,41 @@ function dateConvert (date) {
     return n
   }
   return `${newDate.getFullYear()}-${formatNumber(newDate.getMonth() + 1)}-${formatNumber(newDate.getDate())} ${formatNumber(newDate.getHours())}:${formatNumber(newDate.getMinutes())}`
+}
+
+function errorFormat (e) {
+  let error = e
+  if (typeof e === 'string') {
+    try {
+      let errorRaw = JSON.parse(e)
+      if (errorRaw.error) {
+        if (errorRaw.error.details.length) {
+          error = errorRaw.error.details[0]
+        } else {
+          error = {
+            message: errorRaw.error.name
+          }
+        }
+      } else {
+        error = errorRaw
+      }
+    } catch (jsonError) {
+      error = {
+        message: e
+      }
+    }
+  }
+  return error
+}
+
+function eosErrorAlert (e) {
+  try {
+    let error = JSON.parse(e).error
+    let message = this.$t('eosError.' + error.code) + ',' + error.details[0].message
+    alert.apply(this, [this.$t('alert.error'), message])
+  } catch (e) {
+    console.log(e)
+  }
 }
 
 function toThousands (num) {
@@ -87,57 +151,4 @@ function isPC () {
     }
   }
   return flag
-}
-
-function errorFormat (e) {
-  let error = e
-  if (typeof e === 'string') {
-    try {
-      let errorRaw = JSON.parse(e)
-      if (errorRaw.error) {
-        if (errorRaw.error.details.length) {
-          error = errorRaw.error.details[0]
-        } else {
-          error = {
-            message: errorRaw.error.name
-          }
-        }
-      } else {
-        error = errorRaw
-      }
-    } catch (jsonError) {
-      error = {
-        message: e
-      }
-    }
-  }
-  return error
-}
-
-function alert (title, msg, confirm, cancel, callback) {
-  if (typeof confirm === 'function') {
-    callback = confirm
-    confirm = null
-  }
-  if (typeof cancel === 'function') {
-    callback = cancel
-    cancel = null
-  }
-  if (isPC()) {
-    MessageBox.alert(msg, title, {
-      confirmButtonText: confirm || this.$t('common.OK'),
-      cancelButtonText: cancel,
-      callback: callback,
-      distinguishCancelAndClose: true,
-      showCancelButton: cancel
-    })
-  } else {
-    MbMessageBox.alert(msg, title, {
-      confirmButtonText: confirm || this.$t('common.OK'),
-      cancelButtonText: cancel,
-      callback: callback,
-      distinguishCancelAndClose: true,
-      showCancelButton: cancel
-    })
-  }
 }
