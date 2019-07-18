@@ -42,41 +42,37 @@
       </div>
       <el-dialog
         :width="dialogWidth"
-        title="Declaration"
+        :title="$t('auditor.declarationTitle')"
         :visible.sync="showDeclar"
       >
       <div v-if="$i18n.locale === 'en'">
-        <h3>Auditor’s Declaration of Independence and Impartiality</h3>
         <p>
           I, the undersigned,<br>
           <br>
           accept to serve as Auditor, in accordance with the BOS Rules.<br>
           <br>
-          I<br>
-          <b>DECLARE</b> to be and to intend to remain independent and impartial during the auditing procedure.<br>
+          I<b>DECLARE</b> to be and to intend to remain independent and impartial during the auditing procedure.<br>
           <br>
-          <b>DECLARE</b> that, to my knowledge, there are no facts, circumstances or relationships which may affect my independence and impartiality.<br>
+          I<b>DECLARE</b> that, to my knowledge, there are no facts, circumstances or relationships which may affect my independence and impartiality.<br>
           <br>
-          <b>DECLARE</b> to treat all BOS members fairly, reward contributions appropriately and not seek unmerited profits. No member should have less or more information about an auditing decision than others.<br>
+          I<b>DECLARE</b> to treat all BOS members fairly, reward contributions appropriately and not seek unmerited profits. No member should have less or more information about an auditing decision than others.<br>
           <br>
-          <b>DECLARE</b> not to seek any stake in, or exert undue influence over, other block producers and shall take appropriate measures to protect my own independence and impartiality. <br>
+          I<b>DECLARE</b> not to seek any stake in, or exert undue influence over, other block producers and shall take appropriate measures to protect my own independence and impartiality. <br>
         </p>
       </div>
         <div v-if="$i18n.locale === 'cn'">
-          <h3>Auditor’s Declaration of Independence and Impartiality</h3>
           <p>
-            I, the undersigned,<br>
+            我，签名人<br>
             <br>
-            accept to serve as Auditor, in accordance with the BOS Rules.<br>
+            根据BOS规则接受担任评审员这一职务。<br>
             <br>
-            I<br>
-            <b>DECLARE</b> to be and to intend to remain independent and impartial during the auditing procedure.<br>
+            我<b>声明</b>在评审提案期间保持独立和公正。<br>
             <br>
-            <b>DECLARE</b> that, to my knowledge, there are no facts, circumstances or relationships which may affect my independence and impartiality.<br>
+            我<b>声明</b>不会出现影响我的独立和公正判断和评审的事实，情况或关系。<br>
             <br>
-            <b>DECLARE</b> to treat all BOS members fairly, reward contributions appropriately and not seek unmerited profits. No member should have less or more information about an auditing decision than others.<br>
+            我<b>声明</b>将公平对待所有BOS成员，给予有贡献提案相应的回报，而不是给予提案方不合理的利润回报。 对于评审员来说任何成员都应该和其他成员掌握相当水平的关于审计决策的信息，而不是更少或更多的。<br>
             <br>
-            <b>DECLARE</b> not to seek any stake in, or exert undue influence over, other block producers and shall take appropriate measures to protect my own independence and impartiality. <br>
+            我<b>声明</b>不得向其他区块生产者寻求任何利益或对其施加不当影响，并应采取适当措施保护自己的独立性和公正性。<br>
           </p>
         </div>
         <span slot="footer">
