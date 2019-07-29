@@ -225,6 +225,10 @@ export default {
         {
           value: 'poll',
           label: this.$t('common.poll')
+        },
+        {
+          value: 'approved',
+          label: this.$t('common.approved')
         }
       ]
     },
@@ -239,9 +243,10 @@ export default {
           let flags = { // types of proposal
             poll: false,
             referendum: false,
-            approved: false,
-            expired: false,
-            ongoing: true
+            approved: false
+          }
+          if (this.proposals[key].approved_by_vote) {
+            flags.approved = true
           }
           this.filterBy.forEach(filter => {
             if (filter === 'poll') { // 暂时把不是referendum的认为是poll
@@ -254,18 +259,11 @@ export default {
                 flags.referendum = true
               }
             }
-            if (filter === 'expired') {
-              if (this.isExpired(this.proposals[key].proposal.expires_at)) {
-                flags.expired = true
-              }
-            }
-            if (filter === 'ongoing') {
-              if (!this.isExpired(this.proposals[key].proposal.expires_at)) {
-                flags.ongoing = true
-              }
+            if (filter === 'approved') {
+              flags.approved = !flags.approved
             }
           })
-          let flag = (flags.poll || flags.referendum) && (flags.expired || flags.ongoing)
+          let flag = (flags.poll || flags.referendum) && (!flags.approved)
           if (flag) {
             if (this.searchBy === '') {
               propList.push(this.proposals[key])
