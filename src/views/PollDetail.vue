@@ -1,5 +1,5 @@
 <template>
-  <div v-loading="!proposal" class="poll-detail">
+  <div v-loading="propLoading" class="poll-detail">
     <el-container>
       <el-main class="header">
         <div class="clear-float">
@@ -55,7 +55,7 @@
             <el-step :title="$t('proposal.finish')"></el-step>
           </el-steps>
         </div>
-      <el-container v-loading="propLoading">
+      <el-container>
         <el-main class="main">
           <div v-if="activeButton !=='voters'" ref="desc" class="card prop-content">
             <!-- <el-select v-model="translateTo">
