@@ -182,7 +182,7 @@ export default {
       extendTime: null,
       extendPropName: '',
       extendVisible: false,
-      filterBy: ['referendum', 'poll'],
+      filterBy: [],
       sortBy: 'MostVoted',
       searchText: '',
       searchBy: ''
@@ -218,17 +218,21 @@ export default {
     },
     filterOptions () {
       return [
+        // {
+        //   value: 'referendum',
+        //   label: this.$t('common.referendum')
+        // },
+        // {
+        //   value: 'poll',
+        //   label: this.$t('common.poll')
+        // },
         {
-          value: 'referendum',
-          label: this.$t('common.referendum')
+          value: 'passed',
+          label: this.$t('common.passed')
         },
         {
-          value: 'poll',
-          label: this.$t('common.poll')
-        },
-        {
-          value: 'approved',
-          label: this.$t('common.approved')
+          value: 'unpassed',
+          label: this.$t('common.unpassed')
         }
       ]
     },
@@ -241,29 +245,37 @@ export default {
       if (this.proposals) {
         Object.keys(this.proposals).forEach(key => {
           let flags = { // types of proposal
-            poll: false,
-            referendum: false,
-            approved: false
-          }
-          if (this.proposals[key].approved_by_vote) {
-            flags.approved = true
+            // poll: true,
+            // referendum: true,
+            passed: false,
+            unpassed: false
           }
           this.filterBy.forEach(filter => {
-            if (filter === 'poll') { // 暂时把不是referendum的认为是poll
-              if (this.proposals[key].proposal.proposal_json.type && this.proposals[key].proposal.proposal_json.type.search('referendum') === -1) {
-                flags.poll = true
+            // if (filter === 'poll') { // 暂时把不是referendum的认为是poll
+            //   if (this.proposals[key].proposal.proposal_json.type && this.proposals[key].proposal.proposal_json.type.search('referendum') === -1) {
+            //     flags.poll = true
+            //   }
+            // }
+            // if (filter === 'referendum') {
+            //   if (this.proposals[key].proposal.proposal_json.type && this.proposals[key].proposal.proposal_json.type.search('referendum') !== -1) {
+            //     flags.referendum = true
+            //   }
+            // }
+            if (filter === 'passed') {
+              if (this.proposals[key].approved_by_vote) {
+                flags.passed = true
               }
             }
-            if (filter === 'referendum') {
-              if (this.proposals[key].proposal.proposal_json.type && this.proposals[key].proposal.proposal_json.type.search('referendum') !== -1) {
-                flags.referendum = true
+            if (filter === 'unpassed') {
+              if (!this.proposals[key].approved_by_vote) {
+                flags.unpassed = true
               }
-            }
-            if (filter === 'approved') {
-              flags.approved = !flags.approved
             }
           })
-          let flag = (flags.poll || flags.referendum) && (!flags.approved)
+          let flag = (flags.passed || flags.unpassed)
+          if (!this.filterBy.length) {
+            flag = true
+          }
           if (flag) {
             if (this.searchBy === '') {
               propList.push(this.proposals[key])
@@ -543,6 +555,16 @@ export default {
   }
 }
 </script>
+
+<style lang="stylus">
+.home
+  .el-select__tags-text
+    color #000
+  .el-input__inner
+    color #000
+.el-select-dropdown__item
+  color #000
+</style>
 
 <style lang="stylus" scoped>
 .title

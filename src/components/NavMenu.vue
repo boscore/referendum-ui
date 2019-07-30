@@ -103,6 +103,7 @@ export default {
       top 60px
       z-index 1000
       width 150px
+
 </style>
 
 <style lang="stylus" scope>
