@@ -46,6 +46,7 @@ export const NETWORK = {
 export const NODE_ENDPOINT = 'https://api.bossweden.org'
 const BACKEND_URL = 'https://boswps.eosplay.me'
 // `https://api.boswps.io`
+const JSON_URL = 'https://s3.amazonaws.com/api.boswps.com'
 
 export const API_URL = {
   API_GET_PRODUCERS: BACKEND_URL + '/getBPs',
@@ -54,12 +55,12 @@ export const API_URL = {
   API_APPLY_REVIEW: BACKEND_URL + '/review',
   API_APPLY_FINISH: BACKEND_URL + '/finish',
   API_GET_ALL_CANDIDATES: BACKEND_URL + '/getAllAuditors',
-  API_POLL_TALLY: 'https://s3.amazonaws.com/bos.referendum/referendum/forum.tallies/latest.json',
-  API_AUDITOR_CONFIG: 'https://s3.amazonaws.com/bos.referendum/auditor.bos/config/latest.json',
-  API_AUDITOR_ACCOUNTS: 'https://s3.amazonaws.com/bos.referendum/referendum/auditor.accounts/latest.json',
-  API_GET_ALL_VOTES: 'https://s3.amazonaws.com/bos.referendum/eosio.forum/vote/latest.json',
-  API_GET_ALL_ACCOUNTS: 'https://s3.amazonaws.com/bos.referendum/referendum/forum.accounts/latest.json',
-  API_GET_ALL_PROXIES: 'https://s3.amazonaws.com/bos.referendum/referendum/forum.proxies/latest.json',
-  API_GET_SUMMARIES: 'https://s3.amazonaws.com/bos.referendum/eosio/stats/latest.json',
-  API_AUDITOR_TALLY: 'https://s3.amazonaws.com/bos.referendum/referendum/auditor.tallies/latest.json'
+  API_POLL_TALLY: JSON_URL + '/referendum/forum.tallies/latest.json',
+  API_AUDITOR_CONFIG: JSON_URL + '/auditor.bos/config/latest.json',
+  API_AUDITOR_ACCOUNTS: JSON_URL + '/referendum/auditor.accounts/latest.json',
+  API_GET_ALL_VOTES: JSON_URL + '/eosio.forum/vote/latest.json',
+  API_GET_ALL_ACCOUNTS: JSON_URL + '/referendum/forum.accounts/latest.json',
+  API_GET_ALL_PROXIES: JSON_URL + '/referendum/forum.proxies/latest.json',
+  API_GET_SUMMARIES: JSON_URL + '/eosio/stats/latest.json',
+  API_AUDITOR_TALLY: JSON_URL + '/referendum/auditor.tallies/latest.json'
 }

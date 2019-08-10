@@ -6,5 +6,7 @@ module.exports = {
       localeDir: 'locales',
       enableInSFC: true
     }
-  }
+  },
+  productionSourceMap: false,
+  publicPath: process.env.NODE_ENV === 'development' ? './' : '/'
 }

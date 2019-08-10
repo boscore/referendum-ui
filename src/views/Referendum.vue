@@ -128,6 +128,14 @@
                   :value="item.value"
                 ></el-option>
               </el-select>
+              <!-- <el-select class="select-button" :value="propLang" @input="setPropLang">
+                <el-option
+                  v-for="item in propLangOptions"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value"
+                ></el-option>
+              </el-select> -->
             </div>
           </div>
         <p v-if="propList.length === 0">{{$t('warning.noResult')}}</p>
@@ -182,7 +190,17 @@ export default {
       extendTime: null,
       extendPropName: '',
       extendVisible: false,
-      filterBy: [],
+      filterBy: ['unpassed'],
+      propLangOptions: [
+        {
+          value: 'cn',
+          label: '中文'
+        },
+        {
+          value: 'en',
+          label: 'English'
+        }
+      ],
       sortBy: 'MostVoted',
       searchText: '',
       searchBy: ''
@@ -238,6 +256,9 @@ export default {
     },
     proposals () {
       return this.$store.state.proposals
+    },
+    propLang () {
+      return this.$store.state.propLang
     },
     propList () {
       // filter approved proposals WIP
@@ -479,6 +500,10 @@ export default {
           this.$util.eosErrorAlert(e)
           console.log(e)
         })
+    },
+    setPropLang (e) {
+      this.$store.commit('setPropLang', { propLang: e })
+      this.$store.dispatch('getProposals')
     },
     openPicker (proposal) {
       this.extendPropName = proposal

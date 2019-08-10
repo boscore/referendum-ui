@@ -58,7 +58,7 @@
       <el-container>
         <el-main class="main">
           <div v-if="activeButton !=='voters'" ref="desc" class="card prop-content">
-            <!-- <el-select v-model="translateTo">
+            <!-- <el-select :value="propLang" @input="setPropLang">
               <el-option
                 v-for="lang in translateOptions"
                 :key="lang.value"
@@ -490,6 +490,9 @@ export default {
         return Number((100 * this.proposal.stats.staked[0] / this.proposal.stats.staked.total).toFixed(1))
       }
     },
+    propLang () {
+      return this.$store.state.propLang
+    },
     votes () { // votes for this proposal
       let allVotes = this.$store.state.votes
       let allAccounts = this.$store.state.accounts
@@ -632,15 +635,14 @@ export default {
       propLoading: true,
       showVotersNum: 30,
       screenWidth: document.body.clientWidth,
-      translateTo: 'en',
       translateOptions: [{
         value: 'en',
         label: 'English'
       }, {
-        value: 'zh-cn',
+        value: 'cn',
         label: '简体中文'
       }, {
-        value: 'zh-tw',
+        value: 'tw',
         label: '繁体中文'
       }],
       voteActionParams: {
@@ -678,7 +680,11 @@ export default {
       }
     },
     getProposal () {
-      fetch(API_URL.API_GET_PROPOSAL + '/' + this.proposalName)
+      let url = API_URL.API_GET_PROPOSAL + '/' + this.proposalName
+      if (this.propLang !== '') {
+        url += '/' + this.propLang
+      }
+      fetch(url)
         .then(res => {
           if (res.status !== 200) {
             console.log(res.statusText)
@@ -700,8 +706,10 @@ export default {
             }
           }
           try {
-            this.proposal.proposal.proposal_json = JSON.parse(this.$util.transSpecialChar(this.proposal.proposal.proposal_json))
-            this.proposal.proposal.proposal_json.content = this.$util.unTransSpecialChar(this.proposal.proposal.proposal_json.content)
+            if (typeof this.proposal.proposal.proposal_json === 'string') {
+              this.proposal.proposal.proposal_json = JSON.parse(this.$util.transSpecialChar(this.proposal.proposal.proposal_json))
+              this.proposal.proposal.proposal_json.content = this.$util.unTransSpecialChar(this.proposal.proposal.proposal_json.content)
+            }
           } catch (e) {
             console.log(e)
             this.proposal.proposal.proposal_json = {
@@ -772,6 +780,10 @@ export default {
         // console.log(this.scatter.identity)
         this.$store.dispatch('setScatter', { scatter: this.scatter })
       })
+    },
+    setPropLang (e) {
+      this.$store.commit('setPropLang', { propLang: e })
+      this.getProposal()
     },
     sendVote () {
       if (this.voteActionParams.vote === -1) {
