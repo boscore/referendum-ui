@@ -46,7 +46,7 @@ export const NETWORK = {
 export const NODE_ENDPOINT = 'https://api.bossweden.org'
 const BACKEND_URL = 'https://boswps.eosplay.me'
 // `https://api.boswps.io`
-const JSON_URL = 'https://s3.amazonaws.com/api.boswps.com'
+const JSON_URL = `https://api.boswps.com` // 'https://s3.amazonaws.com/api.boswps.com'
 
 export const API_URL = {
   API_GET_PRODUCERS: BACKEND_URL + '/getBPs',
