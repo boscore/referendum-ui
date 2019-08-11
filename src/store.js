@@ -13,6 +13,7 @@ export default new Vuex.Store({
     accounts: null,
     votes: [],
     proposals: null,
+    propLang: '',
     proxies: null,
     screenWidth: -1,
     summaries: {},
@@ -36,6 +37,9 @@ export default new Vuex.Store({
     },
     setVotes (state, payload) {
       state.votes = payload.votes
+    },
+    setPropLang (state, payload) {
+      state.propLang = payload.propLang
     },
     addVote (state, payload) {
       state.votes.push(payload.vote)
@@ -83,8 +87,12 @@ export default new Vuex.Store({
     setCurrentProposal ({ commit }, payload) {
       commit('setCurrentProposal', { proposal: payload.proposal })
     },
-    getProposals ({ commit, dispatch }, payload) {
-      fetch(API_URL.API_GET_ALL_PROPOSALS)
+    getProposals ({ commit, dispatch, state }, payload) {
+      let url = API_URL.API_GET_ALL_PROPOSALS
+      if (state.propLang !== '') {
+        url += '/' + state.propLang
+      }
+      fetch(url)
         .then(res => {
           if (res.status !== 200) {
             console.log(res.statusText)
@@ -94,10 +102,10 @@ export default new Vuex.Store({
         .then(res => {
           Object.keys(res).forEach(key => {
             try {
-              if (res[key].proposal.proposal_json) {
+              if (typeof res[key].proposal.proposal_json === 'string') {
                 res[key].proposal.proposal_json = JSON.parse(util.transSpecialChar(res[key].proposal.proposal_json))
                 res[key].proposal.proposal_json.content = util.unTransSpecialChar(res[key].proposal.proposal_json.content)
-              } else {
+              } else if (res[key].proposal.proposal_json === undefined) {
                 res[key].proposal.proposal_json = {
                   type: '',
                   content: ''

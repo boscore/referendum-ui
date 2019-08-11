@@ -1,10 +1,10 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import Referendum from './views/Referendum.vue'
-import Auditor from './views/Auditor.vue'
-import CreateProposal from './views/CreateProposal.vue'
-import PollDetail from './views/PollDetail.vue'
-import RegisterAuditor from './views/RegisterAuditor.vue'
+// import Referendum from './views/Referendum.vue'
+// import Auditor from './views/Auditor.vue'
+// import CreateProposal from './views/CreateProposal.vue'
+// import PollDetail from './views/PollDetail.vue'
+// import RegisterAuditor from './views/RegisterAuditor.vue'
 
 Vue.use(Router)
 
@@ -13,7 +13,7 @@ export default new Router({
     {
       path: '/',
       name: 'Home',
-      component: Referendum
+      component: () => import('@/views/Referendum')
     },
     {
       path: '/help/process',
@@ -28,32 +28,32 @@ export default new Router({
     {
       path: '/referendum',
       name: 'referendum',
-      component: Referendum
+      component: () => import('@/views/Referendum')
     },
     {
       path: '/auditor',
       name: 'auditor',
-      component: Auditor
+      component: () => import('@/views/Auditor')
     },
     {
       path: '/auditor/register',
       name: 'register',
-      component: RegisterAuditor
+      component: () => import('@/views/RegisterAuditor')
     },
     {
       path: '/poll_detail',
       name: 'pull_detail',
-      component: PollDetail
+      component: () => import('@/views/PollDetail')
     },
     {
       path: '/create_proposal',
       name: 'create_proposal',
-      component: CreateProposal
+      component: () => import('@/views/CreateProposal')
     },
     {
       path: '/*',
       name: '',
-      component: Referendum,
+      component: () => import('@/views/Referendum'),
       redirect: '/'
     }
   ]
