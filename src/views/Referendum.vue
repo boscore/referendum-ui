@@ -146,6 +146,7 @@
             :class="{'prop-item-middle': $store.state.screenWidth < 1040 ? (index % 2) === 1 : (index % 3) === 1}"
             :key="index"
           >
+          <router-link tag="a" :to="`/poll_detail?proposal=${prop.proposal.proposal_name}`">
             <PropCard
               @click.native="turnDetail(prop)"
               :type="prop.proposal.proposal_json.type || $t('common.unknown')"
@@ -156,6 +157,7 @@
               :expired="false"
               :percent="prop.meet_conditions_days"
               ></PropCard>
+          </router-link>
           </div>
         </div>
         <el-pagination
@@ -545,13 +547,6 @@ export default {
         localStorage.setItem('proposalName', prop.proposal.proposal_name)
       }
       this.$store.dispatch('setCurrentProposal', { proposal: prop })
-      let routeUrl = this.$router.resolve({
-        path: '/poll_detail',
-        query: {
-          proposal: prop.proposal.proposal_name
-        }
-      })
-      window.open(routeUrl.href, '_blank')
     },
     forgetIdentity () {
       this.scatter.forgetIdentity()
