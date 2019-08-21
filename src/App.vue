@@ -32,6 +32,9 @@ export default {
     if (localStorage.getItem('language')) {
       this.$i18n.locale = localStorage.getItem('language')
     }
+    if (localStorage.getItem('propLang')) {
+      this.$store.commit('setPropLang', { propLang: localStorage.getItem('propLang') })
+    }
     this.$util.eosErrorAlert = this.$util.eosErrorAlert.bind(this)
     this.$util.changeLanguage = this.$util.changeLanguage.bind(this)
     this.$util.alert = this.$util.alert.bind(this)
@@ -62,35 +65,21 @@ export default {
     window.onresize = () => {
       this.$store.dispatch('setScreenWidth', { screenWidth: document.body.clientWidth })
     }
-    this.connectInterval = setInterval(() => {
-      ScatterJS.scatter.connect('BOSCore-Referendum').then(connected => {
-        if (!connected) {
-          this.connectCount++
-          if (this.connectCount >= 3) {
-            clearInterval(this.connectInterval)
-          }
-          return false
+    ScatterJS.scatter.connect('BOSCore-Referendum').then(connected => {
+      // 有scatter
+      if (!this.$store.state.isPC) {
+        const requiredFields = {
+          accounts: [ NETWORK ]
         }
-        // 有scatter
-        if (!this.$store.state.isPC) {
-          const requiredFields = {
-            accounts: [ NETWORK ]
-          }
-          ScatterJS.scatter.getIdentity(requiredFields).then(() => {
-            // console.log(this.scatter.identity)
-            this.$store.dispatch('setScatter', { scatter: ScatterJS.scatter })
-          })
-        }
-        clearInterval(this.connectInterval)
-        console.log(ScatterJS.scatter)
-        this.$store.dispatch('setScatter', { scatter: ScatterJS.scatter })
-      }).catch(e => {
-        this.connectCount++
-        if (this.connectCount >= 3) {
-          clearInterval(this.connectInterval)
-        }
-      })
-    }, 500)
+        ScatterJS.scatter.getIdentity(requiredFields).then(() => {
+          // console.log(this.scatter.identity)
+          this.$store.dispatch('setScatter', { scatter: ScatterJS.scatter })
+        })
+      }
+      this.$store.dispatch('setScatter', { scatter: ScatterJS.scatter })
+    }).catch(e => {
+      console.log(e)
+    })
   },
   beforeDestroy () {
     clearInterval(this.interval)

@@ -13,7 +13,7 @@ export default new Vuex.Store({
     accounts: null,
     votes: [],
     proposals: null,
-    propLang: '',
+    propLang: 'en',
     proxies: null,
     screenWidth: -1,
     summaries: {},
@@ -40,6 +40,7 @@ export default new Vuex.Store({
     },
     setPropLang (state, payload) {
       state.propLang = payload.propLang
+      localStorage.setItem('propLang', payload.propLang)
     },
     addVote (state, payload) {
       state.votes.push(payload.vote)

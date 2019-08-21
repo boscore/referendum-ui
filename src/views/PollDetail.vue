@@ -58,14 +58,14 @@
       <el-container>
         <el-main class="main">
           <div v-if="activeButton !=='voters'" ref="desc" class="card prop-content">
-            <!-- <el-select :value="propLang" @input="setPropLang">
+            <el-select :value="propLang" @input="setPropLang">
               <el-option
                 v-for="lang in translateOptions"
                 :key="lang.value"
                 :label="lang.label"
                 :value="lang.value"></el-option>
-            </el-select> -->
-            <div v-html="content"></div>
+            </el-select>
+            <div v-html="content" v-loading="contentLoading"></div>
           </div>
           <div v-else class="card" ref="voters">
             <h2>{{$t('proposal.voters')}}</h2>
@@ -602,6 +602,7 @@ export default {
       CDToBP: -1,
       CDToAuditor: -1,
       content: '',
+      contentLoading: false,
       myComment: '',
       producers: [],
       proposal: {
@@ -644,6 +645,15 @@ export default {
       }, {
         value: 'tw',
         label: '繁体中文'
+      }, {
+        value: 'ja',
+        label: '日本語'
+      }, {
+        value: 'ko',
+        label: '한국어'
+      }, {
+        value: 'ru',
+        label: 'русский'
       }],
       voteActionParams: {
         voter: '',
@@ -680,6 +690,7 @@ export default {
       }
     },
     getProposal () {
+      this.contentLoading = true
       let url = API_URL.API_GET_PROPOSAL + '/' + this.proposalName
       if (this.propLang !== '') {
         url += '/' + this.propLang
@@ -692,6 +703,7 @@ export default {
           return res.json()
         })
         .then(res => {
+          this.contentLoading = false
           this.propLoading = false
           this.proposal = res
           this.proposal.duration = this.calcDays(this.proposal.proposal.created_at, new Date().toString())
@@ -721,8 +733,13 @@ export default {
           }
 
           // 将提案内容MD解析并翻译
-          this.content = marked(this.proposal.proposal.proposal_json.content, { sanitize: true })
+          if (this.propLang === '') {
+            this.content = marked(this.proposal.proposal.proposal_json.content, { sanitize: true })
+          } else {
+            this.content = this.proposal.proposal.proposal_json.content
+          }
         }).catch(e => {
+          this.contentLoading = false
           this.propLoading = false
           // let error = this.$util.errorFormat(e)
           // this.$util.alert('Error', 'Get Proposal ERROR:' + error.message)
@@ -783,7 +800,6 @@ export default {
     },
     setPropLang (e) {
       this.$store.commit('setPropLang', { propLang: e })
-      this.getProposal()
     },
     sendVote () {
       if (this.voteActionParams.vote === -1) {
@@ -899,6 +915,9 @@ export default {
     },
     activeStep (newValue, oldValue) {
       this.$refs['steps'].scrollLeft += this.$refs['stepItem'].width * newValue
+    },
+    propLang () {
+      this.getProposal()
     }
   }
 }
