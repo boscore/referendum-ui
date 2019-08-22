@@ -230,6 +230,68 @@ export default {
     IEcharts,
     Comment
   },
+  data () {
+    return {
+      activeButton: 'desc',
+      actionLoading: false,
+      auditorsList: [],
+      budgetList: {
+        'historyindex': '250000.0000',
+        'eosiosg11111': '1000000.0000',
+        'bosnationwps': '515000.0000',
+        'constantstab': '350000.0000',
+        'hyperion.api': '995600.0000',
+        'chintaionbos': '1000000.0000',
+        'omegaautodex': '450000.0000',
+        'btconbos': '400000.0000',
+        'universal': '800000.0000'
+      },
+      CDToBP: -1,
+      CDToAuditor: -1,
+      content: '',
+      contentLoading: false,
+      myComment: '',
+      producers: [],
+      proposal: {
+        approved_by_BET: false,
+        approved_by_BPs: false,
+        approved_by_BPs_date: 'None',
+        approved_by_vote: false,
+        approved_by_vote_date: 'None',
+        id: '',
+        meet_conditions_days: 0,
+        proposal: {
+          // expires_at: '',
+          created_at: '',
+          title: '',
+          proposer: '',
+          proposal_name: '',
+          proposal_json: {
+            type: '',
+            content: ''
+          }
+        },
+        reviewed_by_BET_date: 'None',
+        stats: {
+          votes: {},
+          accounts: {},
+          staked: {
+            total: 0
+          }
+        }
+      },
+      propLoading: true,
+      showVotersNum: 30,
+      screenWidth: document.body.clientWidth,
+      voteActionParams: {
+        voter: '',
+        proposal_name: '',
+        vote: -1,
+        vote_json: ''
+      },
+      writeComment: false
+    }
+  },
   computed: {
     account () {
       if (this.scatter && this.scatter.identity) {
@@ -440,6 +502,31 @@ export default {
     proposalName () {
       return this.$route.query.proposal || localStorage.getItem('proposalName')
     },
+    translateOptions () {
+      return [
+        {
+          value: '',
+          label: this.$t('common.original')
+        }, {
+          value: 'en',
+          label: 'English'
+        }, {
+          value: 'cn',
+          label: '简体中文'
+        }, {
+          value: 'tw',
+          label: '繁体中文'
+        }, {
+          value: 'ja',
+          label: '日本語'
+        }, {
+          value: 'ko',
+          label: '한국어'
+        }, {
+          value: 'ru',
+          label: 'русский'
+        }]
+    },
     relatedPolls () {
       let related = []
       const proposals = this.$store.state.proposals
@@ -583,87 +670,7 @@ export default {
       return -1
     }
   },
-  data () {
-    return {
-      activeButton: 'desc',
-      actionLoading: false,
-      auditorsList: [],
-      budgetList: {
-        'historyindex': '250000.0000',
-        'eosiosg11111': '1000000.0000',
-        'bosnationwps': '515000.0000',
-        'constantstab': '350000.0000',
-        'hyperion.api': '995600.0000',
-        'chintaionbos': '1000000.0000',
-        'omegaautodex': '450000.0000',
-        'btconbos': '400000.0000',
-        'universal': '800000.0000'
-      },
-      CDToBP: -1,
-      CDToAuditor: -1,
-      content: '',
-      contentLoading: false,
-      myComment: '',
-      producers: [],
-      proposal: {
-        approved_by_BET: false,
-        approved_by_BPs: false,
-        approved_by_BPs_date: 'None',
-        approved_by_vote: false,
-        approved_by_vote_date: 'None',
-        id: '',
-        meet_conditions_days: 0,
-        proposal: {
-          // expires_at: '',
-          created_at: '',
-          title: '',
-          proposer: '',
-          proposal_name: '',
-          proposal_json: {
-            type: '',
-            content: ''
-          }
-        },
-        reviewed_by_BET_date: 'None',
-        stats: {
-          votes: {},
-          accounts: {},
-          staked: {
-            total: 0
-          }
-        }
-      },
-      propLoading: true,
-      showVotersNum: 30,
-      screenWidth: document.body.clientWidth,
-      translateOptions: [{
-        value: 'en',
-        label: 'English'
-      }, {
-        value: 'cn',
-        label: '简体中文'
-      }, {
-        value: 'tw',
-        label: '繁体中文'
-      }, {
-        value: 'ja',
-        label: '日本語'
-      }, {
-        value: 'ko',
-        label: '한국어'
-      }, {
-        value: 'ru',
-        label: 'русский'
-      }],
-      voteActionParams: {
-        voter: '',
-        proposal_name: '',
-        vote: -1,
-        vote_json: ''
-      },
-      writeComment: false
-    }
-  },
+
   created () {
     this.getProposal()
   },
@@ -991,14 +998,14 @@ export default {
     color: #8A8A8A;
     letter-spacing: 0;
 .main
-  font-family: Roboto-Regular;
-  font-size: 18px;
+  font-family: PingFangSC-Regular;
+  font-size: 15px;
   color: #8A8A8A;
   letter-spacing: 0;
   padding-left 0
   padding-top 0
   h1, h2, h3, h4, h5
-    font-family: Roboto-Medium;
+    font-family: PingFangSC-Medium;
     color: #507DFE;
 .aside-right
   padding 0 12px
@@ -1024,13 +1031,18 @@ export default {
     font-size: 14px;
     color #507DFE
   >>> p
-    font-family: Roboto-Regular;
-    font-size: 14px;
     letter-spacing: 0;
   >>> a
     color #0366d6
   >>> img
     max-width 100%
+  >>> code
+    display block
+    padding 18px 15px
+    background #f8f8f8
+    overflow-x auto
+    white-space pre-wrap
+    word-wrap break-word
 #back-button
   float left
   cursor pointer
