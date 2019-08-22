@@ -194,28 +194,6 @@ export default {
       extendPropName: '',
       extendVisible: false,
       filterBy: ['unpassed'],
-      propLangOptions: [
-        {
-          value: 'cn',
-          label: '中文'
-        },
-        {
-          value: 'en',
-          label: 'English'
-        }, {
-          value: 'tw',
-          label: '繁体中文'
-        }, {
-          value: 'ja',
-          label: '日本語'
-        }, {
-          value: 'ko',
-          label: '한국어'
-        }, {
-          value: 'ru',
-          label: 'русский'
-        }
-      ],
       sortBy: 'MostVoted',
       searchText: '',
       searchBy: ''
@@ -266,6 +244,32 @@ export default {
         {
           value: 'unpassed',
           label: this.$t('common.unpassed')
+        }
+      ]
+    },
+    propLangOptions () {
+      return [
+        {
+          value: '',
+          label: this.$t('common.original')
+        }, {
+          value: 'en',
+          label: 'English'
+        }, {
+          value: 'cn',
+          label: '简体中文'
+        }, {
+          value: 'tw',
+          label: '繁体中文'
+        }, {
+          value: 'ja',
+          label: '日本語'
+        }, {
+          value: 'ko',
+          label: '한국어'
+        }, {
+          value: 'ru',
+          label: 'русский'
         }
       ]
     },
