@@ -107,14 +107,14 @@
               class="search-input">
               <i @click="searchBy = searchText" slot="suffix" class="el-input__icon el-icon-search"></i>
             </el-input>
-            <el-select class="select-button" v-model="filterBy" multiple collapse-tags placeholder="Filter">
-              <el-option
-                v-for="item in filterOptions"
-                :key="item.value"
-                :label="item.label"
-                :value="item.value">
-              </el-option>
-            </el-select>
+            <el-select class="select-button" :value="propLang" @input="setPropLang">
+                <el-option
+                  v-for="item in propLangOptions"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value"
+                ></el-option>
+              </el-select>
           </div>
         </div>
         <div class="clear-float">
@@ -128,14 +128,15 @@
                   :value="item.value"
                 ></el-option>
               </el-select>
-              <!-- <el-select class="select-button" :value="propLang" @input="setPropLang">
-                <el-option
-                  v-for="item in propLangOptions"
-                  :key="item.value"
-                  :label="item.label"
-                  :value="item.value"
-                ></el-option>
-              </el-select> -->
+              <el-select class="select-button" v-model="filterBy" multiple collapse-tags placeholder="Filter">
+              <el-option
+                v-for="item in filterOptions"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value">
+              </el-option>
+            </el-select>
+
             </div>
           </div>
         <p v-if="propList.length === 0">{{$t('warning.noResult')}}</p>
@@ -201,6 +202,18 @@ export default {
         {
           value: 'en',
           label: 'English'
+        }, {
+          value: 'tw',
+          label: '繁体中文'
+        }, {
+          value: 'ja',
+          label: '日本語'
+        }, {
+          value: 'ko',
+          label: '한국어'
+        }, {
+          value: 'ru',
+          label: 'русский'
         }
       ],
       sortBy: 'MostVoted',
@@ -505,7 +518,6 @@ export default {
     },
     setPropLang (e) {
       this.$store.commit('setPropLang', { propLang: e })
-      this.$store.dispatch('getProposals')
     },
     openPicker (proposal) {
       this.extendPropName = proposal
@@ -570,6 +582,9 @@ export default {
   },
   watch: {
     $route () {
+      this.$store.dispatch('getProposals')
+    },
+    propLang () {
       this.$store.dispatch('getProposals')
     }
   }
@@ -661,6 +676,7 @@ export default {
     width 100%
     margin-bottom 10px
   .select-button
+    width 50%
     margin 0 0 5px 0
 @media only screen and (max-width 450px)
   .prop-list

@@ -128,7 +128,7 @@ export default {
       }
     },
     propDesc () {
-      return this.desc.replace(/#/g, '')
+      return this.desc.replace(/<[^>]*>/g, '')
     },
     satisfiedWord () {
       let word = ''
