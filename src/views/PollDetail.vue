@@ -736,12 +736,12 @@ export default {
               content: ' '
             }
             let error = this.$util.errorFormat(e)
-            this.$util.alert('Error', 'proposal_json ERROR:' + error.message)
+            console.log('proposal_json ERROR:' + error.message)
           }
 
           // 将提案内容MD解析并翻译
           if (this.propLang === '') {
-            this.content = marked(this.proposal.proposal.proposal_json.content, { sanitize: true })
+            this.content = marked(this.proposal.proposal.proposal_json.content)
           } else {
             this.content = this.proposal.proposal.proposal_json.content
           }
@@ -1043,6 +1043,11 @@ export default {
     overflow-x auto
     white-space pre-wrap
     word-wrap break-word
+  >>> table
+    border-collapse collapse
+    th, td
+      padding 12px 10px
+      border 1px solid #D7DBDD
 #back-button
   float left
   cursor pointer

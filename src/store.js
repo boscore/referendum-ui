@@ -13,7 +13,7 @@ export default new Vuex.Store({
     accounts: null,
     votes: [],
     proposals: null,
-    propLang: 'en',
+    propLang: '',
     proxies: null,
     screenWidth: -1,
     summaries: {},
