@@ -67,7 +67,7 @@ export default {
   methods: {
     changeLang (lang) {
       this.$util.changeLanguage.call(this, lang)
-      this.$store.commit('setPropLang', { propLang: lang })
+      // this.$store.commit('setPropLang', { propLang: lang })
     },
     getIdentity () { // scatter认证
       if (this.scatter) {
