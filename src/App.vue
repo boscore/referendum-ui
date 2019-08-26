@@ -115,12 +115,12 @@ export default {
 
         socket.send('42/scatter,' + JSON.stringify(['pair', msg]))
       }
-      socket.onmessage(msg => {
-        console.log(msg)
-        if (msg.data.indexOf('42/scatter') !== -1) {
-          socket.send('42/scatter,' + JSON.stringify(['pair', msg]))
-        }
-      })
+      // socket.onmessage(msg => {
+      //   console.log(msg)
+      //   if (msg.data.indexOf('42/scatter') !== -1) {
+      //     socket.send('42/scatter,' + JSON.stringify(['pair', msg]))
+      //   }
+      // })
     }
   }
 }
