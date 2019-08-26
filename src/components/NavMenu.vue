@@ -25,16 +25,19 @@
       </el-submenu>
       <el-submenu index="logout" v-if="account">
         <template slot="title">{{account}}</template>
-        <el-menu-item index="logout-1" @click="forgetIdentity" style="text-align:center">{{$t('common.removeId')}}</el-menu-item>
+        <el-menu-item index="logout-1" @click.native="forgetIdentity" style="text-align:center">{{$t('common.removeId')}}</el-menu-item>
       </el-submenu>
-      <el-menu-item index="login"  v-else @click="getIdentity">{{$t('common.login')}}</el-menu-item>
+      <el-menu-item index="login"  v-else @click.native="getIdentity">{{$t('common.login')}}</el-menu-item>
     </el-menu>
     </div>
   </div>
 </template>
 
 <script>
+import ScatterJS from '@scatterjs/core'
+import ScatterEOS from '@scatterjs/eosjs'
 import { NETWORK } from '@/assets/constants.js'
+ScatterJS.plugins(new ScatterEOS())
 export default {
   name: 'NavMenu',
   data () {
@@ -74,20 +77,42 @@ export default {
         const requiredFields = {
           accounts: [ NETWORK ]
         }
-        this.scatter.getIdentity(requiredFields).then(() => {
+        this.scatter.login(requiredFields).then(() => {
           // console.log(this.scatter.identity)
+          localStorage.setItem('logined', true)
           this.$store.commit('setScatter', { scatter: this.scatter })
         })
       } else {
-        this.$util.alert('', this.$t('warning.needScatter'), this.$t('common.OK'), this.$t('warning.getScatter'), (action) => {
-          if (action === 'cancel') {
-            window.open('https://get-scatter.com/', '_blank')
+        ScatterJS.scatter.connect('BOSCore-Referendum', { NETWORK }).then(connected => {
+          // 有scatter
+          if (connected) {
+            const requiredFields = {
+              accounts: [ NETWORK ]
+            }
+            this.$store.dispatch('setScatter', { scatter: ScatterJS.scatter })
+            ScatterJS.scatter.login(requiredFields).then(() => {
+            // console.log(this.scatter.identity)
+              this.$store.dispatch('setScatter', { scatter: ScatterJS.scatter })
+              localStorage.setItem('logined', true)
+            }).catch(e => {
+              console.log('scatter login error:', e)
+            })
+          } else {
+            console.error('scatter connect failed')
           }
+        }).catch(e => {
+          console.log(e, 'scatter connect error')
+          this.$util.alert('', this.$t('warning.needScatter'), this.$t('common.OK'), this.$t('warning.getScatter'), (action) => {
+            if (action === 'cancel') {
+              window.open('https://get-scatter.com/', '_blank')
+            }
+          })
         })
       }
     },
     forgetIdentity () {
       this.scatter.forgetIdentity()
+      localStorage.removeItem('logined')
     }
   }
 }

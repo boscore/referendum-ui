@@ -259,6 +259,7 @@ p
   hr
     opacity 0.22
     background #004496
+    border-bottom 0
   .desc
     height 83px
     width 100%

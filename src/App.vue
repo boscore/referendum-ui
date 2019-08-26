@@ -11,8 +11,8 @@
 <script>
 import Footer from '@/components/Footer.vue'
 import NavMenu from '@/components/NavMenu.vue'
-import ScatterJS from 'scatterjs-core'
-import ScatterEOS from 'scatterjs-plugin-eosjs'
+import ScatterJS from '@scatterjs/core'
+import ScatterEOS from '@scatterjs/eosjs'
 import { NETWORK } from '@/assets/constants.js'
 ScatterJS.plugins(new ScatterEOS())
 export default {
@@ -65,21 +65,26 @@ export default {
     window.onresize = () => {
       this.$store.dispatch('setScreenWidth', { screenWidth: document.body.clientWidth })
     }
-    ScatterJS.scatter.connect('BOSCore-Referendum').then(connected => {
+    let logined = localStorage.getItem('logined')
+    if (!this.$store.state.isPC || logined) {
+      ScatterJS.scatter.connect('BOSCore-Referendum', { NETWORK }).then(connected => {
       // 有scatter
-      if (!this.$store.state.isPC) {
-        const requiredFields = {
-          accounts: [ NETWORK ]
-        }
-        ScatterJS.scatter.getIdentity(requiredFields).then(() => {
-          // console.log(this.scatter.identity)
+        if (connected) {
           this.$store.dispatch('setScatter', { scatter: ScatterJS.scatter })
-        })
-      }
-      this.$store.dispatch('setScatter', { scatter: ScatterJS.scatter })
-    }).catch(e => {
-      console.log(e)
-    })
+          ScatterJS.scatter.getIdentity().then(() => {
+            // console.log(this.scatter.identity)
+            this.$store.dispatch('setScatter', { scatter: ScatterJS.scatter })
+            localStorage.setItem('logined', true)
+          }).catch(e => {
+            console.log('scatter login error:', e)
+          })
+        } else {
+          console.error('scatter connect failed')
+        }
+      }).catch(e => {
+        console.log(e, 'scatter connect error')
+      })
+    }
   },
   beforeDestroy () {
     clearInterval(this.interval)
