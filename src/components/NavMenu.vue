@@ -25,9 +25,9 @@
       </el-submenu>
       <el-submenu index="logout" v-if="account">
         <template slot="title">{{account}}</template>
-        <el-menu-item index="logout-1" @click="forgetIdentity" style="text-align:center">{{$t('common.removeId')}}</el-menu-item>
+        <el-menu-item index="logout-1" @click.native="forgetIdentity" style="text-align:center">{{$t('common.removeId')}}</el-menu-item>
       </el-submenu>
-      <el-menu-item index="login"  v-else @click="getIdentity">{{$t('common.login')}}</el-menu-item>
+      <el-menu-item index="login"  v-else @click.native="getIdentity">{{$t('common.login')}}</el-menu-item>
     </el-menu>
     </div>
   </div>

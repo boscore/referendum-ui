@@ -67,18 +67,22 @@ export default {
     }
     ScatterJS.scatter.connect('BOSCore-Referendum').then(connected => {
       // 有scatter
-      if (!this.$store.state.isPC) {
-        const requiredFields = {
-          accounts: [ NETWORK ]
+      if (connected) {
+        if (!this.$store.state.isPC) {
+          const requiredFields = {
+            accounts: [ NETWORK ]
+          }
+          ScatterJS.scatter.getIdentity(requiredFields).then(() => {
+            // console.log(this.scatter.identity)
+            this.$store.dispatch('setScatter', { scatter: ScatterJS.scatter })
+          })
         }
-        ScatterJS.scatter.getIdentity(requiredFields).then(() => {
-          // console.log(this.scatter.identity)
-          this.$store.dispatch('setScatter', { scatter: ScatterJS.scatter })
-        })
+        this.$store.dispatch('setScatter', { scatter: ScatterJS.scatter })
+      } else {
+        console.error('scatter connect failed')
       }
-      this.$store.dispatch('setScatter', { scatter: ScatterJS.scatter })
     }).catch(e => {
-      console.log(e)
+      console.log(e, 'scatter connect error')
     })
   },
   beforeDestroy () {
