@@ -14,6 +14,11 @@ import NavMenu from '@/components/NavMenu.vue'
 import ScatterJS from '@scatterjs/core'
 import ScatterEOS from '@scatterjs/eosjs'
 import { NETWORK } from '@/assets/constants.js'
+import getRandomValues from 'get-random-values'
+// import createHash from 'create-hash'
+
+// const sha256 = data => createHash('sha256').update(data).digest('hex')
+
 ScatterJS.plugins(new ScatterEOS())
 export default {
   name: 'app',
@@ -65,7 +70,8 @@ export default {
     window.onresize = () => {
       this.$store.dispatch('setScreenWidth', { screenWidth: document.body.clientWidth })
     }
-    let logined = localStorage.getItem('logined')
+    this.connectScatter()
+    let logined = this.$util.getCookie('logined')
     if (!this.$store.state.isPC || logined) {
       ScatterJS.scatter.connect('BOSCore-Referendum', { NETWORK }).then(connected => {
       // 有scatter
@@ -74,7 +80,7 @@ export default {
           ScatterJS.scatter.getIdentity().then(() => {
             // console.log(this.scatter.identity)
             this.$store.dispatch('setScatter', { scatter: ScatterJS.scatter })
-            localStorage.setItem('logined', true)
+            this.$util.setCookie('logined', true, 30 * 60 * 1000)
           }).catch(e => {
             console.log('scatter login error:', e)
           })
@@ -90,6 +96,32 @@ export default {
     clearInterval(this.interval)
   },
   methods: {
+    connectScatter () {
+      let host = '127.0.0.1:50005'
+      const socket = new WebSocket(`ws://${host}/socket.io/?EIO=3&transport=websocket`)
+      let a = new Uint8Array(24)
+      getRandomValues(a)
+      let appkey = 'appkey:' + a.join('')
+      let msg = {
+        plugin: 'BOSCore-Referendum',
+        data: {
+          appkey,
+          origin: 'BOSCore-Referendum',
+          passthrough: true
+        }
+      }
+      socket.onopen = () => {
+        socket.send('40/scatter')
+
+        socket.send('42/scatter,' + JSON.stringify(['pair', msg]))
+      }
+      socket.onmessage(msg => {
+        console.log(msg)
+        if (msg.data.indexOf('42/scatter') !== -1) {
+          socket.send('42/scatter,' + JSON.stringify(['pair', msg]))
+        }
+      })
+    }
   }
 }
 </script>
