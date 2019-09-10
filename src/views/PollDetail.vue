@@ -50,8 +50,7 @@
         <div ref="steps" class="steps-bar">
           <el-steps  style="background: #fff;min-width:500px;margin-bottom: 0"  class="card" :active="activeStep" simple finish-status="success" process-status="finish">
             <el-step ref="stepItem" :title="$t('proposal.vote')"></el-step>
-            <el-step :title="$t('proposal.develop')"></el-step>
-            <el-step :title="$t('proposal.review')"></el-step>
+            <el-step :title="$t('proposal.develop') + '&' + $t('proposal.review')"></el-step>
             <el-step :title="$t('proposal.finish')"></el-step>
           </el-steps>
         </div>
