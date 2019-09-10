@@ -566,6 +566,7 @@ export default {
     },
     forgetIdentity () {
       this.scatter.forgetIdentity()
+      this.$util.setCookie('logined', false)
     },
     tabClick (tab) {
       switch (tab.name) {

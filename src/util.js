@@ -19,7 +19,9 @@ export default {
   isExpired,
   isPC,
   transSpecialChar,
-  unTransSpecialChar
+  unTransSpecialChar,
+  setCookie,
+  getCookie
 }
 
 function alert (title, msg, confirm, cancel, callback) {
@@ -151,4 +153,14 @@ function isPC () {
     }
   }
   return flag
+}
+
+function setCookie (key, value, expires = 0) {
+  let exp = new Date((Date.now() + expires))
+  let s = `${key}=${value};expires=${exp.toUTCString()}`
+  document.cookie = s
+}
+
+function getCookie (key) {
+  return document.cookie.replace(new RegExp('(?:(?:^|.*;)\\s*' + encodeURIComponent(key).replace(/[-.+*]/g, '\\$&') + '\\s*\\=\\s*([^;]*).*$)|^.*$'), '$1') || null
 }

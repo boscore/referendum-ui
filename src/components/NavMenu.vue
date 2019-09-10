@@ -79,7 +79,7 @@ export default {
         }
         this.scatter.login(requiredFields).then(() => {
           // console.log(this.scatter.identity)
-          localStorage.setItem('logined', true)
+          this.$util.setCookie('logined', true, 30 * 60 * 1000)
           this.$store.commit('setScatter', { scatter: this.scatter })
         })
       } else {
@@ -93,7 +93,7 @@ export default {
             ScatterJS.scatter.login(requiredFields).then(() => {
             // console.log(this.scatter.identity)
               this.$store.dispatch('setScatter', { scatter: ScatterJS.scatter })
-              localStorage.setItem('logined', true)
+              this.$util.setCookie('logined', true, 30 * 60 * 1000)
             }).catch(e => {
               console.log('scatter login error:', e)
             })
@@ -112,7 +112,7 @@ export default {
     },
     forgetIdentity () {
       this.scatter.forgetIdentity()
-      localStorage.removeItem('logined')
+      this.$util.setCookie('logined', false)
     }
   }
 }
