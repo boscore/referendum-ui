@@ -99,6 +99,11 @@ export default {
             })
           } else {
             console.error('scatter connect failed')
+            this.$util.alert('', this.$t('warning.needScatter'), this.$t('common.OK'), this.$t('warning.getScatter'), (action) => {
+              if (action === 'cancel') {
+                window.open('https://get-scatter.com/', '_blank')
+              }
+            })
           }
         }).catch(e => {
           console.log(e, 'scatter connect error')
