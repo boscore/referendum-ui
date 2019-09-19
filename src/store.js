@@ -106,6 +106,36 @@ export default new Vuex.Store({
               if (typeof res[key].proposal.proposal_json === 'string') {
                 res[key].proposal.proposal_json = JSON.parse(util.transSpecialChar(res[key].proposal.proposal_json))
                 res[key].proposal.proposal_json.content = util.unTransSpecialChar(res[key].proposal.proposal_json.content)
+                let budgetList = {
+                  'historyindex': '250000.0000',
+                  'eosiosg11111': '1000000.0000',
+                  'bosnationwps': '515000.0000',
+                  'constantstab': '350000.0000',
+                  'hyperion.api': '995600.0000',
+                  'chintaionbos': '1000000.0000',
+                  'omegaautodex': '450000.0000',
+                  'btconbos': '400000.0000',
+                  'universal': '800000.0000'
+                }
+                if (res[key].proposal.proposal_json.incentives !== undefined) {
+                  let incentives = Number(res[key].proposal.proposal_json.incentives.split(' ')[0])
+                  let integer = Number(incentives.toFixed(0))
+                  let decimals = String(incentives * 10000 % 10000)
+                  while (decimals.length < 4) {
+                    decimals = '0' + decimals
+                  }
+                  res[key].proposal.proposal_json.budget = util.toThousands(integer) + '.' + decimals + ' BOS'
+                } else {
+                  if (budgetList[res[key].proposal.proposal_name] !== undefined) {
+                    let incentives = Number(budgetList[res[key].proposal.proposal_name])
+                    let integer = Number(incentives.toFixed(0))
+                    let decimals = String(incentives * 10000 % 10000)
+                    while (decimals.length < 4) {
+                      decimals = '0' + decimals
+                    }
+                    res[key].proposal.proposal_json.budget = util.toThousands(integer) + '.' + decimals + ' BOS'
+                  }
+                }
               } else if (res[key].proposal.proposal_json === undefined) {
                 res[key].proposal.proposal_json = {
                   type: '',

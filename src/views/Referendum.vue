@@ -152,6 +152,7 @@
               @click.native="turnDetail(prop)"
               :type="prop.proposal.proposal_json.type || $t('common.unknown')"
               :title="prop.proposal.title"
+              :budget="prop.proposal.proposal_json.budget"
               :desc="prop.proposal.proposal_json.content || ''"
               :votes="prop.stats.staked"
               :staked="prop.stats.staked.total"
