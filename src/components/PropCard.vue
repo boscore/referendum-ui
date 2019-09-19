@@ -10,6 +10,9 @@
         </div>
       </div>
       <p>{{title}}</p>
+      <div class="card-top-info">
+        <div>{{$t('proposal.budget')}}: {{budget}}</div>
+      </div>
     </div>
     <div class="card-bottom">
       <p class="desc">{{propDesc}}</p>
@@ -40,6 +43,10 @@ export default {
     title: {
       type: String,
       default: 'Title'
+    },
+    budget: {
+      type: String,
+      default: '0 BOS'
     },
     desc: {
       type: String,
@@ -190,7 +197,8 @@ p
   border-radius 12.25px 12.25px 0px 0px
   p
     width 90%
-    height 60px
+    height 40px
+    line-height 20px
     margin 9px 5%
     font-family Roboto-Medium
     font-size 17px
@@ -204,6 +212,14 @@ p
     display -webkit-box !important
     -webkit-box-orient vertical
     -webkit-line-clamp: 3
+  .card-top-info
+    padding 0 5%
+    width 100%
+    height 22px
+    text-align left
+    font-family Roboto-Medium
+    font-size 14px
+    color #FFFFFF
   .card-top-bar
     width 100%
     height 22px
@@ -261,7 +277,8 @@ p
     background #004496
     border-bottom 0
   .desc
-    height 83px
+    height 80px
+    line-height 16px
     width 100%
     font-family Roboto-Regular
     font-size 14px
